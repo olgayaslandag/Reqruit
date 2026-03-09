@@ -5,11 +5,21 @@ namespace App\Repositories;
 use App\Interfaces\FormInterface;
 use App\Models\Form;
 use App\Models\FormField;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
-class FormRepository implements FormInterface
+class FormRepository extends BaseRepository implements FormInterface
 {
-    public function getAll(array $filters = [])
+    public function __construct(Form $model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * Get all forms.
+     */
+    public function getAll(array $filters = []): Collection
     {
         $query = Form::with('department', 'fields');
 
@@ -20,17 +30,42 @@ class FormRepository implements FormInterface
         return $query->orderBy('name')->get();
     }
 
-    public function getById(int $id)
+    /**
+     * Get paginated forms.
+     */
+    public function getPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = Form::with('department', 'fields');
+
+        if (isset($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
+        }
+
+        return $query->orderBy('name')->paginate($perPage);
+    }
+
+    /**
+     * Get form by ID.
+     */
+    public function getById(int $id): Form
     {
         return Form::with('department', 'fields')->findOrFail($id);
     }
 
-    public function getBySlug(string $slug)
+    /**
+     * Get form by slug.
+     */
+    public function getBySlug(string $slug): Form
     {
-        return Form::with('department', 'fields')->where('slug', $slug)->firstOrFail();
+        return Form::with('department', 'fields')
+            ->where('slug', $slug)
+            ->firstOrFail();
     }
 
-    public function create(array $data)
+    /**
+     * Create a new form with fields.
+     */
+    public function create(array $data): Form
     {
         $data['slug'] = $data['slug'] ?? Str::slug($data['name']);
 
@@ -49,23 +84,16 @@ class FormRepository implements FormInterface
         $form = Form::create($data);
 
         if (isset($data['fields'])) {
-            foreach ($data['fields'] as $index => $field) {
-                FormField::create([
-                    'form_id' => $form->id,
-                    'label' => $field['label'],
-                    'name' => $field['name'],
-                    'type' => $field['type'],
-                    'required' => $field['required'] ?? false,
-                    'options' => $field['options'] ?? null,
-                    'sort_order' => $index,
-                ]);
-            }
+            $this->createFields($form, $data['fields']);
         }
 
         return $form->fresh(['fields', 'department']);
     }
 
-    public function update(int $id, array $data)
+    /**
+     * Update a form with fields.
+     */
+    public function update(int $id, array $data): Form
     {
         $form = Form::findOrFail($id);
 
@@ -88,38 +116,44 @@ class FormRepository implements FormInterface
         if (isset($data['fields'])) {
             // Delete old fields
             $form->fields()->delete();
-
             // Create new fields
-            foreach ($data['fields'] as $index => $field) {
-                FormField::create([
-                    'form_id' => $form->id,
-                    'label' => $field['label'],
-                    'name' => $field['name'],
-                    'type' => $field['type'],
-                    'required' => $field['required'] ?? false,
-                    'options' => $field['options'] ?? null,
-                    'sort_order' => $index,
-                ]);
-            }
+            $this->createFields($form, $data['fields']);
         }
 
         return $form->fresh(['fields', 'department']);
     }
 
-    public function delete(int $id)
-    {
-        $form = Form::findOrFail($id);
-
-        return $form->delete();
-    }
-
-    public function getWithFields(int $id)
+    /**
+     * Get form with fields by ID.
+     */
+    public function getWithFields(int $id): Form
     {
         return Form::with('fields')->findOrFail($id);
     }
 
-    public function getWithFieldsBySlug(string $slug)
+    /**
+     * Get form with fields by slug.
+     */
+    public function getWithFieldsBySlug(string $slug): Form
     {
         return Form::with('fields')->where('slug', $slug)->firstOrFail();
+    }
+
+    /**
+     * Create form fields.
+     */
+    private function createFields(Form $form, array $fields): void
+    {
+        foreach ($fields as $index => $field) {
+            FormField::create([
+                'form_id' => $form->id,
+                'label' => $field['label'],
+                'name' => $field['name'],
+                'type' => $field['type'],
+                'required' => $field['required'] ?? false,
+                'options' => $field['options'] ?? null,
+                'sort_order' => $index,
+            ]);
+        }
     }
 }

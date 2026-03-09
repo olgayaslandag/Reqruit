@@ -2,32 +2,38 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('users')->updateOrInsert(
+        // Create roles and permissions first
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+        ]);
+
+        // Create or update admin user
+        $user = User::updateOrCreate(
+            ['email' => 'olgayaslandag@gmail.com'],
             [
                 'name' => 'Olgay Aslandağ',
-                'email' => 'olgayaslandag@gmail.com',
                 'password' => Hash::make('123123123'),
                 'email_verified_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
             ]
         );
 
+        // Assign super_admin role to the user
+        $user->assignRole('super_admin');
+
+        // Seed other data
         $this->call([
             DepartmentSeeder::class,
             FormSeeder::class,
             FormFieldSeeder::class,
             SubmissionSeeder::class,
-            SubmissionDetailSeeder::class,
-            SubmissionCommentSeeder::class,
         ]);
     }
 }

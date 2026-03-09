@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reqruit Widget Test</title>
+</head>
+<body style="margin: 0; padding: 20px; background: #f3f4f6;">
+    <div style="max-width: 800px; margin: 0 auto;">
+        <h1 style="font-family: system-ui, sans-serif; color: #111827;">Reqruit Widget Test</h1>
+        <p style="font-family: system-ui, sans-serif; color: #6b7280;">Widget'ı test etmek için aşağıdaki container kullanılır.</p>
+        
+        <!-- Widget Container -->
+        <div id="reqruit-widget"></div>
+    </div>
+
+    <!-- Widget Script -->
+    <script src="/widget/reqruit.js"></script>
+    <script>
+        // Widget'ı başlat
+        ReqruitWidget.init({
+            container: '#reqruit-widget',
+            baseUrl: window.location.origin,
+            theme: {
+                primaryColor: '#4f46e5',
+                borderRadius: '8px'
+            }
+        });
+    </script>
+</body>
+</html>

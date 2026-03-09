@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreDepartmentRequest;
+use App\Models\Department;
 use App\Services\DepartmentService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DepartmentController extends Controller
 {
     public function __construct(
         protected DepartmentService $departmentService
-    ) {}
+    ) {
+        $this->authorizeResource(Department::class, 'department');
+    }
 
     public function index()
     {
@@ -21,39 +24,25 @@ class DepartmentController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreDepartmentRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'emails' => 'nullable|array',
-            'emails.*' => 'email',
-            'parent_id' => 'nullable|exists:departments,id',
-        ]);
-
-        $this->departmentService->create($validated);
+        $this->departmentService->create($request->validated());
 
         return redirect()->route('admin.departments.index')
             ->with('success', 'Departman başarıyla oluşturuldu.');
     }
 
-    public function update(Request $request, int $id)
+    public function update(StoreDepartmentRequest $request, Department $department)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'emails' => 'nullable|array',
-            'emails.*' => 'email',
-            'parent_id' => 'nullable|exists:departments,id',
-        ]);
-
-        $this->departmentService->update($id, $validated);
+        $this->departmentService->update($department->id, $request->validated());
 
         return redirect()->route('admin.departments.index')
             ->with('success', 'Departman başarıyla güncellendi.');
     }
 
-    public function destroy(int $id)
+    public function destroy(Department $department)
     {
-        $this->departmentService->delete($id);
+        $this->departmentService->delete($department->id);
 
         return redirect()->route('admin.departments.index')
             ->with('success', 'Departman başarıyla silindi.');

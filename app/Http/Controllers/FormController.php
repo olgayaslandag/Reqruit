@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreFormRequest;
+use App\Http\Requests\UpdateFormRequest;
+use App\Models\Form;
 use App\Services\DepartmentService;
 use App\Services\FormService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FormController extends Controller
@@ -12,7 +14,9 @@ class FormController extends Controller
     public function __construct(
         protected FormService $formService,
         protected DepartmentService $departmentService
-    ) {}
+    ) {
+        $this->authorizeResource(Form::class, 'form');
+    }
 
     public function index()
     {
@@ -35,30 +39,19 @@ class FormController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreFormRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'department_id' => 'required|exists:departments,id',
-            'description' => 'nullable|string',
-            'notification_emails' => 'nullable|array',
-            'notification_emails.*' => 'nullable|email',
-            'fields' => 'nullable|array',
-            'fields.*.label' => 'required|string|max:255',
-            'fields.*.type' => 'required|string|max:50',
-            'fields.*.required' => 'nullable|boolean',
-            'fields.*.options' => 'nullable|array',
-        ]);
-
-        $this->formService->create($validated);
+        $this->formService->create($request->validated());
 
         return redirect()->route('admin.forms.index')
             ->with('success', 'Form başarıyla oluşturuldu.');
     }
 
-    public function edit(int $id)
+    public function edit(Form $form)
     {
-        $form = $this->formService->getById($id);
+        $this->authorize('update', $form);
+
+        $form->load('fields');
         $departments = $this->departmentService->getAll();
 
         return Inertia::render('Admin/Forms/Builder', [
@@ -67,30 +60,17 @@ class FormController extends Controller
         ]);
     }
 
-    public function update(Request $request, int $id)
+    public function update(UpdateFormRequest $request, Form $form)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'department_id' => 'required|exists:departments,id',
-            'description' => 'nullable|string',
-            'notification_emails' => 'nullable|array',
-            'notification_emails.*' => 'nullable|email',
-            'fields' => 'nullable|array',
-            'fields.*.label' => 'required|string|max:255',
-            'fields.*.type' => 'required|string|max:50',
-            'fields.*.required' => 'nullable|boolean',
-            'fields.*.options' => 'nullable|array',
-        ]);
-
-        $this->formService->update($id, $validated);
+        $this->formService->update($form->id, $request->validated());
 
         return redirect()->route('admin.forms.index')
             ->with('success', 'Form başarıyla güncellendi.');
     }
 
-    public function destroy(int $id)
+    public function destroy(Form $form)
     {
-        $this->formService->delete($id);
+        $this->formService->delete($form->id);
 
         return redirect()->route('admin.forms.index')
             ->with('success', 'Form başarıyla silindi.');

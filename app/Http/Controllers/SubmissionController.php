@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddSubmissionCommentRequest;
+use App\Http\Requests\UpdateSubmissionStatusRequest;
+use App\Models\Submission;
 use App\Services\DepartmentService;
 use App\Services\FormService;
 use App\Services\SubmissionService;
@@ -14,7 +17,9 @@ class SubmissionController extends Controller
         protected SubmissionService $submissionService,
         protected FormService $formService,
         protected DepartmentService $departmentService
-    ) {}
+    ) {
+        $this->authorizeResource(Submission::class, 'submission');
+    }
 
     public function index(Request $request)
     {
@@ -32,53 +37,49 @@ class SubmissionController extends Controller
         ]);
     }
 
-    public function show(int $id)
+    public function show(Submission $submission)
     {
-        $submission = $this->submissionService->getById($id);
+        $submission = $this->submissionService->getById($submission->id);
 
         return Inertia::render('Admin/Submissions/Show', [
             'submission' => $submission,
         ]);
     }
 
-    public function updateStatus(Request $request, int $id)
+    public function updateStatus(UpdateSubmissionStatusRequest $request, Submission $submission)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:new,reviewing,interview,offer,hired,rejected',
-        ]);
+        $this->authorize('review', $submission);
 
-        $this->submissionService->updateStatus($id, $validated['status']);
+        $this->submissionService->updateStatus($submission->id, $request->validated('status'));
 
         return back()->with('success', 'Başvuru durumu güncellendi.');
     }
 
-    public function updateInvestigation(Request $request, int $id)
+    public function updateInvestigation(Request $request, Submission $submission)
     {
+        $this->authorize('update', $submission);
+
         $validated = $request->validate([
-            'investigation' => 'required|in:pending,completed,none',
+            'investigation' => ['required', 'string', 'in:pending,completed,none'],
         ]);
 
-        $this->submissionService->updateInvestigation($id, $validated['investigation']);
+        $this->submissionService->updateInvestigation($submission->id, $validated['investigation']);
 
         return back()->with('success', 'İstihbarat durumu güncellendi.');
     }
 
-    public function addComment(Request $request, int $id)
+    public function addComment(AddSubmissionCommentRequest $request, Submission $submission)
     {
-        $validated = $request->validate([
-            'comment' => 'required|string',
-            'rating' => 'nullable|integer|min:1|max:5',
-            'is_private' => 'nullable|boolean',
-        ]);
+        $this->authorize('addComment', $submission);
 
-        $this->submissionService->addComment($id, $validated, auth()->id());
+        $this->submissionService->addComment($submission->id, $request->validated(), auth()->id());
 
         return back()->with('success', 'Yorum eklendi.');
     }
 
-    public function destroy(int $id)
+    public function destroy(Submission $submission)
     {
-        $this->submissionService->delete($id);
+        $this->submissionService->delete($submission->id);
 
         return redirect()->route('admin.submissions.index')
             ->with('success', 'Başvuru başarıyla silindi.');

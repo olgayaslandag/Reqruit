@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Interfaces\FormInterface;
 use App\Interfaces\SubmissionInterface;
+use App\Jobs\SendSubmissionNotification;
 use App\Models\SubmissionComment;
-use Illuminate\Support\Facades\Mail;
 
 class SubmissionService
 {
@@ -33,12 +33,15 @@ class SubmissionService
     {
         $form = $this->formRepository->getBySlug($formSlug);
 
-        // Handle file uploads
+        // Handle file uploads - secure storage with local disk
         $uploadedFiles = [];
         foreach ($files as $key => $file) {
             if ($file && $file->isValid()) {
-                $path = $file->store('submissions/'.$form->id, 'public');
-                $uploadedFiles[$key] = asset('storage/'.$path);
+                // Store in local disk (private) - not publicly accessible
+                $path = $file->store('submissions/'.$form->id, 'local');
+                // Store only the path, not a public URL
+                // Signed URLs will be generated via FileController
+                $uploadedFiles[$key] = $path;
             }
         }
 
@@ -67,8 +70,8 @@ class SubmissionService
             'details' => $details,
         ]);
 
-        // Send notification email
-        $this->sendNotificationEmail($form, $submission);
+        // Dispatch notification job to queue (async)
+        SendSubmissionNotification::dispatch($form, $submission);
 
         return $submission;
     }
@@ -101,45 +104,5 @@ class SubmissionService
     public function delete(int $id)
     {
         return $this->submissionRepository->delete($id);
-    }
-
-    protected function sendNotificationEmail($form, $submission)
-    {
-        $recipients = [];
-
-        // Add department emails
-        $department = $form->department;
-        if ($department && ! empty($department->emails)) {
-            $deptEmails = is_array($department->emails)
-                ? $department->emails
-                : [$department->emails];
-            $recipients = array_merge($recipients, $deptEmails);
-        }
-
-        // Add form-specific notification emails
-        if (! empty($form->notification_emails)) {
-            $recipients = array_merge($recipients, $form->notification_emails);
-        }
-
-        // Remove duplicates and empty values
-        $recipients = array_unique(array_filter($recipients));
-
-        if (empty($recipients)) {
-            return;
-        }
-
-        $body = "Yeni bir başvuru alındı:\n\n";
-        $body .= "Form: {$form->name}\n";
-        $body .= "Referans No: {$submission->reference_no}\n";
-        $body .= "Tarih: {$submission->created_at}\n\n";
-
-        foreach ($submission->details as $detail) {
-            $body .= "{$detail->field_label}: {$detail->field_value}\n";
-        }
-
-        // Note: In production, use proper Mail facade
-        // Mail::raw($body, function ($message) use ($recipients) {
-        //     $message->to($recipients)->subject('Yeni Başvuru');
-        // });
     }
 }

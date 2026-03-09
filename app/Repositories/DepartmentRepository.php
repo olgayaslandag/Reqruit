@@ -4,10 +4,19 @@ namespace App\Repositories;
 
 use App\Interfaces\DepartmentInterface;
 use App\Models\Department;
+use Illuminate\Database\Eloquent\Collection;
 
-class DepartmentRepository implements DepartmentInterface
+class DepartmentRepository extends BaseRepository implements DepartmentInterface
 {
-    public function getAll(array $filters = [])
+    public function __construct(Department $model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * Get all departments.
+     */
+    public function getAll(array $filters = []): Collection
     {
         $query = Department::query();
 
@@ -18,36 +27,46 @@ class DepartmentRepository implements DepartmentInterface
         return $query->orderBy('title')->get();
     }
 
-    public function getById(int $id)
+    /**
+     * Get department by ID.
+     */
+    public function getById(int $id): Department
     {
-        return Department::findOrFail($id);
+        return $this->findOrFail($id);
     }
 
-    public function getBySlug(string $slug)
+    /**
+     * Get department by slug.
+     */
+    public function getBySlug(string $slug): Department
     {
-        return Department::where('slug', $slug)->firstOrFail();
+        return $this->findByOrFail('slug', $slug);
     }
 
-    public function create(array $data)
+    /**
+     * Create a new department.
+     */
+    public function create(array $data): Department
     {
-        return Department::create($data);
+        return parent::create($data);
     }
 
-    public function update(int $id, array $data)
+    /**
+     * Update a department.
+     */
+    public function update(int $id, array $data): Department
     {
-        $department = Department::findOrFail($id);
-        $department->update($data);
-        return $department;
+        return parent::update($id, $data);
     }
 
-    public function delete(int $id)
+    /**
+     * Get department tree (hierarchical).
+     */
+    public function getTree(): Collection
     {
-        $department = Department::findOrFail($id);
-        return $department->delete();
-    }
-
-    public function getTree()
-    {
-        return Department::with('children')->whereNull('parent_id')->orderBy('title')->get();
+        return Department::with('children')
+            ->whereNull('parent_id')
+            ->orderBy('title')
+            ->get();
     }
 }
