@@ -20,7 +20,6 @@ class SubmissionTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
-        $this->user->assignRole('super_admin');
     }
 
     public function test_authenticated_user_can_view_submissions_index(): void

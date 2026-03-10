@@ -29,11 +29,19 @@ class SubmissionRepository extends BaseRepository implements SubmissionInterface
 
         // Transform submissions to add computed attributes
         $submissions->transform(function ($submission) {
-            $nameDetail = $submission->details->firstWhere('field_name', 'name');
-            $emailDetail = $submission->details->firstWhere('field_name', 'email');
+            // Find name field (supports multiple naming conventions)
+            $nameField = $submission->details->firstWhere('field_name', 'name')
+                ?? $submission->details->firstWhere('field_name', 'ad_soyad')
+                ?? $submission->details->firstWhere('field_name', 'full_name')
+                ?? $submission->details->firstWhere('field_name', 'name_surname');
+            
+            // Find email field
+            $emailField = $submission->details->firstWhere('field_name', 'email')
+                ?? $submission->details->firstWhere('field_name', 'eposta')
+                ?? $submission->details->firstWhere('field_name', 'mail');
 
-            $submission->applicant_name = $nameDetail?->field_value ?? '-';
-            $submission->applicant_email = $emailDetail?->field_value ?? '-';
+            $submission->applicant_name = $nameField?->field_value ?? '-';
+            $submission->applicant_email = $emailField?->field_value ?? '-';
             $submission->comment_count = $submission->comments->count();
             $submission->avg_rating = $submission->comments->whereNotNull('rating')->avg('rating');
 
@@ -56,11 +64,19 @@ class SubmissionRepository extends BaseRepository implements SubmissionInterface
 
         // Transform submissions to add computed attributes
         $paginator->getCollection()->transform(function ($submission) {
-            $nameDetail = $submission->details->firstWhere('field_name', 'name');
-            $emailDetail = $submission->details->firstWhere('field_name', 'email');
+            // Find name field (supports multiple naming conventions)
+            $nameField = $submission->details->firstWhere('field_name', 'name')
+                ?? $submission->details->firstWhere('field_name', 'ad_soyad')
+                ?? $submission->details->firstWhere('field_name', 'full_name')
+                ?? $submission->details->firstWhere('field_name', 'name_surname');
+            
+            // Find email field
+            $emailField = $submission->details->firstWhere('field_name', 'email')
+                ?? $submission->details->firstWhere('field_name', 'eposta')
+                ?? $submission->details->firstWhere('field_name', 'mail');
 
-            $submission->applicant_name = $nameDetail?->field_value ?? '-';
-            $submission->applicant_email = $emailDetail?->field_value ?? '-';
+            $submission->applicant_name = $nameField?->field_value ?? '-';
+            $submission->applicant_email = $emailField?->field_value ?? '-';
             $submission->comment_count = $submission->comments->count();
             $submission->avg_rating = $submission->comments->whereNotNull('rating')->avg('rating');
 

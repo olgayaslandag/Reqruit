@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRoleEnum;
+use App\Enums\UserStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -40,6 +42,8 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'rank_id' => UserRoleEnum::RECRUITER->value,
+            'status_id' => UserStatusEnum::PENDING->value, // Yeni kayıtlar beklemede
         ]);
 
         event(new Registered($user));

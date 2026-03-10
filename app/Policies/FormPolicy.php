@@ -11,15 +11,11 @@ class FormPolicy
     use HandlesAuthorization;
 
     /**
-     * Bypass all checks for super_admin.
+     * Allow all actions for authenticated users.
      */
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
-
-        return null;
+        return $user ? true : null;
     }
 
     /**
@@ -27,7 +23,7 @@ class FormPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view-forms');
+        return true;
     }
 
     /**
@@ -35,7 +31,7 @@ class FormPolicy
      */
     public function view(User $user, Form $form): bool
     {
-        return $user->can('view-forms');
+        return true;
     }
 
     /**
@@ -43,7 +39,7 @@ class FormPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create-forms');
+        return true;
     }
 
     /**
@@ -51,7 +47,7 @@ class FormPolicy
      */
     public function update(User $user, Form $form): bool
     {
-        return $user->can('update-forms');
+        return true;
     }
 
     /**
@@ -59,6 +55,6 @@ class FormPolicy
      */
     public function delete(User $user, Form $form): bool
     {
-        return $user->can('delete-forms');
+        return true;
     }
 }

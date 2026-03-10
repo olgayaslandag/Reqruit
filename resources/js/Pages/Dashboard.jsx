@@ -75,10 +75,14 @@ export default function Dashboard({ stats, weeklySubmissions }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         {statsData.map((stat, index) => {
                             let href = '#';
-                            if (stat.label === 'Toplam Başvuru') {
+                            if (stat.label === 'Toplam Başvuru' || stat.label.includes('Başvuru')) {
                                 href = '/admin/submissions';
                             } else if (stat.label === 'Yeni Başvuru') {
                                 href = '/admin/submissions?status=new';
+                            } else if (stat.label === 'Aktif Form') {
+                                href = '/admin/forms';
+                            } else if (stat.label === 'Departman') {
+                                href = '/admin/departments';
                             }
                             
                             return (

@@ -24,12 +24,12 @@ class Department extends Model
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Department::class, 'parent_id');
+        return $this->belongsTo(self::class, 'parent_id');
     }
 
     public function children(): HasMany
     {
-        return $this->hasMany(Department::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function forms(): HasMany

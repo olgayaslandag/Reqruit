@@ -11,15 +11,11 @@ class SubmissionPolicy
     use HandlesAuthorization;
 
     /**
-     * Bypass all checks for super_admin.
+     * Allow all actions for authenticated users.
      */
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
-
-        return null;
+        return $user ? true : null;
     }
 
     /**
@@ -27,7 +23,7 @@ class SubmissionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view-applications');
+        return true;
     }
 
     /**
@@ -35,7 +31,7 @@ class SubmissionPolicy
      */
     public function view(User $user, Submission $submission): bool
     {
-        return $user->can('view-applications');
+        return true;
     }
 
     /**
@@ -43,7 +39,7 @@ class SubmissionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create-applications');
+        return true;
     }
 
     /**
@@ -51,7 +47,7 @@ class SubmissionPolicy
      */
     public function update(User $user, Submission $submission): bool
     {
-        return $user->can('update-applications');
+        return true;
     }
 
     /**
@@ -59,7 +55,7 @@ class SubmissionPolicy
      */
     public function delete(User $user, Submission $submission): bool
     {
-        return $user->can('delete-applications');
+        return true;
     }
 
     /**
@@ -67,7 +63,7 @@ class SubmissionPolicy
      */
     public function review(User $user, Submission $submission): bool
     {
-        return $user->can('review-applications');
+        return true;
     }
 
     /**
@@ -75,6 +71,6 @@ class SubmissionPolicy
      */
     public function addComment(User $user, Submission $submission): bool
     {
-        return $user->can('add-comments');
+        return true;
     }
 }

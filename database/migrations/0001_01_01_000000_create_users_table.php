@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->tinyInteger('rank_id')->default(3); // default: recruiter
+            $table->tinyInteger('status_id')->default(1); // default: active
             $table->rememberToken();
             $table->timestamps();
         });

@@ -11,15 +11,11 @@ class DepartmentPolicy
     use HandlesAuthorization;
 
     /**
-     * Bypass all checks for super_admin.
+     * Allow all actions for authenticated users.
      */
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->hasRole('super_admin')) {
-            return true;
-        }
-
-        return null;
+        return $user ? true : null;
     }
 
     /**
@@ -27,7 +23,7 @@ class DepartmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view-departments');
+        return true;
     }
 
     /**
@@ -35,7 +31,7 @@ class DepartmentPolicy
      */
     public function view(User $user, Department $department): bool
     {
-        return $user->can('view-departments');
+        return true;
     }
 
     /**
@@ -43,7 +39,7 @@ class DepartmentPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create-departments');
+        return true;
     }
 
     /**
@@ -51,7 +47,7 @@ class DepartmentPolicy
      */
     public function update(User $user, Department $department): bool
     {
-        return $user->can('update-departments');
+        return true;
     }
 
     /**
@@ -59,6 +55,6 @@ class DepartmentPolicy
      */
     public function delete(User $user, Department $department): bool
     {
-        return $user->can('delete-departments');
+        return true;
     }
 }

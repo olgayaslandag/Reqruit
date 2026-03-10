@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Mail\Message;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SendSubmissionNotification implements ShouldQueue
@@ -101,7 +102,7 @@ class SendSubmissionNotification implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        \Log::error('SendSubmissionNotification job failed', [
+        Log::error('SendSubmissionNotification job failed', [
             'form_id' => $this->form->id,
             'submission_id' => $this->submission->id,
             'error' => $exception->getMessage(),

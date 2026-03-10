@@ -54,6 +54,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Departmanlar
                                 </NavLink>
+
+                                <NavLink
+                                    href={route('admin.users.index')}
+                                    active={route().current('admin.users.*')}
+                                >
+                                    Kullanıcılar
+                                </NavLink>
                             </div>
                         </div>
 
@@ -175,6 +182,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('admin.departments.*')}
                         >
                             Departmanlar
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('admin.users.index')}
+                            active={route().current('admin.users.*')}
+                        >
+                            Kullanıcılar
                         </ResponsiveNavLink>
                     </div>
 

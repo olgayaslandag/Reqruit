@@ -6,6 +6,7 @@ use App\Http\Controllers\FormController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicFormController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -98,6 +99,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{submission}/investigation', [SubmissionController::class, 'updateInvestigation'])->name('updateInvestigation');
         Route::post('/{submission}/comments', [SubmissionController::class, 'addComment'])->name('addComment');
         Route::delete('/{submission}', [SubmissionController::class, 'destroy'])->name('destroy');
+    });
+
+    // Admin - Users
+    Route::prefix('admin/users')->name('admin.users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
     });
 
     // Profile

@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRoleEnum;
+use App\Enums\UserStatusEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -10,11 +12,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create roles and permissions first
-        $this->call([
-            RolesAndPermissionsSeeder::class,
-        ]);
-
         // Create or update admin user
         $user = User::updateOrCreate(
             ['email' => 'olgayaslandag@gmail.com'],
@@ -22,11 +19,10 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Olgay Aslandağ',
                 'password' => Hash::make('123123123'),
                 'email_verified_at' => now(),
+                'rank_id' => UserRoleEnum::ADMIN->value,
+                'status_id' => UserStatusEnum::ACTIVE->value,
             ]
         );
-
-        // Assign super_admin role to the user
-        $user->assignRole('super_admin');
 
         // Seed other data
         $this->call([
@@ -34,6 +30,8 @@ class DatabaseSeeder extends Seeder
             FormSeeder::class,
             FormFieldSeeder::class,
             SubmissionSeeder::class,
+            SubmissionDetailSeeder::class,
+            SubmissionCommentSeeder::class,
         ]);
     }
 }

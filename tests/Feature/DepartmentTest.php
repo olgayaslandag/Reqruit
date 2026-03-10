@@ -18,7 +18,6 @@ class DepartmentTest extends TestCase
         parent::setUp();
 
         $this->user = User::factory()->create();
-        $this->user->assignRole('super_admin');
     }
 
     public function test_authenticated_user_can_view_departments_index(): void
