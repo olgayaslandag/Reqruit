@@ -11,7 +11,6 @@ export default function UpdateProfileInformation({
     className = '',
 }) {
     const user = usePage().props.auth.user;
-
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
             name: user.name,
@@ -23,6 +22,9 @@ export default function UpdateProfileInformation({
 
         patch(route('profile.update'));
     };
+
+    // Check advanced info availability
+    const { showAdvancedInfo, advancedUserInfo } = usePage().props;
 
     return (
         <section className={className}>
@@ -68,6 +70,24 @@ export default function UpdateProfileInformation({
 
                     <InputError className="mt-2" message={errors.email} />
                 </div>
+
+                {/* Show advanced info for admin/manager */}
+                {showAdvancedInfo && advancedUserInfo && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <InputLabel htmlFor="rank" value="Rol" />
+                            <div className="mt-1 block w-full p-2 bg-gray-100 rounded-md">
+                                {advancedUserInfo.rank_label} ({advancedUserInfo.rank_id})
+                            </div>
+                        </div>
+                        <div>
+                            <InputLabel htmlFor="status" value="Durum" />
+                            <div className="mt-1 block w-full p-2 bg-gray-100 rounded-md">
+                                {advancedUserInfo.status_label} ({advancedUserInfo.status_id})
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>

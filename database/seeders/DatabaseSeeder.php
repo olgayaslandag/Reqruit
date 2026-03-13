@@ -24,14 +24,9 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Seed other data
+        // Import all initial data from JSON files
         $this->call([
-            DepartmentSeeder::class,
-            FormSeeder::class,
-            FormFieldSeeder::class,
-            SubmissionSeeder::class,
-            SubmissionDetailSeeder::class,
-            SubmissionCommentSeeder::class,
+            ImportAllDataSeeder::class,
         ]);
     }
 }

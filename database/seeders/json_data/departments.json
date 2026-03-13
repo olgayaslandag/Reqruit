@@ -1,0 +1,794 @@
+[
+    {
+        "id": 5,
+        "title": "İDARİ İŞLER",
+        "slug": "idari-isler",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-11-25 07:04:29",
+        "updated_at": "2025-11-25 07:05:23"
+    },
+    {
+        "id": 2,
+        "title": "Grafik Tasarım",
+        "slug": "grafik-tasarim",
+        "emails": null,
+        "parent_id": 3,
+        "created_at": "2025-11-24 10:21:58",
+        "updated_at": "2025-11-24 10:22:40"
+    },
+    {
+        "id": 4,
+        "title": "BİLGİ İŞLEM",
+        "slug": "bilgi-islem",
+        "emails": "keremyagiz@bsban.com",
+        "parent_id": 0,
+        "created_at": "2025-11-25 06:11:20",
+        "updated_at": "2025-12-03 09:45:11"
+    },
+    {
+        "id": 28,
+        "title": "EBATLAMA",
+        "slug": "ebatlama",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 23,
+        "created_at": "2026-02-25 11:23:31",
+        "updated_at": "2026-02-25 11:37:17"
+    },
+    {
+        "id": 7,
+        "title": "LOJİSTİK",
+        "slug": "lojistik",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-11-25 07:59:28",
+        "updated_at": "2025-11-25 07:59:28"
+    },
+    {
+        "id": 8,
+        "title": "MALİ İŞLER",
+        "slug": "mali-isler",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-11-25 08:42:10",
+        "updated_at": "2025-11-25 08:42:10"
+    },
+    {
+        "id": 9,
+        "title": "MONTAJ VE MÜŞTERİ DESTEK HİZMETLERİ",
+        "slug": "montaj-ve-musteri-destek-hizmetleri",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-11-25 10:42:51",
+        "updated_at": "2025-11-25 10:51:25"
+    },
+    {
+        "id": 10,
+        "title": "MÜŞTERİ TEMSİLCİLİĞİ",
+        "slug": "musteri-temsilciligi",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-11-26 08:46:07",
+        "updated_at": "2025-11-26 08:48:06"
+    },
+    {
+        "id": 11,
+        "title": "PAZARLAMA",
+        "slug": "pazarlama",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-11-26 09:59:12",
+        "updated_at": "2025-11-26 09:59:34"
+    },
+    {
+        "id": 12,
+        "title": "PROJE ve İÇ MİMARLIK",
+        "slug": "proje-ve-ic-mimarlik",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-12-03 06:00:26",
+        "updated_at": "2026-02-19 10:42:34"
+    },
+    {
+        "id": 13,
+        "title": "SATIN ALMA",
+        "slug": "satin-alma",
+        "emails": null,
+        "parent_id": 0,
+        "created_at": "2025-12-03 06:37:12",
+        "updated_at": "2025-12-03 06:41:15"
+    },
+    {
+        "id": 14,
+        "title": "ÜRETİM",
+        "slug": "uretim",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 0,
+        "created_at": "2025-12-03 07:02:51",
+        "updated_at": "2026-02-25 12:30:55"
+    },
+    {
+        "id": 98,
+        "title": "GÜVENLİK GÖREVLİSİ",
+        "slug": "guvenlik-gorevlisi-1",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:47:52",
+        "updated_at": "2026-03-10 10:47:52"
+    },
+    {
+        "id": 93,
+        "title": "MARANGOZ",
+        "slug": "marangoz",
+        "emails": "ik@bsban.com",
+        "parent_id": 24,
+        "created_at": "2026-03-05 06:50:51",
+        "updated_at": "2026-03-05 06:50:51"
+    },
+    {
+        "id": 101,
+        "title": "TEKNİK PERSONEL",
+        "slug": "teknik-personel",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:48:40",
+        "updated_at": "2026-03-10 10:48:40"
+    },
+    {
+        "id": 24,
+        "title": "AHŞAP ÜRETİM",
+        "slug": "ahsap-uretim",
+        "emails": null,
+        "parent_id": 14,
+        "created_at": "2026-02-25 10:13:18",
+        "updated_at": "2026-02-26 06:58:51"
+    },
+    {
+        "id": 25,
+        "title": "EBATLAMA VE KESİM",
+        "slug": "ebatlama-ve-kesim",
+        "emails": null,
+        "parent_id": 24,
+        "created_at": "2026-02-25 10:13:45",
+        "updated_at": "2026-02-25 10:13:45"
+    },
+    {
+        "id": 26,
+        "title": "ELEKTRİK ÜRETİM",
+        "slug": "elektrik-uretim",
+        "emails": null,
+        "parent_id": 14,
+        "created_at": "2026-02-25 10:14:17",
+        "updated_at": "2026-02-25 10:14:17"
+    },
+    {
+        "id": 23,
+        "title": "METAL ÜRETİM",
+        "slug": "metal-uretim",
+        "emails": null,
+        "parent_id": 14,
+        "created_at": "2026-02-24 12:17:30",
+        "updated_at": "2026-02-24 12:17:30"
+    },
+    {
+        "id": 27,
+        "title": "KABLO HAZIRLAMA VE KESİM",
+        "slug": "kablo-hazirlama-ve-kesim",
+        "emails": null,
+        "parent_id": 26,
+        "created_at": "2026-02-25 10:14:40",
+        "updated_at": "2026-02-25 10:14:40"
+    },
+    {
+        "id": 22,
+        "title": "CNC MAKİNE İŞLEMLERİ",
+        "slug": "cnc-makine-islemleri",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 23,
+        "created_at": "2026-02-24 11:59:33",
+        "updated_at": "2026-02-25 10:11:30"
+    },
+    {
+        "id": 29,
+        "title": "KAYNAK",
+        "slug": "kaynak",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 23,
+        "created_at": "2026-02-25 12:37:08",
+        "updated_at": "2026-02-25 12:37:08"
+    },
+    {
+        "id": 30,
+        "title": "TESVİYE",
+        "slug": "tesviye",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 23,
+        "created_at": "2026-02-25 13:13:41",
+        "updated_at": "2026-02-25 13:13:41"
+    },
+    {
+        "id": 31,
+        "title": "METAL BOYA-CİLA",
+        "slug": "metal-boya-cila",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 23,
+        "created_at": "2026-02-26 06:41:46",
+        "updated_at": "2026-02-26 06:41:46"
+    },
+    {
+        "id": 32,
+        "title": "TOPLAMA-MONTAJ",
+        "slug": "toplama-montaj",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 23,
+        "created_at": "2026-02-26 06:42:12",
+        "updated_at": "2026-02-26 06:42:12"
+    },
+    {
+        "id": 33,
+        "title": "NUMUNE & AR-GE",
+        "slug": "numune-ar-ge",
+        "emails": null,
+        "parent_id": 23,
+        "created_at": "2026-02-26 06:42:57",
+        "updated_at": "2026-02-26 06:42:57"
+    },
+    {
+        "id": 34,
+        "title": "KAPLAMA VE PRESLEME",
+        "slug": "kaplama-ve-presleme",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 24,
+        "created_at": "2026-02-26 07:01:08",
+        "updated_at": "2026-02-26 07:01:08"
+    },
+    {
+        "id": 35,
+        "title": "ZIMPARA",
+        "slug": "zimpara",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 24,
+        "created_at": "2026-02-26 07:01:39",
+        "updated_at": "2026-02-26 07:01:39"
+    },
+    {
+        "id": 36,
+        "title": "AHŞAP BOYA-CİLA",
+        "slug": "ahsap-boya-cila",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 24,
+        "created_at": "2026-02-26 07:01:57",
+        "updated_at": "2026-02-26 07:01:57"
+    },
+    {
+        "id": 37,
+        "title": "TOPLAMA-MONTAJ",
+        "slug": "toplama-montaj-1",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 24,
+        "created_at": "2026-02-26 07:53:44",
+        "updated_at": "2026-02-26 07:53:44"
+    },
+    {
+        "id": 38,
+        "title": "CNC ve ÖZEL İŞLEMLER",
+        "slug": "cnc-ve-ozel-islemler",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 24,
+        "created_at": "2026-02-26 07:54:25",
+        "updated_at": "2026-02-26 07:54:25"
+    },
+    {
+        "id": 39,
+        "title": "NUMUNE ve AR-GE",
+        "slug": "numune-ve-ar-ge",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 24,
+        "created_at": "2026-02-26 07:54:48",
+        "updated_at": "2026-02-26 07:54:48"
+    },
+    {
+        "id": 40,
+        "title": "DÖŞEME ÜRETİM",
+        "slug": "doseme-uretim",
+        "emails": null,
+        "parent_id": 14,
+        "created_at": "2026-02-26 07:55:09",
+        "updated_at": "2026-02-26 07:55:09"
+    },
+    {
+        "id": 41,
+        "title": "İSKELET KONTROL VE HAZIRLIK",
+        "slug": "iskelet-kontrol-ve-hazirlik",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 40,
+        "created_at": "2026-02-26 07:55:32",
+        "updated_at": "2026-02-26 07:55:32"
+    },
+    {
+        "id": 42,
+        "title": "ELASTİK KATMANLAR MONTAJI",
+        "slug": "elastik-katmanlar-montaji",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 40,
+        "created_at": "2026-02-26 07:56:27",
+        "updated_at": "2026-02-26 07:56:27"
+    },
+    {
+        "id": 43,
+        "title": "SÜNGER-DOLGU UYGULAMASI",
+        "slug": "sunger-dolgu-uygulamasi",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 40,
+        "created_at": "2026-02-26 07:56:54",
+        "updated_at": "2026-02-26 07:56:54"
+    },
+    {
+        "id": 44,
+        "title": "DİKİŞ ve KILIF HAZIRLIĞI",
+        "slug": "dikis-ve-kilif-hazirligi",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 40,
+        "created_at": "2026-02-26 07:57:19",
+        "updated_at": "2026-02-26 07:57:19"
+    },
+    {
+        "id": 45,
+        "title": "KILIF GİYDİRME ve DÖŞEME MONTAJI",
+        "slug": "kilif-giydirme-ve-doseme-montaji",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 40,
+        "created_at": "2026-02-26 07:57:46",
+        "updated_at": "2026-02-26 07:57:46"
+    },
+    {
+        "id": 46,
+        "title": "ELEKTRİK MONTAJ PERSONELİ",
+        "slug": "elektrik-montaj-personeli",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 26,
+        "created_at": "2026-02-26 08:01:04",
+        "updated_at": "2026-02-26 08:01:04"
+    },
+    {
+        "id": 47,
+        "title": "KABLOLAMA ve İÇ TESİSAT DÖŞEME",
+        "slug": "kablolama-ve-ic-tesisat-doseme",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 26,
+        "created_at": "2026-02-26 08:01:30",
+        "updated_at": "2026-02-26 08:01:30"
+    },
+    {
+        "id": 48,
+        "title": "ELEKTRİK İÇ MONTAJ",
+        "slug": "elektrik-ic-montaj",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 26,
+        "created_at": "2026-02-26 08:01:50",
+        "updated_at": "2026-02-26 08:01:50"
+    },
+    {
+        "id": 49,
+        "title": "İÇ MONTAJ",
+        "slug": "ic-montaj",
+        "emails": null,
+        "parent_id": 14,
+        "created_at": "2026-02-26 08:02:02",
+        "updated_at": "2026-02-26 08:02:02"
+    },
+    {
+        "id": 50,
+        "title": "ANA GÖVDE MONTAJI",
+        "slug": "ana-govde-montaji",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 49,
+        "created_at": "2026-02-26 08:02:27",
+        "updated_at": "2026-02-26 08:02:27"
+    },
+    {
+        "id": 51,
+        "title": "AKSESUAR ve TAMAMLAYICI MONTAJ",
+        "slug": "aksesuar-ve-tamamlayici-montaj",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 49,
+        "created_at": "2026-02-26 08:02:54",
+        "updated_at": "2026-02-26 08:02:54"
+    },
+    {
+        "id": 52,
+        "title": "KONTROL SON HAZIRLIK MONTAJI",
+        "slug": "kontrol-son-hazirlik-montaji",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 49,
+        "created_at": "2026-02-26 08:03:19",
+        "updated_at": "2026-02-26 08:03:19"
+    },
+    {
+        "id": 53,
+        "title": "PLASTİK ÜRETİM",
+        "slug": "plastik-uretim",
+        "emails": null,
+        "parent_id": 14,
+        "created_at": "2026-02-26 08:03:32",
+        "updated_at": "2026-02-26 08:03:32"
+    },
+    {
+        "id": 54,
+        "title": "HAMMADDE HAZIRLIK ve BESLEME",
+        "slug": "hammadde-hazirlik-ve-besleme",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 53,
+        "created_at": "2026-02-26 08:04:06",
+        "updated_at": "2026-02-26 08:04:06"
+    },
+    {
+        "id": 55,
+        "title": "KALIPLAMA ve ENJEKSİYON",
+        "slug": "kaliplama-ve-enjeksiyon",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 53,
+        "created_at": "2026-02-26 08:04:25",
+        "updated_at": "2026-02-26 08:04:25"
+    },
+    {
+        "id": 56,
+        "title": "PLASTİK CNC\/KESİM ve ŞEKİLLENDİRME",
+        "slug": "plastik-cnc-kesim-ve-sekillendirme",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 53,
+        "created_at": "2026-02-26 08:05:05",
+        "updated_at": "2026-02-26 08:05:05"
+    },
+    {
+        "id": 57,
+        "title": "YÜZEY İŞLEM",
+        "slug": "yuzey-islem",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 53,
+        "created_at": "2026-02-26 08:05:21",
+        "updated_at": "2026-02-26 08:05:21"
+    },
+    {
+        "id": 58,
+        "title": "PLASTİK TOPLAMA ve MONTAJ",
+        "slug": "plastik-toplama-ve-montaj",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 53,
+        "created_at": "2026-02-26 08:05:47",
+        "updated_at": "2026-02-26 08:05:47"
+    },
+    {
+        "id": 59,
+        "title": "PLASTİK NUMUNE ve AR-GE",
+        "slug": "plastik-numune-ve-ar-ge",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 53,
+        "created_at": "2026-02-26 08:06:10",
+        "updated_at": "2026-02-26 08:06:10"
+    },
+    {
+        "id": 60,
+        "title": "DİĞER İŞLEMLER",
+        "slug": "diger-islemler",
+        "emails": null,
+        "parent_id": 14,
+        "created_at": "2026-02-26 08:07:08",
+        "updated_at": "2026-02-26 08:07:08"
+    },
+    {
+        "id": 61,
+        "title": "KALIPHANE\/KALIP BAKIM",
+        "slug": "kaliphane-kalip-bakim",
+        "emails": null,
+        "parent_id": 60,
+        "created_at": "2026-02-26 08:08:10",
+        "updated_at": "2026-02-26 08:08:10"
+    },
+    {
+        "id": 62,
+        "title": "KAYNAK DIŞI BAĞLANTI YÖNTEMLERİ",
+        "slug": "kaynak-disi-baglanti-yontemleri",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 60,
+        "created_at": "2026-02-26 08:08:37",
+        "updated_at": "2026-02-26 08:08:37"
+    },
+    {
+        "id": 63,
+        "title": "TAMİR-BAKIM ATÖLYESİ",
+        "slug": "tamir-bakim-atolyesi",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 60,
+        "created_at": "2026-02-26 08:09:00",
+        "updated_at": "2026-02-26 08:09:00"
+    },
+    {
+        "id": 64,
+        "title": "DESTEK İŞLERİ",
+        "slug": "destek-isleri",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 60,
+        "created_at": "2026-02-26 08:09:14",
+        "updated_at": "2026-02-26 08:09:14"
+    },
+    {
+        "id": 65,
+        "title": "MUHASEBE ve KAYIT İŞLEMLERİ",
+        "slug": "muhasebe-ve-kayit-islemleri",
+        "emails": null,
+        "parent_id": 8,
+        "created_at": "2026-02-26 08:40:58",
+        "updated_at": "2026-02-26 08:40:58"
+    },
+    {
+        "id": 66,
+        "title": "FİNANS ve NAKİT YÖNETİMİ",
+        "slug": "finans-ve-nakit-yonetimi",
+        "emails": null,
+        "parent_id": 8,
+        "created_at": "2026-02-26 08:41:26",
+        "updated_at": "2026-02-26 08:41:26"
+    },
+    {
+        "id": 67,
+        "title": "BÜTÇE ve RAPORLAMA",
+        "slug": "butce-ve-raporlama",
+        "emails": null,
+        "parent_id": 8,
+        "created_at": "2026-02-26 08:41:45",
+        "updated_at": "2026-02-26 08:41:45"
+    },
+    {
+        "id": 68,
+        "title": "VERGİ ve MEVZUAT İŞLERİ",
+        "slug": "vergi-ve-mevzuat-isleri",
+        "emails": null,
+        "parent_id": 8,
+        "created_at": "2026-02-26 08:42:07",
+        "updated_at": "2026-02-26 08:42:07"
+    },
+    {
+        "id": 69,
+        "title": "MALİYET MUHASEBESİ",
+        "slug": "maliyet-muhasebesi",
+        "emails": null,
+        "parent_id": 8,
+        "created_at": "2026-02-26 08:42:20",
+        "updated_at": "2026-02-26 08:42:20"
+    },
+    {
+        "id": 70,
+        "title": "MALİ İŞLER YÖNETİMİ",
+        "slug": "mali-isler-yonetimi",
+        "emails": null,
+        "parent_id": 8,
+        "created_at": "2026-02-26 08:42:41",
+        "updated_at": "2026-02-26 08:42:41"
+    },
+    {
+        "id": 71,
+        "title": "DEPO YÖNETİMİ",
+        "slug": "depo-yonetimi",
+        "emails": null,
+        "parent_id": 8,
+        "created_at": "2026-02-26 08:43:06",
+        "updated_at": "2026-02-26 08:43:06"
+    },
+    {
+        "id": 72,
+        "title": "OPERASYONEL SATIN ALMA",
+        "slug": "operasyonel-satin-alma",
+        "emails": null,
+        "parent_id": 13,
+        "created_at": "2026-02-26 08:43:44",
+        "updated_at": "2026-02-26 08:43:44"
+    },
+    {
+        "id": 73,
+        "title": "STRATEJİK SATIN ALMA",
+        "slug": "stratejik-satin-alma",
+        "emails": null,
+        "parent_id": 13,
+        "created_at": "2026-02-26 08:44:00",
+        "updated_at": "2026-02-26 08:44:00"
+    },
+    {
+        "id": 74,
+        "title": "MALZEME PLANLAMA ve STOK YÖNETİM",
+        "slug": "malzeme-planlama-ve-stok-yonetim",
+        "emails": null,
+        "parent_id": 13,
+        "created_at": "2026-02-26 08:44:20",
+        "updated_at": "2026-02-26 08:44:20"
+    },
+    {
+        "id": 75,
+        "title": "TEDARİKÇİ İLİŞKİLERİ VE DENETİM",
+        "slug": "tedarikci-iliskileri-ve-denetim",
+        "emails": null,
+        "parent_id": 13,
+        "created_at": "2026-02-26 08:44:41",
+        "updated_at": "2026-02-26 08:44:41"
+    },
+    {
+        "id": 76,
+        "title": "SATIN ALMA YÖNETİMİ",
+        "slug": "satin-alma-yonetimi",
+        "emails": null,
+        "parent_id": 13,
+        "created_at": "2026-02-26 08:45:02",
+        "updated_at": "2026-02-26 08:45:02"
+    },
+    {
+        "id": 100,
+        "title": "ÇAY VE İKRAM GÖREVLİSİ",
+        "slug": "cay-ve-ikram-gorevlisi-2",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:48:27",
+        "updated_at": "2026-03-10 10:48:27"
+    },
+    {
+        "id": 94,
+        "title": "GÜVENLİK GÖREVLİSİ",
+        "slug": "guvenlik-gorevlisi",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 77,
+        "created_at": "2026-03-10 10:46:36",
+        "updated_at": "2026-03-10 10:47:00"
+    },
+    {
+        "id": 95,
+        "title": "TEMİZLİK GÖREVLİSİ",
+        "slug": "temizlik-gorevlisi",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 77,
+        "created_at": "2026-03-10 10:46:51",
+        "updated_at": "2026-03-10 10:46:51"
+    },
+    {
+        "id": 96,
+        "title": "ÇAY VE İKRAM GÖREVLİSİ",
+        "slug": "cay-ve-ikram-gorevlisi",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 77,
+        "created_at": "2026-03-10 10:47:16",
+        "updated_at": "2026-03-10 10:47:16"
+    },
+    {
+        "id": 97,
+        "title": "ÇAY VE İKRAM GÖREVLİSİ",
+        "slug": "cay-ve-ikram-gorevlisi-1",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 77,
+        "created_at": "2026-03-10 10:47:16",
+        "updated_at": "2026-03-10 10:47:16"
+    },
+    {
+        "id": 99,
+        "title": "TEMİZLİK PERSONELİ",
+        "slug": "temizlik-personeli",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:48:12",
+        "updated_at": "2026-03-10 10:48:12"
+    },
+    {
+        "id": 86,
+        "title": "İÇ MONTAJ",
+        "slug": "ic-montaj-1",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 9,
+        "created_at": "2026-02-26 08:54:06",
+        "updated_at": "2026-02-26 08:54:06"
+    },
+    {
+        "id": 87,
+        "title": "DIŞ MONTAJ",
+        "slug": "dis-montaj",
+        "emails": null,
+        "parent_id": 9,
+        "created_at": "2026-02-26 08:54:19",
+        "updated_at": "2026-02-26 08:54:19"
+    },
+    {
+        "id": 88,
+        "title": "TEKNİK SERVİS",
+        "slug": "teknik-servis",
+        "emails": null,
+        "parent_id": 9,
+        "created_at": "2026-02-26 08:54:42",
+        "updated_at": "2026-02-26 08:54:42"
+    },
+    {
+        "id": 89,
+        "title": "ULAŞIM ve SEVKİYAT DESTEK",
+        "slug": "ulasim-ve-sevkiyat-destek",
+        "emails": null,
+        "parent_id": 7,
+        "created_at": "2026-02-26 08:55:08",
+        "updated_at": "2026-02-26 08:55:08"
+    },
+    {
+        "id": 90,
+        "title": "SEVKİYAT DESTEK EKİBİ",
+        "slug": "sevkiyat-destek-ekibi",
+        "emails": null,
+        "parent_id": 7,
+        "created_at": "2026-02-26 08:55:36",
+        "updated_at": "2026-02-26 08:55:36"
+    },
+    {
+        "id": 91,
+        "title": "LOJİSTİK YÖNETİM ve KOORDİNASYON",
+        "slug": "lojistik-yonetim-ve-koordinasyon",
+        "emails": null,
+        "parent_id": 7,
+        "created_at": "2026-02-26 08:55:56",
+        "updated_at": "2026-02-26 08:55:56"
+    },
+    {
+        "id": 92,
+        "title": "MAKİNE ve EKİPMAN YÖNETİMİ",
+        "slug": "makine-ve-ekipman-yonetimi",
+        "emails": null,
+        "parent_id": 7,
+        "created_at": "2026-02-26 08:56:19",
+        "updated_at": "2026-02-26 08:56:19"
+    },
+    {
+        "id": 102,
+        "title": "AŞÇI-AŞÇI YARDIMCILIĞI",
+        "slug": "asci-asci-yardimciligi",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:48:49",
+        "updated_at": "2026-03-10 10:49:07"
+    },
+    {
+        "id": 103,
+        "title": "BULAŞIKHANE PERSONELİ",
+        "slug": "bulasikhane-personeli",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:49:21",
+        "updated_at": "2026-03-10 11:20:45"
+    },
+    {
+        "id": 104,
+        "title": "ŞOFÖR",
+        "slug": "sofor",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:49:30",
+        "updated_at": "2026-03-10 10:49:30"
+    },
+    {
+        "id": 105,
+        "title": "MEYDANCI",
+        "slug": "meydanci",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:50:08",
+        "updated_at": "2026-03-10 10:50:08"
+    },
+    {
+        "id": 106,
+        "title": "BAHÇE ve PEYZAJ DÜZENLEME PERSONELİ",
+        "slug": "bahce-ve-peyzaj-duzenleme-personeli",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:50:35",
+        "updated_at": "2026-03-10 10:50:35"
+    },
+    {
+        "id": 107,
+        "title": "OFİSBOY",
+        "slug": "ofisboy",
+        "emails": "ikasistan@bsban.com",
+        "parent_id": 5,
+        "created_at": "2026-03-10 10:50:45",
+        "updated_at": "2026-03-10 10:50:45"
+    }
+]

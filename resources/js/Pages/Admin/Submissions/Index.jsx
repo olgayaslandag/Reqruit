@@ -205,10 +205,10 @@ export default function Index({ submissions, forms, departments, filters }) {
                                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                             {new Date(submission.created_at).toLocaleDateString('tr-TR')}
                                         </td>
-                                        <td className="px-4 py-3 text-sm text-gray-900">
+                                        <td className="px-4 py-3 text-xs text-gray-900">
                                             {submission.form?.name}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                        <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
                                             {submission.form?.department?.title || '-'}
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap">

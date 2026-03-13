@@ -31,6 +31,14 @@ class WidgetService
             ->find($id);
     }
 
+    public function getDepartmentBySlug(string $slug): ?Department
+    {
+        return Department::with(['children.forms', 'forms.fields'])
+            ->withCount(['children', 'forms'])
+            ->where('slug', $slug)
+            ->first();
+    }
+
     public function getFormBySlug(string $slug): ?Form
     {
         return Form::with(['fields' => fn ($q) => $q->orderBy('sort_order')])

@@ -12,6 +12,7 @@ Route::middleware('guest')->group(function () {
     Route::prefix('widget')->name('api.widget.')->group(function () {
         Route::get('/departments', [WidgetController::class, 'departments'])->name('departments');
         Route::get('/departments/{id}', [WidgetController::class, 'department'])->name('department');
+        Route::get('/departments/slug/{slug}', [WidgetController::class, 'departmentSlug'])->name('department.slug');
 
         Route::get('/forms/{slug}', [WidgetFormController::class, 'show'])->name('forms.show');
         Route::post('/forms/{slug}/submit', [WidgetFormController::class, 'submit'])

@@ -23,11 +23,15 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="Şifre Sıfırlama" />
+
+            <div className="mb-6 text-sm text-gray-600">
+                Yeni şifrenizi belirleyin. Güvenli bir şifre seçtiğinizden emin olun.
+            </div>
 
             <form onSubmit={submit}>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="E-posta" />
 
                     <TextInput
                         id="email"
@@ -43,7 +47,7 @@ export default function ResetPassword({ token, email }) {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="Yeni Şifre" />
 
                     <TextInput
                         id="password"
@@ -54,6 +58,7 @@ export default function ResetPassword({ token, email }) {
                         autoComplete="new-password"
                         isFocused={true}
                         onChange={(e) => setData('password', e.target.value)}
+                        placeholder="Yeni şifreniz"
                     />
 
                     <InputError message={errors.password} className="mt-2" />
@@ -62,7 +67,7 @@ export default function ResetPassword({ token, email }) {
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Şifre Tekrar"
                     />
 
                     <TextInput
@@ -75,6 +80,7 @@ export default function ResetPassword({ token, email }) {
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
                         }
+                        placeholder="Şifrenizi tekrar girin"
                     />
 
                     <InputError
@@ -85,7 +91,7 @@ export default function ResetPassword({ token, email }) {
 
                 <div className="mt-4 flex items-center justify-end">
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
+                        {processing ? 'Kaydediliyor...' : 'Şifremi Sıfırla'}
                     </PrimaryButton>
                 </div>
             </form>

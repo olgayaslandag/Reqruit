@@ -29,21 +29,49 @@ class SubmissionRepository extends BaseRepository implements SubmissionInterface
 
         // Transform submissions to add computed attributes
         $submissions->transform(function ($submission) {
-            // Find name field (supports multiple naming conventions)
+            // Find name field - support multiple languages and formats
             $nameField = $submission->details->firstWhere('field_name', 'name')
+                ?? $submission->details->firstWhere('field_name', 'isim')
                 ?? $submission->details->firstWhere('field_name', 'ad_soyad')
+                ?? $submission->details->firstWhere('field_name', 'adsoyad')
+                ?? $submission->details->firstWhere('field_name', 'ad')
                 ?? $submission->details->firstWhere('field_name', 'full_name')
                 ?? $submission->details->firstWhere('field_name', 'name_surname');
-            
-            // Find email field
+
+            // Find surname field for Turkish
+            $surnameField = $submission->details->firstWhere('field_name', 'soyisim')
+                ?? $submission->details->firstWhere('field_name', 'soyad')
+                ?? $submission->details->firstWhere('field_name', 'soyisim')
+                ?? $submission->details->firstWhere('field_name', 'surname');
+
+            // Build full name
+            $fullName = '';
+            if ($nameField && $nameField->field_value) {
+                $fullName = $nameField->field_value;
+            }
+            if ($surnameField && $surnameField->field_value) {
+                $fullName .= ' '.$surnameField->field_value;
+            }
+
+            // Find email field - support multiple languages and formats
             $emailField = $submission->details->firstWhere('field_name', 'email')
+                ?? $submission->details->firstWhere('field_name', 'e-posta')
+                ?? $submission->details->firstWhere('field_name', 'e_posta')
                 ?? $submission->details->firstWhere('field_name', 'eposta')
                 ?? $submission->details->firstWhere('field_name', 'mail');
 
-            $submission->applicant_name = $nameField?->field_value ?? '-';
+            $submission->applicant_name = trim($fullName) ?: '-';
             $submission->applicant_email = $emailField?->field_value ?? '-';
             $submission->comment_count = $submission->comments->count();
             $submission->avg_rating = $submission->comments->whereNotNull('rating')->avg('rating');
+
+            // Capitalize form name and department title
+            if ($submission->form) {
+                $submission->form->name = ucwords(strtolower($submission->form->name));
+                if ($submission->form->department) {
+                    $submission->form->department->title = ucwords(strtolower($submission->form->department->title));
+                }
+            }
 
             return $submission;
         });
@@ -64,21 +92,49 @@ class SubmissionRepository extends BaseRepository implements SubmissionInterface
 
         // Transform submissions to add computed attributes
         $paginator->getCollection()->transform(function ($submission) {
-            // Find name field (supports multiple naming conventions)
+            // Find name field - support multiple languages and formats
             $nameField = $submission->details->firstWhere('field_name', 'name')
+                ?? $submission->details->firstWhere('field_name', 'isim')
                 ?? $submission->details->firstWhere('field_name', 'ad_soyad')
+                ?? $submission->details->firstWhere('field_name', 'adsoyad')
+                ?? $submission->details->firstWhere('field_name', 'ad')
                 ?? $submission->details->firstWhere('field_name', 'full_name')
                 ?? $submission->details->firstWhere('field_name', 'name_surname');
-            
-            // Find email field
+
+            // Find surname field for Turkish
+            $surnameField = $submission->details->firstWhere('field_name', 'soyisim')
+                ?? $submission->details->firstWhere('field_name', 'soyad')
+                ?? $submission->details->firstWhere('field_name', 'soyisim')
+                ?? $submission->details->firstWhere('field_name', 'surname');
+
+            // Build full name
+            $fullName = '';
+            if ($nameField && $nameField->field_value) {
+                $fullName = $nameField->field_value;
+            }
+            if ($surnameField && $surnameField->field_value) {
+                $fullName .= ' '.$surnameField->field_value;
+            }
+
+            // Find email field - support multiple languages and formats
             $emailField = $submission->details->firstWhere('field_name', 'email')
+                ?? $submission->details->firstWhere('field_name', 'e-posta')
+                ?? $submission->details->firstWhere('field_name', 'e_posta')
                 ?? $submission->details->firstWhere('field_name', 'eposta')
                 ?? $submission->details->firstWhere('field_name', 'mail');
 
-            $submission->applicant_name = $nameField?->field_value ?? '-';
+            $submission->applicant_name = trim($fullName) ?: '-';
             $submission->applicant_email = $emailField?->field_value ?? '-';
             $submission->comment_count = $submission->comments->count();
             $submission->avg_rating = $submission->comments->whereNotNull('rating')->avg('rating');
+
+            // Capitalize form name and department title
+            if ($submission->form) {
+                $submission->form->name = ucwords(strtolower($submission->form->name));
+                if ($submission->form->department) {
+                    $submission->form->department->title = ucwords(strtolower($submission->form->department->title));
+                }
+            }
 
             return $submission;
         });

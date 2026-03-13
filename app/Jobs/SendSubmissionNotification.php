@@ -2,12 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Mail\ApplicantThankYouMailable;
+use App\Mail\NewSubmissionMailable;
 use App\Models\Form;
 use App\Models\Submission;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Mail\Message;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +26,7 @@ class SendSubmissionNotification implements ShouldQueue
     /**
      * The maximum number of seconds the job can run.
      */
-    public int $timeout = 60;
+    public int $timeout = 120;
 
     /**
      * Create a new job instance.
@@ -40,40 +41,92 @@ class SendSubmissionNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        $recipients = $this->getRecipients();
+        // 1. Send notification to department
+        $this->sendDepartmentNotification();
 
-        if (empty($recipients)) {
-            return;
-        }
-
-        $subject = __('messages.new_submission_subject', ['form' => $this->form->name]);
-        $body = $this->buildEmailBody();
-
-        Mail::raw($body, function (Message $message) use ($recipients, $subject) {
-            $message->to($recipients)
-                ->subject($subject);
-        });
+        // 2. Send thank you email to applicant
+        $this->sendApplicantThankYouEmail();
     }
 
     /**
-     * Get the notification recipients.
+     * Send notification to department emails.
+     */
+    protected function sendDepartmentNotification(): void
+    {
+        $recipients = $this->getRecipients();
+
+        if (empty($recipients)) {
+            Log::info('No recipients found for submission notification', [
+                'form_id' => $this->form->id,
+                'submission_id' => $this->submission->id,
+            ]);
+
+            return;
+        }
+
+        try {
+            Mail::to($recipients)->send(new NewSubmissionMailable($this->submission));
+
+            Log::info('Department notification sent', [
+                'recipients' => $recipients,
+                'submission_id' => $this->submission->id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to send department notification', [
+                'error' => $e->getMessage(),
+                'submission_id' => $this->submission->id,
+            ]);
+        }
+    }
+
+    /**
+     * Send thank you email to applicant.
+     */
+    protected function sendApplicantThankYouEmail(): void
+    {
+        // Find applicant's email from submission details
+        $applicantEmail = $this->getApplicantEmail();
+
+        if (empty($applicantEmail)) {
+            Log::info('No applicant email found for thank you email', [
+                'submission_id' => $this->submission->id,
+            ]);
+
+            return;
+        }
+
+        try {
+            Mail::to($applicantEmail)->send(
+                new ApplicantThankYouMailable($this->submission, $applicantEmail)
+            );
+
+            Log::info('Applicant thank you email sent', [
+                'email' => $applicantEmail,
+                'submission_id' => $this->submission->id,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to send applicant thank you email', [
+                'error' => $e->getMessage(),
+                'submission_id' => $this->submission->id,
+            ]);
+        }
+    }
+
+    /**
+     * Get the notification recipients (department/form emails).
      */
     protected function getRecipients(): array
     {
         $recipients = [];
 
-        // Add department emails
-        $department = $this->form->department;
-        if ($department && ! empty($department->emails)) {
-            $deptEmails = is_array($department->emails)
-                ? $department->emails
-                : [$department->emails];
-            $recipients = array_merge($recipients, $deptEmails);
-        }
-
-        // Add form-specific notification emails
+        // Form notification_emails öncelikli
         if (! empty($this->form->notification_emails)) {
             $recipients = array_merge($recipients, $this->form->notification_emails);
+        }
+        // Sonra department emails
+        elseif (! empty($this->form->department?->emails)) {
+            $emails = $this->form->department->emails;
+            $recipients = array_merge($recipients, is_array($emails) ? $emails : [$emails]);
         }
 
         // Remove duplicates and empty values
@@ -81,20 +134,20 @@ class SendSubmissionNotification implements ShouldQueue
     }
 
     /**
-     * Build the email body.
+     * Get applicant's email from submission details.
      */
-    protected function buildEmailBody(): string
+    protected function getApplicantEmail(): ?string
     {
-        $body = __('messages.new_submission_intro')."\n\n";
-        $body .= __('messages.form_label').": {$this->form->name}\n";
-        $body .= __('messages.reference_no').": {$this->submission->reference_no}\n";
-        $body .= __('messages.date_label').": {$this->submission->created_at}\n\n";
+        // Common field names for email
+        $emailFields = ['email', 'eposta', 'mail', 'e-posta', 'email_address'];
 
         foreach ($this->submission->details as $detail) {
-            $body .= "{$detail->field_label}: {$detail->field_value}\n";
+            if (in_array(strtolower($detail->field_name), $emailFields)) {
+                return $detail->field_value;
+            }
         }
 
-        return $body;
+        return null;
     }
 
     /**

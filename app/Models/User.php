@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\UserRoleEnum;
 use App\Enums\UserStatusEnum;
+use App\Notifications\CustomResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -65,5 +66,13 @@ class User extends Authenticatable
     public function getStatusLabelAttribute(): string
     {
         return $this->status_id?->label() ?? '-';
+    }
+
+    /**
+     * Send a password reset notification.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new CustomResetPasswordNotification($token));
     }
 }

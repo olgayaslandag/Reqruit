@@ -39,4 +39,21 @@ class WidgetController extends Controller
             'data' => new DepartmentResource($department),
         ]);
     }
+
+    public function departmentSlug(string $slug): JsonResponse
+    {
+        $department = $this->widgetService->getDepartmentBySlug($slug);
+
+        if (! $department) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Departman bulunamadı.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => new DepartmentResource($department),
+        ]);
+    }
 }

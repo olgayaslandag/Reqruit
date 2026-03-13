@@ -1,0 +1,243 @@
+# =============================================================================
+# OpenCode Proje Yapılandırması
+# =============================================================================
+version: "1.0"
+last_updated: "2024-01-01"
+
+# -----------------------------------------------------------------------------
+# DİL AYARLARI
+# -----------------------------------------------------------------------------
+language:
+  response: "tr"
+  code: "en"
+  comments: "tr"           # Kod yorumları Türkçe olsun ki ekip anlayabilsin
+
+# -----------------------------------------------------------------------------
+# PROJE BİLGİLERİ
+# -----------------------------------------------------------------------------
+project:
+  framework: "laravel"
+  php_version: "8.2"
+  architecture: "repository_service_pattern"
+  database: "mysql"
+  test_framework: "pest"
+
+# -----------------------------------------------------------------------------
+# AJAN YAPILANDIRMASI
+# -----------------------------------------------------------------------------
+agents:
+  # -------------------------------------------------------------------------
+  # 1. SENIOR BACKEND ARCHITECT (TEK YETKİLİ)
+  # -------------------------------------------------------------------------
+  - name: "Senior Backend Architect"
+    file: ".opencode/agents/senior-backend-architect.md"
+    role: "primary"
+    auto_load: true
+    description: "Tüm PHP, Logic, DB, API ve Mimari kararları"
+    triggers:
+      - "backend"
+      - "api"
+      - "endpoint"
+      - "model"
+      - "migration"
+      - "controller"
+      - "service"
+      - "repository"
+      - "database"
+      - "query"
+      - "php"
+      - "artisan"
+      - "seed"
+      - "job"
+      - "event"
+      - "listener"
+
+  # -------------------------------------------------------------------------
+  # 2. SENIOR FRONTEND ARCHITECT (YENİ EKLENDİ)
+  # -------------------------------------------------------------------------
+  - name: "Senior Frontend Architect"
+    file: ".opencode/agents/senior-frontend-architect.md"
+    role: "specialist"
+    auto_load: false
+    description: "Blade, CSS, JS, UI, Form Validation"
+    triggers:
+      # --- Genel Kavramlar ---
+      - "frontend"
+      - "ui"
+      - "tasarım"
+      - "arayüz"
+      - "sayfa"
+      - "ekran"
+      - "component"
+      - "bileşen"
+
+      # --- Teknolojiler ---
+      - "blade"
+      - "view"
+      - "layout"
+      - "css"
+      - "scss"
+      - "tailwind"
+      - "javascript"
+      - "typescript"
+      - "alpine"
+      - "vue"
+      - "react"
+      - "inertia"
+
+      # --- Dosya Uzantıları (Çok Önemli) ---
+      - ".js"
+      - ".ts"
+      - ".jsx"
+      - ".tsx"
+      - ".vue"
+      - ".css"
+      - ".scss"
+      - ".blade.php"
+
+      # --- UI Elemanları ---
+      - "form"
+      - "input"
+      - "button"
+      - "modal"
+      - "tablo"
+      - "liste"
+      - "menu"
+      - "navbar"
+      - "footer"
+
+      # --- Paket Yöneticileri (Frontend Bağımlılıkları) ---
+      - "npm"
+      - "yarn"
+      - "pnpm"
+      - "package.json"
+      - "vite"
+
+  # -------------------------------------------------------------------------
+  # 3. CODE REFINER (DENETÇİ)
+  # -------------------------------------------------------------------------
+  - name: "Code Refiner"
+    file: ".opencode/agents/code_refiner.md"
+    role: "subagent"
+    auto_load: true
+    description: "Kod iyileştirme ve standart kontrolü"
+    triggers:
+      # --- Temel Eylemler ---
+      - "iyileştir"
+      - "refine"
+      - "düzelt"
+      - "optimize"
+      - "temizle"
+      - "sadeleştir"
+      - "düzenle"
+      - "gözden geçir"
+
+      # --- Kod Kalitesi & Review ---
+      - "review"
+      - "kontrol"
+      - "audit"
+      - "denetle"
+      - "incele"
+      - "kalite"
+      - "standart"
+      - "best practice"
+
+      # --- Refactoring ---
+      - "refactor"
+      - "yeniden yaz"
+      - "yapıyı düzelt"
+      - "mimari kontrol"
+      - "tekrarı önle"
+      - "DRY"
+      - "SOLID"
+
+      # --- Hata & Güvenlik ---
+      - "hata bul"
+      - "güvenlik kontrol"
+      - "slimlar"
+      - "vulnerability"
+      - "bug"
+      - "issue"
+
+      # --- Performans ---
+      - "performans"
+      - "hızlandır"
+      - "optimize et"
+      - "cache"
+      - "query optimize"
+
+      # --- Komut Tabanlı (@mention) ---
+      - "@refiner"
+      - "@review"
+      - "@check"
+      - "@audit"
+      - "@clean"
+
+      # --- Otomatik Tetikleyiciler ---
+      - "after_write"
+      - "before_commit"
+      - "on_save"
+
+# -----------------------------------------------------------------------------
+# KURALLAR
+# -----------------------------------------------------------------------------
+rules:
+  - file: ".opencode/rules/naming_conventions.md"
+    priority: "high"
+    auto_load: true
+  - file: ".opencode/rules/architecture.md"
+    priority: "high"
+    auto_load: true
+  - file: ".opencode/rules/security.md"
+    priority: "critical"
+    auto_load: true
+
+# -----------------------------------------------------------------------------
+# İŞ AKIŞLARI
+# -----------------------------------------------------------------------------
+workflows:
+  fullstack_module:
+    file: ".opencode/workflows/fullstack_module.md"
+    description: "Backend + Frontend birlikte modül oluşturur"
+    trigger: "modül oluştur"
+
+  bug_fix:
+    file: ".opencode/workflows/bug_fix.md"
+    trigger: "hata düzelt"
+
+# -----------------------------------------------------------------------------
+# SİSTEM AYARLARI
+# -----------------------------------------------------------------------------
+settings:
+  auto_load: true
+  refine_after_write: true
+  ask_before_breaking_change: true
+  max_context_files: 10
+  cache_enabled: true
+
+# -----------------------------------------------------------------------------
+# ZORUNLU KURALLAR
+# -----------------------------------------------------------------------------
+enforced_rules:
+  - "Controller içinde business logic YASAK"
+  - "Controller → Repository doğrudan çağrı YASAK"
+  - "PollModel, PollService, PollRepository suffix KULLAN"
+  - "Interface üzerinden Repository çağrısı YAP"
+  - "Blade dosyalarında {{ }} dışına asla ham veri yazma (XSS)"
+  - "Frontend ajanı Backend yapısına (Route/Variable) BAĞIMLI çalışır"
+
+# -----------------------------------------------------------------------------
+# DOSYA YAPISI
+# -----------------------------------------------------------------------------
+file_structure:
+  agents:
+    - ".opencode/agents/senior-backend-architect.md"
+    - ".opencode/agents/senior-frontend-architect.md"
+    - ".opencode/agents/code_refiner.md"
+  rules:
+    - ".opencode/rules/naming_conventions.md"
+    - ".opencode/rules/architecture.md"
+    - ".opencode/rules/security.md"
+  workflows:
+    - ".opencode/workflows/fullstack_module.md"
+    - ".opencode/workflows/bug_fix.md"

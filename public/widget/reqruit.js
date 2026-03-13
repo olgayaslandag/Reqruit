@@ -5,6 +5,7 @@
         var defaults = {
             container: '#reqruit-widget',
             baseUrl: '',
+            department: null,
             theme: {
                 primaryColor: '#4f46e5',
                 primaryHover: '#4338ca',
@@ -44,7 +45,19 @@
                 }
 
                 injectStyles();
-                loadRootDepartments();
+                
+                // Önce init parametresindeki department'i kontrol et, yoksa URL'den al
+                var deptSlug = config.department;
+                if (!deptSlug) {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    deptSlug = urlParams.get('department');
+                }
+                
+                if (deptSlug) {
+                    loadDepartmentBySlug(deptSlug);
+                } else {
+                    loadRootDepartments();
+                }
             }
             
             if (document.readyState === 'loading') {
@@ -347,6 +360,27 @@
                 @keyframes reqruit-spin {
                     to { transform: rotate(360deg); }
                 }
+                .reqruit-widget-wrapper {
+                    position: relative;
+                }
+                .reqruit-widget-loading-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(255, 255, 255, 0.9);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10;
+                    border-radius: var(--reqruit-border-radius);
+                }
+                .reqruit-widget-loading-overlay .reqruit-spinner {
+                    width: 48px;
+                    height: 48px;
+                    border-width: 4px;
+                }
                 .reqruit-error-container {
                     background: #fef2f2;
                     border: 1px solid var(--reqruit-error);
@@ -381,6 +415,7 @@
         function loadRootDepartments() {
             state.loading = true;
             state.breadcrumb = [];
+            state.form = null;  // Form temizlenmeli
             render();
 
             apiRequest('/departments')
@@ -401,6 +436,20 @@
                 });
         }
 
+        function updateUrl(slug) {
+            if (slug) {
+                var url = new URL(window.location.href);
+                url.searchParams.set('department', slug);
+                window.history.replaceState({ slug: slug }, '', url.toString());
+            }
+        }
+
+        function clearUrl() {
+            var url = new URL(window.location.href);
+            url.searchParams.delete('department');
+            window.history.replaceState({}, '', url.toString());
+        }
+
         function loadDepartment(id) {
             state.loading = true;
             render();
@@ -413,16 +462,62 @@
                             state.departments = dept.children;
                             state.breadcrumb.push({
                                 id: id,
-                                title: dept.title
+                                title: dept.title,
+                                slug: dept.slug
                             });
                             state.form = null;
+                            updateUrl(dept.slug);
                         } else if (dept.has_form && dept.form) {
                             state.form = dept.form;
                             state.breadcrumb.push({
                                 id: id,
-                                title: dept.title
+                                title: dept.title,
+                                slug: dept.slug
                             });
                             state.departments = [];
+                            updateUrl(dept.slug);
+                        }
+                        state.error = null;
+                    } else {
+                        state.error = response.message || 'Departman yüklenemedi.';
+                    }
+                })
+                .catch(function() {
+                    state.error = 'Bağlantı hatası. Lütfen tekrar deneyin.';
+                })
+                .finally(function() {
+                    state.loading = false;
+                    render();
+                });
+        }
+
+        function loadDepartmentBySlug(slug) {
+            state.loading = true;
+            state.breadcrumb = [];
+            render();
+
+            apiRequest('/departments/slug/' + encodeURIComponent(slug))
+                .then(function(response) {
+                    if (response.success) {
+                        var dept = response.data;
+                        if (dept.has_children) {
+                            state.departments = dept.children;
+                            state.breadcrumb.push({
+                                id: dept.id,
+                                title: dept.title,
+                                slug: dept.slug
+                            });
+                            state.form = null;
+                            updateUrl(dept.slug);
+                        } else if (dept.has_form && dept.form) {
+                            state.form = dept.form;
+                            state.breadcrumb.push({
+                                id: dept.id,
+                                title: dept.title,
+                                slug: dept.slug
+                            });
+                            state.departments = [];
+                            updateUrl(dept.slug);
                         }
                         state.error = null;
                     } else {
@@ -441,19 +536,25 @@
         function navigateToBreadcrumb(index) {
             if (index === -1) {
                 loadRootDepartments();
+                clearUrl();
             } else {
                 state.breadcrumb = state.breadcrumb.slice(0, index);
-                loadDepartment(state.breadcrumb[index].id);
+                var item = state.breadcrumb[index];
+                if (item.slug) {
+                    loadDepartmentBySlug(item.slug);
+                } else {
+                    loadDepartment(item.id);
+                }
             }
         }
 
         function render() {
             if (!container) return;
 
-            var html = '<div class="reqruit-widget">';
+            var html = '<div class="reqruit-widget-wrapper">';
 
             if (state.loading) {
-                html += renderLoading();
+                html += '<div class="reqruit-widget-loading-overlay"><div class="reqruit-spinner"></div></div>';
             } else if (state.error) {
                 html += renderError();
             } else if (state.form) {
@@ -461,18 +562,14 @@
             } else {
                 html += renderDepartments();
             }
-
+            
             html += '</div>';
             container.innerHTML = html;
             attachEventListeners();
         }
 
         function renderLoading() {
-            return `
-                <div class="reqruit-loading">
-                    <div class="reqruit-spinner"></div>
-                </div>
-            `;
+            return '';
         }
 
         function renderError() {
@@ -491,7 +588,7 @@
 
             if (state.breadcrumb.length > 0) {
                 html += '<div class="reqruit-breadcrumb">';
-                html += '<button class="reqruit-breadcrumb-item" data-breadcrumb="-1">Ana Sayfa</button>';
+                html += '<button type="button" class="reqruit-breadcrumb-item" data-breadcrumb="-1">Departmanlar</button>';
                 state.breadcrumb.forEach(function(item, index) {
                     html += '<span class="reqruit-breadcrumb-separator">›</span>';
                     if (index === state.breadcrumb.length - 1) {
@@ -536,7 +633,7 @@
 
             if (state.breadcrumb.length > 0) {
                 html += '<div class="reqruit-breadcrumb">';
-                html += '<button class="reqruit-breadcrumb-item" data-breadcrumb="-1">Ana Sayfa</button>';
+                html += '<button type="button" class="reqruit-breadcrumb-item" data-breadcrumb="-1">Departmanlar</button>';
                 state.breadcrumb.forEach(function(item, index) {
                     html += '<span class="reqruit-breadcrumb-separator">›</span>';
                     if (index === state.breadcrumb.length - 1) {
@@ -662,7 +759,8 @@
         function attachEventListeners() {
             var breadcrumbItems = container.querySelectorAll('[data-breadcrumb]');
             breadcrumbItems.forEach(function(item) {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
                     var index = parseInt(this.getAttribute('data-breadcrumb'));
                     navigateToBreadcrumb(index);
                 });
@@ -747,7 +845,12 @@
 
         function retry() {
             if (state.breadcrumb.length > 0) {
-                loadDepartment(state.breadcrumb[state.breadcrumb.length - 1].id);
+                var lastItem = state.breadcrumb[state.breadcrumb.length - 1];
+                if (lastItem.slug) {
+                    loadDepartmentBySlug(lastItem.slug);
+                } else {
+                    loadDepartment(lastItem.id);
+                }
             } else {
                 loadRootDepartments();
             }

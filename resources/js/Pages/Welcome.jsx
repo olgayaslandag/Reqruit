@@ -17,22 +17,14 @@ export default function Welcome({ auth }) {
                                     >
                                         Panele Git
                                     </Link>
-                                ) : (
-                                    <>
-                                        <Link
-                                            href={route('login')}
-                                            className="px-4 py-2 text-white hover:text-gray-200 transition"
-                                        >
-                                            Giriş Yap
-                                        </Link>
-                                        <Link
-                                            href={route('register')}
-                                            className="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition"
-                                        >
-                                            Kayıt Ol
-                                        </Link>
-                                    </>
-                                )}
+                ) : (
+                    <Link
+                        href={route('login')}
+                        className="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition"
+                    >
+                        Giriş Yap
+                    </Link>
+                )}
                             </div>
                         </nav>
                     </header>
@@ -48,10 +40,10 @@ export default function Welcome({ auth }) {
                             </p>
                             <div className="flex gap-4 justify-center">
                                 <Link
-                                    href={route('register')}
+                                    href={route('login')}
                                     className="px-6 py-3 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-gray-100 transition text-lg"
                                 >
-                                    Hemen Başlayın
+                                    Giriş Yap
                                 </Link>
                                 {auth.user && (
                                     <Link
