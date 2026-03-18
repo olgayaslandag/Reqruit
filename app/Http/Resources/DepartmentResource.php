@@ -8,8 +8,8 @@ class DepartmentResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $hasChildren = $this->children_count ?? ($this->relationLoaded('children') ? $this->children->count() > 0 : false);
-        $hasForm = $this->forms_count ?? ($this->relationLoaded('forms') ? $this->forms->count() > 0 : false);
+        $hasChildren = (bool) ($this->children_count ?? ($this->relationLoaded('children') ? $this->children->count() > 0 : false));
+        $hasForm = (bool) ($this->forms_count ?? ($this->relationLoaded('forms') ? $this->forms->count() > 0 : false));
 
         return [
             'id' => $this->id,

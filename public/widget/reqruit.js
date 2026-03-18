@@ -117,22 +117,15 @@
                     flex-wrap: wrap;
                 }
                 .reqruit-breadcrumb-item {
-                    color: var(--reqruit-primary);
-                    cursor: pointer;
-                    font-size: 14px;
                     background: none;
                     border: none;
                     padding: 0;
+                    cursor: pointer;
                 }
                 .reqruit-breadcrumb-item:hover {
                     text-decoration: underline;
                 }
-                .reqruit-breadcrumb-separator {
-                    color: #9ca3af;
-                }
                 .reqruit-breadcrumb-current {
-                    color: var(--reqruit-text);
-                    font-size: 14px;
                     font-weight: 500;
                 }
                 .reqruit-title {
@@ -216,30 +209,8 @@
                     color: var(--reqruit-error);
                     margin-left: 4px;
                 }
-                .reqruit-input,
-                .reqruit-select,
-                .reqruit-textarea {
-                    width: 100%;
-                    padding: 10px 12px;
-                    font-size: 14px;
-                    font-family: inherit;
-                    border: 1px solid var(--reqruit-border);
-                    border-radius: var(--reqruit-border-radius);
-                    background: var(--reqruit-card-bg);
-                    color: var(--reqruit-text);
-                    transition: border-color 0.2s, box-shadow 0.2s;
-                }
-                .reqruit-input:focus,
-                .reqruit-select:focus,
-                .reqruit-textarea:focus {
-                    outline: none;
-                    border-color: var(--reqruit-primary);
-                    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-                }
-                .reqruit-textarea {
-                    min-height: 100px;
-                    resize: vertical;
-                }
+
+
                 .reqruit-error-msg {
                     color: var(--reqruit-error);
                     font-size: 12px;
@@ -261,12 +232,9 @@
                 }
                 .reqruit-checkbox,
                 .reqruit-radio {
-                    width: 16px;
-                    height: 16px;
                     accent-color: var(--reqruit-primary);
                 }
                 .reqruit-file-input {
-                    font-size: 14px;
                 }
                 .reqruit-file-hint {
                     font-size: 12px;
@@ -277,23 +245,15 @@
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 12px 24px;
-                    font-size: 14px;
-                    font-weight: 500;
                     font-family: inherit;
-                    color: #fff;
-                    background: var(--reqruit-primary);
                     border: none;
-                    border-radius: var(--reqruit-border-radius);
                     cursor: pointer;
-                    transition: background 0.2s;
                 }
                 .reqruit-btn:hover {
-                    background: var(--reqruit-primary-hover);
+                    filter: brightness(0.9);
                 }
                 .reqruit-btn:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
+                    filter: opacity(0.6);
                 }
                 .reqruit-btn-secondary {
                     background: transparent;
