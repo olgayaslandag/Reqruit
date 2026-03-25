@@ -8,3 +8,5 @@ export default function InputError({ message, className = '', ...props }) {
         </p>
     ) : null;
 }
+
+export { InputError };

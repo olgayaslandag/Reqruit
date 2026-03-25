@@ -20,11 +20,14 @@ export default function Builder({ departments, form }) {
         name: form?.name || '',
         department_id: form?.department_id || '',
         description: form?.description || '',
-        notification_emails: form?.notification_emails?.length ? form.notification_emails : [''],
-        fields: form?.fields?.length ? form.fields : [
+        notification_emails: Array.isArray(form?.notification_emails) ? form.notification_emails.filter(email => email) : [],
+        fields: (form?.fields?.length ? form.fields.map(field => ({
+            ...field,
+            options: Array.isArray(field.options) ? field.options : []
+        })) : [
             { name: 'name', label: 'Ad Soyad', type: 'text', required: true, options: [] },
             { name: 'email', label: 'E-posta', type: 'email', required: true, options: [] },
-        ],
+        ]),
     });
 
     const [draggedIndex, setDraggedIndex] = useState(null);
@@ -85,10 +88,14 @@ export default function Builder({ departments, form }) {
         }
         
         if (key === 'name') {
-            newFields[index].name = generateUniqueName(value, index);
+            // Generate unique name from the provided value
+            const uniqueName = generateUniqueName(value, index);
+            newFields[index].name = uniqueName;
+            // Don't set newFields[index][key] = value here, because we want the unique name
+        } else {
+            newFields[index][key] = value;
         }
         
-        newFields[index][key] = value;
         setData('fields', newFields);
     };
 
@@ -147,13 +154,35 @@ export default function Builder({ departments, form }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         
+        // Clean up notification emails - remove empty ones
+        const cleanedNotificationEmails = (data.notification_emails || []).filter(email => email.trim() !== '');
+        
+        // Prepare the data to send
+        const formData = {
+            ...data,
+            notification_emails: cleanedNotificationEmails
+        };
+        
+        // Debug: Log the data being sent
+        console.log('Form data being submitted:', formData);
+        
         if (form?.id) {
-            put(`/admin/forms/${form.id}`, {
+            put(`/admin/forms/${form.id}`, formData, {
                 onSuccess: () => router.visit('/admin/forms'),
+                onError: (errors) => {
+                    console.error('Form update errors:', errors);
+                    // Optionally display errors to user
+                    alert('Form güncellenirken hata oluştu. Konsolu kontrol edin.');
+                },
             });
         } else {
-            post('/admin/forms', {
+            post('/admin/forms', formData, {
                 onSuccess: () => router.visit('/admin/forms'),
+                onError: (errors) => {
+                    console.error('Form create errors:', errors);
+                    // Optionally display errors to user
+                    alert('Form oluşturulurken hata oluştu. Konsolu kontrol edin.');
+                },
             });
         }
     };
@@ -217,7 +246,7 @@ export default function Builder({ departments, form }) {
                                                 type="email"
                                                 value={email || ''}
                                                 onChange={(e) => {
-                                                    const newEmails = [...(data.notification_emails || [''])];
+                                                    const newEmails = [...(data.notification_emails || [])];
                                                     newEmails[index] = e.target.value;
                                                     setData('notification_emails', newEmails);
                                                 }}
@@ -228,7 +257,7 @@ export default function Builder({ departments, form }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        const newEmails = (data.notification_emails || ['']).filter((_, i) => i !== index);
+                                                        const newEmails = (data.notification_emails || []).filter((_, i) => i !== index);
                                                         setData('notification_emails', newEmails);
                                                     }}
                                                     className="p-2 text-red-600 hover:text-red-900"
@@ -242,7 +271,7 @@ export default function Builder({ departments, form }) {
                                     ))}
                                     <button
                                         type="button"
-                                        onClick={() => setData('notification_emails', [...(data.notification_emails || ['']), ''])}
+                                        onClick={() => setData('notification_emails', [...(data.notification_emails || []), ''])}
                                         className="text-indigo-600 hover:text-indigo-900 text-sm"
                                     >
                                         + E-posta ekle

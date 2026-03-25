@@ -18,3 +18,5 @@ export default function PrimaryButton({
         </button>
     );
 }
+
+export { PrimaryButton };

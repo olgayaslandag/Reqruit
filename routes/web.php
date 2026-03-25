@@ -1,10 +1,15 @@
 <?php
 
+use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\PayrollReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicFormController;
+use App\Http\Controllers\SalaryComponentController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -109,6 +114,106 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
         Route::put('/{user}', [UserController::class, 'update'])->name('update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+    });
+
+    // Admin - Employees
+    Route::prefix('admin/employees')->name('admin.employees.')->group(function () {
+        Route::get('/', [EmployeeController::class, 'index'])->name('index');
+        Route::get('/create', [EmployeeController::class, 'create'])->name('create');
+        Route::post('/', [EmployeeController::class, 'store'])->name('store');
+        Route::get('/{employee}', [EmployeeController::class, 'show'])->name('show');
+        Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
+        Route::put('/{employee}', [EmployeeController::class, 'update'])->name('update');
+        Route::delete('/{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
+
+        // Doküman işlemleri
+        Route::post('/{employee}/documents', [EmployeeController::class, 'uploadDocument'])->name('uploadDocument');
+        Route::delete('/{employee}/documents/{documentId}', [EmployeeController::class, 'deleteDocument'])->name('deleteDocument');
+
+        // Pozisyon geçmişi
+        Route::post('/{employee}/positions', [EmployeeController::class, 'addPosition'])->name('addPosition');
+
+        // İşten çıkarma
+        Route::post('/{employee}/terminate', [EmployeeController::class, 'terminate'])->name('terminate');
+
+        // Arama
+        Route::get('/search', [EmployeeController::class, 'search'])->name('search');
+    });
+
+    // Admin - Salary Components
+    Route::prefix('admin/salary-components')->name('admin.salary-components.')->group(function () {
+        Route::get('/', [SalaryComponentController::class, 'index'])->name('index');
+        Route::get('/create', [SalaryComponentController::class, 'create'])->name('create');
+        Route::post('/', [SalaryComponentController::class, 'store'])->name('store');
+        Route::get('/{salaryComponent}', [SalaryComponentController::class, 'show'])->name('show');
+        Route::get('/{salaryComponent}/edit', [SalaryComponentController::class, 'edit'])->name('edit');
+        Route::put('/{salaryComponent}', [SalaryComponentController::class, 'update'])->name('update');
+        Route::delete('/{salaryComponent}', [SalaryComponentController::class, 'destroy'])->name('destroy');
+    });
+
+    // Admin - Payrolls
+    Route::prefix('admin/payrolls')->name('admin.payrolls.')->group(function () {
+        Route::get('/', [PayrollController::class, 'index'])->name('index');
+        Route::get('/create', [PayrollController::class, 'create'])->name('create');
+        Route::post('/', [PayrollController::class, 'store'])->name('store');
+        Route::get('/{payroll}', [PayrollController::class, 'show'])->name('show');
+        Route::get('/{payroll}/edit', [PayrollController::class, 'edit'])->name('edit');
+        Route::put('/{payroll}', [PayrollController::class, 'update'])->name('update');
+        Route::delete('/{payroll}', [PayrollController::class, 'destroy'])->name('destroy');
+
+        // Bordro kalemleri oluştur
+        Route::post('/{payroll}/generate-items', [PayrollController::class, 'generateItems'])->name('generateItems');
+
+        // Bordro onay
+        Route::post('/{payroll}/approve', [PayrollController::class, 'approve'])->name('approve');
+
+        // Bordro yayınla
+        Route::post('/{payroll}/publish', [PayrollController::class, 'publish'])->name('publish');
+    });
+
+    // Admin - Advances
+    Route::prefix('admin/advances')->name('admin.advances.')->group(function () {
+        Route::get('/', [AdvanceController::class, 'index'])->name('index');
+        Route::get('/create', [AdvanceController::class, 'create'])->name('create');
+        Route::post('/', [AdvanceController::class, 'store'])->name('store');
+        Route::get('/{advance}', [AdvanceController::class, 'show'])->name('show');
+        Route::get('/{advance}/edit', [AdvanceController::class, 'edit'])->name('edit');
+        Route::put('/{advance}', [AdvanceController::class, 'update'])->name('update');
+        Route::delete('/{advance}', [AdvanceController::class, 'destroy'])->name('destroy');
+
+        // Avans onay
+        Route::post('/{advance}/approve', [AdvanceController::class, 'approve'])->name('approve');
+
+        // Avans reddet
+        Route::post('/{advance}/reject', [AdvanceController::class, 'reject'])->name('reject');
+
+        // Avans ödenmiş olarak işaretle
+        Route::post('/{advance}/mark-as-paid', [AdvanceController::class, 'markAsPaid'])->name('markAsPaid');
+
+        // Avans iptal
+        Route::post('/{advance}/cancel', [AdvanceController::class, 'cancel'])->name('cancel');
+    });
+
+    // Admin - Payroll Reports
+    Route::prefix('admin/payroll-reports')->name('admin.payroll-reports.')->group(function () {
+        Route::get('/', [PayrollReportController::class, 'index'])
+            ->middleware([\App\Http\Middleware\CheckPayrollViewPermission::class])
+            ->name('index');
+        Route::get('/summary/{payroll}', [PayrollReportController::class, 'summary'])
+            ->middleware([\App\Http\Middleware\CheckPayrollViewPermission::class])
+            ->name('summary');
+        Route::get('/tax-summary/{payroll}', [PayrollReportController::class, 'taxSummary'])
+            ->middleware([\App\Http\Middleware\CheckPayrollViewPermission::class])
+            ->name('taxSummary');
+        Route::get('/department-summary/{payroll}', [PayrollReportController::class, 'departmentSummary'])
+            ->middleware([\App\Http\Middleware\CheckPayrollViewPermission::class])
+            ->name('departmentSummary');
+        Route::get('/compare', [PayrollReportController::class, 'compare'])
+            ->middleware([\App\Http\Middleware\CheckPayrollGeneratePermission::class])
+            ->name('compare');
+        Route::get('/annual', [PayrollReportController::class, 'annual'])
+            ->middleware([\App\Http\Middleware\CheckPayrollGeneratePermission::class])
+            ->name('annual');
     });
 
     // Profile

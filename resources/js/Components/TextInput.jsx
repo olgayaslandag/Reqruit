@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
-export default forwardRef(function TextInput(
+const TextInput = forwardRef(function TextInput(
     { type = 'text', className = '', isFocused = false, ...props },
     ref,
 ) {
@@ -28,3 +28,6 @@ export default forwardRef(function TextInput(
         />
     );
 });
+
+export default TextInput;
+export { TextInput };
