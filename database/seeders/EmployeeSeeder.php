@@ -4,9 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\EmployeeCertificate;
-use App\Models\EmployeeEducation;
-use App\Models\EmployeePositionHistory;
 use Illuminate\Database\Seeder;
 
 class EmployeeSeeder extends Seeder
@@ -16,7 +13,7 @@ class EmployeeSeeder extends Seeder
         // Create departments if not exist
         $departments = $this->createDepartments();
 
-        // Seed employees
+        // Seed employees - 200+
         $employees = $this->seedEmployees($departments);
 
         // Seed employee education
@@ -34,19 +31,23 @@ class EmployeeSeeder extends Seeder
         $departmentData = [
             ['title' => 'Bilgi Teknolojileri', 'slug' => 'bilgi-teknolojileri'],
             ['title' => 'İnsan Kaynakları', 'slug' => 'insan-kaynaklari'],
-            ['title' => 'Proje Yönetimi', 'slug' => 'proje-yonetimi'],
+            ['title' => 'Proje Yönetimi', 'slug' => 'proye-yonetimi'],
             ['title' => 'Muhasebe', 'slug' => 'muhasebe'],
+            ['title' => 'Satış', 'slug' => 'satıs'],
+            ['title' => 'Pazarlama', 'slug' => 'pazarlama'],
+            ['title' => 'Üretim', 'slug' => 'uretim'],
+            ['title' => 'Müşteri Hizmetleri', 'slug' => 'musteri-hizmetleri'],
+            ['title' => 'Ar-Ge', 'slug' => 'ar-ge'],
+            ['title' => 'Finans', 'slug' => 'finans'],
         ];
 
         $departments = [];
-        $slugs = ['bilgi-teknolojileri', 'insan-kaynaklari', 'proje-yonetimi', 'muhasebe'];
-        
-        foreach ($departmentData as $index => $data) {
+        foreach ($departmentData as $data) {
             $department = Department::firstOrCreate(
                 ['slug' => $data['slug']],
                 $data
             );
-            $departments[$slugs[$index]] = $department;
+            $departments[$data['slug']] = $department;
         }
 
         return $departments;
@@ -54,211 +55,250 @@ class EmployeeSeeder extends Seeder
 
     private function seedEmployees(array $departments): array
     {
+        $now = now();
         $employees = [];
 
-        // 1. Ahmet Yılmaz - Yazılım Geliştirici
-        $employees['ahmet'] = Employee::create([
-            'identity_no' => '12345678901',
-            'first_name' => 'Ahmet',
-            'last_name' => 'Yılmaz',
-            'birth_date' => '1990-05-15',
-            'gender' => 'male',
-            'phone' => '+90 532 123 4567',
-            'email' => 'ahmet.yilmaz@company.com',
-            'marital_status' => 'married',
-            'children_count' => 2,
-            'hire_date' => '2022-01-10',
-            'position_title' => 'Yazılım Geliştirici',
-            'department_id' => $departments['bilgi-teknolojileri']->id,
-            'employment_type' => 'full_time',
-            'contract_type' => 'permanent',
-        ]);
+        $firstNames = [
+            'Ahmet', 'Ayşe', 'Mehmet', 'Fatma', 'Ali', 'Burak', 'Cem', 'Deniz', 'Elif',
+            'Ferdi', 'Gizem', 'Hakan', 'İpek', 'Kaan', 'Lale', 'Mert', 'Nesrin', 'Onur', 'Pınar',
+            'Rıza', 'Sevda', 'Tolga', 'Umut', 'Vildan', 'Yasin', 'Zeynep', 'Barış', 'Can', 'Derya',
+            'Eren', 'Funda', 'Gökhan', 'Hilal', 'İrem', 'Kadir', 'Leyla', 'Murat', 'Nermin', 'Orhan',
+            'Serkan', 'Tuba', 'Ümit', 'Volkan', 'Yasemin', 'Zafer', 'Bahar', 'Cansu', 'Duygu', 'Emre',
+            'Gamze', 'Hüseyin', 'Işıl', 'Jale', 'Kamil', 'Lütfiye', 'Mahmut', 'Nuri', 'Olcay', 'Peşin',
+        ];
 
-        // 2. Ayşe Demir - İK Uzmanı
-        $employees['ayse'] = Employee::create([
-            'identity_no' => '23456789012',
-            'first_name' => 'Ayşe',
-            'last_name' => 'Demir',
-            'birth_date' => '1992-08-22',
-            'gender' => 'female',
-            'phone' => '+90 532 234 5678',
-            'email' => 'ayse.demir@company.com',
-            'marital_status' => 'single',
-            'children_count' => 0,
-            'hire_date' => '2021-03-15',
-            'position_title' => 'İK Uzmanı',
-            'department_id' => $departments['insan-kaynaklari']->id,
-            'employment_type' => 'full_time',
-            'contract_type' => 'permanent',
-        ]);
+        $lastNames = [
+            'Yılmaz', 'Demir', 'Kaya', 'Şahin', 'Öztürk', 'Çelik', 'Erdoğan', 'Kurt', 'Özkan', 'Aydın',
+            'Aktaş', 'Arslan', 'Baran', 'Bektaş', 'Bulut', 'Çakır', 'Çetin', 'Doğan', 'Erdem', 'Eroğlu',
+            'Güneş', 'Karaca', 'Karahan', 'Köseoğlu', 'Metin', 'Mutlu', 'Nalbantoğlu', 'Oral', 'Özdemir', 'Sayar',
+            'Sezen', 'Tan', 'Tekin', 'Turan', 'Uçar', 'Yavuz', 'Yıldız', 'Yücel', 'Zorlu', 'Sert',
+            'Aksoy', 'Altun', 'Aydoğdu', 'Bayram', 'Bostancı', 'Cebeci', 'Duran', 'Eryılmaz', 'Güler', 'Işık',
+        ];
 
-        // 3. Mehmet Kaya - Proje Yöneticisi
-        $employees['mehmet'] = Employee::create([
-            'identity_no' => '34567890123',
-            'first_name' => 'Mehmet',
-            'last_name' => 'Kaya',
-            'birth_date' => '1985-12-03',
-            'gender' => 'male',
-            'phone' => '+90 532 345 6789',
-            'email' => 'mehmet.kaya@company.com',
-            'marital_status' => 'married',
-            'children_count' => 1,
-            'hire_date' => '2020-06-01',
-            'position_title' => 'Proje Yöneticisi',
-            'department_id' => $departments['proje-yonetimi']->id,
-            'employment_type' => 'hybrid',
-            'contract_type' => 'permanent',
-            'manager_id' => null,
-        ]);
+        $positions = [
+            'bilgi-teknolojileri' => ['Yazılım Geliştirici', 'Sistem Yöneticisi', 'Veritabanı Uzmanı', 'DevOps Mühendisi', 'Frontend Geliştirici', 'Backend Geliştirici', 'QA Engineer', 'IT Destek Uzmanı'],
+            'insan-kaynaklari' => ['İK Uzmanı', 'İK Müdürü', 'İşe Alım Uzmanı', 'Eğitim ve Gelişim Uzmanı', 'İK Asistanı'],
+            'proye-yonetimi' => ['Proje Yöneticisi', 'Proje Koordinatörü', 'Proje Asistanı', 'Planlama Uzmanı'],
+            'muhasebe' => ['Muhasebe Uzmanı', 'Muhasebe Müdürü', 'Stajyer', 'Mali Müşavir', 'Bütçe Uzmanı'],
+            'satıs' => ['Satış Temsilcisi', 'Satış Müdürü', 'Key Account Manager', 'Satış Destek Uzmanı'],
+            'pazarlama' => ['Pazarlama Uzmanı', 'Dijital Pazarlama Uzmanı', 'İçerik Uzmanı', 'Grafik Tasarımcı', 'Marka Yöneticisi'],
+            'uretim' => ['Üretim Mühendisi', 'Operatör', 'Kalite Kontrol Uzmanı', 'Üretim Şefi', 'Ambalajcı'],
+            'musteri-hizmetleri' => ['Müşteri Temsilcisi', 'Müşteri Hizmetleri Müdürü', 'Şikayet Yöneticisi', 'Call Center Operatörü'],
+            'ar-ge' => ['Ar-Ge Mühendisi', 'Araştırmacı', 'Ürün Geliştirme Uzmanı', 'Prototip Uzmanı'],
+            'finans' => ['Finans Uzmanı', 'Finans Müdürü', 'Mali Analist', 'Yatırım Uzmanı', 'Banka ilişkileri Uzmanı'],
+        ];
 
-        // 4. Fatma Şahin - Muhasebe Uzmanı
-        $employees['fatma'] = Employee::create([
-            'identity_no' => '45678901234',
-            'first_name' => 'Fatma',
-            'last_name' => 'Şahin',
-            'birth_date' => '1988-03-18',
-            'gender' => 'female',
-            'phone' => '+90 532 456 7890',
-            'email' => 'fatma.sahin@company.com',
-            'marital_status' => 'widowed',
-            'children_count' => 0,
-            'hire_date' => '2023-09-01',
-            'position_title' => 'Muhasebe Uzmanı',
-            'department_id' => $departments['muhasebe']->id,
-            'employment_type' => 'part_time',
-            'contract_type' => 'fixed_term',
-        ]);
+        $genders = ['male', 'female'];
+        $maritalStatuses = ['single', 'married', 'widowed', 'divorced'];
+        $employmentTypes = ['full_time', 'part_time', 'remote', 'hybrid'];
+        $contractTypes = ['permanent', 'fixed_term', 'probation'];
 
-        // 5. Ali Öztürk - Stajyer
-        $employees['ali'] = Employee::create([
-            'identity_no' => '56789012345',
-            'first_name' => 'Ali',
-            'last_name' => 'Öztürk',
-            'birth_date' => '2000-07-10',
-            'gender' => 'male',
-            'phone' => '+90 532 567 8901',
-            'email' => 'ali.ozturk@company.com',
-            'marital_status' => 'single',
-            'children_count' => 0,
-            'hire_date' => '2024-01-15',
-            'position_title' => 'Stajyer',
-            'department_id' => $departments['bilgi-teknolojileri']->id,
-            'employment_type' => 'full_time',
-            'contract_type' => 'probation',
-            'manager_id' => $employees['ahmet']->id,
-        ]);
+        // Create 200 employees
+        $employeeData = [];
 
-        return $employees;
+        for ($i = 0; $i < 220; $i++) {
+            $deptSlug = array_rand($departments);
+            $dept = $departments[$deptSlug];
+            $position = $positions[$deptSlug][array_rand($positions[$deptSlug])];
+
+            $firstName = $firstNames[array_rand($firstNames)];
+            $lastName = $lastNames[array_rand($lastNames)];
+            $gender = $genders[array_rand($genders)];
+            $maritalStatus = $maritalStatuses[array_rand($maritalStatuses)];
+            $employmentType = $employmentTypes[array_rand($employmentTypes)];
+            $contractType = $contractTypes[array_rand($contractTypes)];
+
+            // Random birth date between 1970 and 2002
+            $birthYear = rand(1970, 2002);
+            $birthMonth = rand(1, 12);
+            $birthDay = rand(1, 28);
+            $birthDate = sprintf('%04d-%02d-%02d', $birthYear, $birthMonth, $birthDay);
+
+            // Random hire date between 2018 and 2024
+            $hireYear = rand(2018, 2024);
+            $hireMonth = rand(1, 12);
+            $hireDay = rand(1, 28);
+            $hireDate = sprintf('%04d-%02d-%02d', $hireYear, $hireMonth, $hireDay);
+
+            $childrenCount = $maritalStatus === 'married' ? rand(0, 4) : 0;
+
+            $employeeData[] = [
+                'identity_no' => str_pad(rand(10000000000, 99999999999), 11, '0', STR_PAD_LEFT),
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'birth_date' => $birthDate,
+                'gender' => $gender,
+                'phone' => '+90 5'.rand(30, 39).' '.rand(100, 999).' '.rand(1000, 9999),
+                'email' => strtolower("$firstName.$lastName$i@company.com"),
+                'marital_status' => $maritalStatus,
+                'children_count' => $childrenCount,
+                'hire_date' => $hireDate,
+                'position_title' => $position,
+                'department_id' => $dept->id,
+                'employment_type' => $employmentType,
+                'contract_type' => $contractType,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
+
+        // Bulk insert employees
+        foreach (array_chunk($employeeData, 50) as $chunk) {
+            Employee::insert($chunk);
+        }
+
+        // Get created employees for relationship seeding
+        $allEmployees = Employee::all();
+
+        // Create some manager relationships
+        $deptEmployees = $allEmployees->groupBy('department_id');
+
+        foreach ($deptEmployees as $deptId => $employees) {
+            if ($employees->count() > 1) {
+                // First employee is manager
+                $manager = $employees->first();
+                $employees->skip(1)->take(min(5, $employees->count() - 1))->each(function ($emp) use ($manager) {
+                    $emp->update(['manager_id' => $manager->id]);
+                });
+            }
+        }
+
+        $this->command->info('Created '.count($employeeData).' employees');
+
+        return $allEmployees->keyBy('id')->toArray();
     }
 
     private function seedEducation(array $employees): void
     {
-        // Ahmet Yılmaz - Bilgisayar Mühendisliği Lisans
-        EmployeeEducation::create([
-            'employee_id' => $employees['ahmet']->id,
-            'school_name' => 'İstanbul Teknik Üniversitesi',
-            'department' => 'Bilgisayar Mühendisliği',
-            'degree' => 'bachelor',
-            'graduation_year' => 2014,
-        ]);
+        $schools = [
+            'İstanbul Teknik Üniversitesi', 'Boğaziçi Üniversitesi', 'Orta Doğu Teknik Üniversitesi',
+            'Ankara Üniversitesi', 'İstanbul Üniversitesi', 'Marmara Üniversitesi',
+            'Yeditepe Üniversitesi', 'Sabancı Üniversitesi', 'Koç Üniversitesi', 'Bilkent Üniversitesi',
+            'Ege Üniversitesi', 'Dokuz Eylül Üniversitesi', 'Anadolu Üniversitesi',
+        ];
 
-        // Ayşe Demir - İşletme Lisans + İK Yüksek Lisans
-        EmployeeEducation::create([
-            'employee_id' => $employees['ayse']->id,
-            'school_name' => 'Ankara Üniversitesi',
-            'department' => 'İşletme',
-            'degree' => 'bachelor',
-            'graduation_year' => 2016,
-        ]);
+        $departments = [
+            'Bilgisayar Mühendisliği', 'Endüstri Mühendisliği', 'İşletme', 'İktisat', 'Hukuk',
+            'Makine Mühendisliği', 'Elektrik-Elektronik Mühendisliği', 'İletişim', 'Psikoloji',
+            'Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Mimarlık', 'İç Mimarlık',
+        ];
 
-        EmployeeEducation::create([
-            'employee_id' => $employees['ayse']->id,
-            'school_name' => 'İstanbul Üniversitesi',
-            'department' => 'İnsan Kaynakları Yönetimi',
-            'degree' => 'master',
-            'graduation_year' => 2019,
-        ]);
+        $degrees = ['associate', 'bachelor', 'master', 'doctorate'];
 
-        // Mehmet Kaya - Endüstri Mühendisliği Lisans
-        EmployeeEducation::create([
-            'employee_id' => $employees['mehmet']->id,
-            'school_name' => 'Orta Doğu Teknik Üniversitesi',
-            'department' => 'Endüstri Mühendisliği',
-            'degree' => 'bachelor',
-            'graduation_year' => 2008,
-        ]);
+        $educationData = [];
 
-        // Fatma Şahin - İktisat Lisans
-        EmployeeEducation::create([
-            'employee_id' => $employees['fatma']->id,
-            'school_name' => 'Marmara Üniversitesi',
-            'department' => 'İktisat',
-            'degree' => 'bachelor',
-            'graduation_year' => 2012,
-        ]);
+        // Add education for first 100 employees
+        $employeeIds = array_slice(array_keys($employees), 0, 100);
 
-        // Ali Öztürk - Bilgisayar Programcılığı Önlisans (devam ediyor)
-        EmployeeEducation::create([
-            'employee_id' => $employees['ali']->id,
-            'school_name' => 'Anadolu Üniversitesi',
-            'department' => 'Bilgisayar Programcılığı',
-            'degree' => 'associate',
-            'graduation_year' => null, // Devam ediyor
-        ]);
+        foreach ($employeeIds as $empId) {
+            $degreeCount = rand(1, 2);
+            for ($i = 0; $i < $degreeCount; $i++) {
+                $gradYear = rand(2000, 2024);
+                $educationData[] = [
+                    'employee_id' => $empId,
+                    'school_name' => $schools[array_rand($schools)],
+                    'department' => $departments[array_rand($departments)],
+                    'degree' => $degrees[array_rand($degrees)],
+                    'graduation_year' => $gradYear,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        foreach (array_chunk($educationData, 50) as $chunk) {
+            \App\Models\EmployeeEducation::insert($chunk);
+        }
+
+        $this->command->info('Created '.count($educationData).' education records');
     }
 
     private function seedCertificates(array $employees): void
     {
-        // Ahmet Yılmaz - AWS Solutions Architect
-        EmployeeCertificate::create([
-            'employee_id' => $employees['ahmet']->id,
-            'name' => 'AWS Solutions Architect',
-            'institution' => 'Amazon Web Services',
-            'date' => '2023-06-15',
-            'file_path' => 'certificates/aws-solutions-architect.pdf',
-        ]);
+        $certificates = [
+            ['name' => 'AWS Solutions Architect', 'institution' => 'Amazon Web Services'],
+            ['name' => 'PMP', 'institution' => 'Project Management Institute'],
+            ['name' => 'Scrum Master', 'institution' => 'Scrum Alliance'],
+            ['name' => 'ISO 27001', 'institution' => 'BSI'],
+            ['name' => 'Six Sigma Green Belt', 'institution' => 'ASQ'],
+            ['name' => 'Google Analytics', 'institution' => 'Google'],
+            ['name' => 'Microsoft Azure Administrator', 'institution' => 'Microsoft'],
+            ['name' => 'CCNA', 'institution' => 'Cisco'],
+            ['name' => 'ITIL Foundation', 'institution' => 'AXELOS'],
+            ['name' => 'CEH', 'institution' => 'EC-Council'],
+        ];
 
-        // Mehmet Kaya - PMP
-        EmployeeCertificate::create([
-            'employee_id' => $employees['mehmet']->id,
-            'name' => 'Project Management Professional (PMP)',
-            'institution' => 'Project Management Institute',
-            'date' => '2021-03-20',
-            'file_path' => 'certificates/pmp-certificate.pdf',
-        ]);
+        $certificateData = [];
+
+        // Add certificates for first 50 employees
+        $employeeIds = array_slice(array_keys($employees), 0, 50);
+
+        foreach ($employeeIds as $empId) {
+            $certCount = rand(1, 3);
+            for ($i = 0; $i < $certCount; $i++) {
+                $cert = $certificates[array_rand($certificates)];
+                $year = rand(2020, 2024);
+                $month = rand(1, 12);
+                $certificateData[] = [
+                    'employee_id' => $empId,
+                    'name' => $cert['name'],
+                    'institution' => $cert['institution'],
+                    'date' => sprintf('%04d-%02d-15', $year, $month),
+                    'file_path' => 'certificates/'.strtolower(str_replace(' ', '-', $cert['name'])).'.pdf',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        \App\Models\EmployeeCertificate::insert($certificateData);
+
+        $this->command->info('Created '.count($certificateData).' certificates');
     }
 
     private function seedPositionHistory(array $employees, array $departments): void
     {
-        // Mehmet Kaya - Pozisyon geçmişi
-        // 2020-2022 Yazılım Takım Lideri
-        EmployeePositionHistory::create([
-            'employee_id' => $employees['mehmet']->id,
-            'position_title' => 'Yazılım Takım Lideri',
-            'department_id' => $departments['bilgi-teknolojileri']->id,
-            'start_date' => '2020-06-01',
-            'end_date' => '2022-05-31',
-            'description' => 'Yazılım ekibinin liderliğini üstlendi.',
-        ]);
+        $positionHistoryData = [];
 
-        // 2022+ Proje Yöneticisi
-        EmployeePositionHistory::create([
-            'employee_id' => $employees['mehmet']->id,
-            'position_title' => 'Proje Yöneticisi',
-            'department_id' => $departments['proje-yonetimi']->id,
-            'start_date' => '2022-06-01',
-            'end_date' => null,
-            'description' => 'Proje yönetimi departmanını yönetiyor.',
-        ]);
+        // Add position history for first 30 employees
+        $employeeIds = array_slice(array_keys($employees), 0, 30);
 
-        // Ahmet Yılmaz - Pozisyon geçmişi
-        EmployeePositionHistory::create([
-            'employee_id' => $employees['ahmet']->id,
-            'position_title' => 'Yazılım Geliştirici',
-            'department_id' => $departments['bilgi-teknolojileri']->id,
-            'start_date' => '2022-01-10',
-            'end_date' => null,
-            'description' => 'Backend geliştirme.',
-        ]);
+        foreach ($employeeIds as $empId) {
+            $emp = $employees[$empId];
+            $deptId = $emp['department_id'];
+
+            // Current position
+            $positionHistoryData[] = [
+                'employee_id' => $empId,
+                'position_title' => $emp['position_title'],
+                'department_id' => $deptId,
+                'start_date' => $emp['hire_date'],
+                'end_date' => null,
+                'description' => $emp['position_title'].' olarak görev yapıyor.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            // Add previous position for some employees
+            if (rand(0, 1)) {
+                $hireYear = (int) date('Y', strtotime($emp['hire_date']));
+                if ($hireYear > 2018) {
+                    $positionHistoryData[] = [
+                        'employee_id' => $empId,
+                        'position_title' => 'Stajyer / Junior '.$emp['position_title'],
+                        'department_id' => $deptId,
+                        'start_date' => date('Y-m-d', strtotime($emp['hire_date'].' -1 year')),
+                        'end_date' => $emp['hire_date'],
+                        'description' => 'Stajyer olarak görev yaptı.',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+            }
+        }
+
+        \App\Models\EmployeePositionHistory::insert($positionHistoryData);
+
+        $this->command->info('Created '.count($positionHistoryData).' position history records');
     }
 }

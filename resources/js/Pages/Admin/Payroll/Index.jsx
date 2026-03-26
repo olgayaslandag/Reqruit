@@ -183,7 +183,7 @@ export default function Index({ payrollPeriods, filters }) {
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">
                                                 <span className="text-sm text-gray-900">
-                                                    {period.work_days} gün
+                                                    {period.work_days || 0} gün
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">

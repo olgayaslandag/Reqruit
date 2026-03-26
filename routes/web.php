@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\AdvanceController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceReportController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FileController;
@@ -10,6 +14,7 @@ use App\Http\Controllers\PayrollReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicFormController;
 use App\Http\Controllers\SalaryComponentController;
+use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -214,6 +219,83 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/annual', [PayrollReportController::class, 'annual'])
             ->middleware([\App\Http\Middleware\CheckPayrollGeneratePermission::class])
             ->name('annual');
+    });
+
+    // Admin - Attendance (PDKS)
+    Route::prefix('admin/attendance')->name('admin.attendance.')->group(function () {
+        Route::get('/', [AttendanceController::class, 'index'])->name('index');
+        Route::get('/scan', [AttendanceController::class, 'scan'])->name('scan');
+        Route::get('/{attendance}', [AttendanceController::class, 'show'])->name('show');
+        Route::get('/{attendance}/edit', [AttendanceController::class, 'edit'])->name('edit');
+        Route::post('/', [AttendanceController::class, 'store'])->name('store');
+        Route::put('/{attendance}', [AttendanceController::class, 'update'])->name('update');
+        Route::delete('/{attendance}', [AttendanceController::class, 'destroy'])->name('destroy');
+        Route::post('/clock-in', [AttendanceController::class, 'clockIn'])->name('clockIn');
+        Route::post('/clock-out', [AttendanceController::class, 'clockOut'])->name('clockOut');
+        Route::get('/employee/{employeeId}', [AttendanceController::class, 'forEmployee'])->name('employee');
+    });
+
+    // Admin - Attendance Reports
+    Route::prefix('admin/attendance-reports')->name('admin.attendance-reports.')->group(function () {
+        Route::get('/', [AttendanceReportController::class, 'index'])->name('index');
+        Route::get('/daily', [AttendanceReportController::class, 'daily'])->name('daily');
+        Route::get('/monthly', [AttendanceReportController::class, 'monthly'])->name('monthly');
+        Route::get('/overtime', [AttendanceReportController::class, 'overtime'])->name('overtime');
+        Route::get('/export', [AttendanceReportController::class, 'export'])->name('export');
+    });
+
+    // Admin - Shifts
+    Route::prefix('admin/shifts')->name('admin.shifts.')->group(function () {
+        Route::get('/', [ShiftController::class, 'index'])->name('index');
+        Route::get('/create', [ShiftController::class, 'create'])->name('create');
+        Route::post('/', [ShiftController::class, 'store'])->name('store');
+        Route::get('/{shift}', [ShiftController::class, 'show'])->name('show');
+        Route::get('/{shift}/edit', [ShiftController::class, 'edit'])->name('edit');
+        Route::put('/{shift}', [ShiftController::class, 'update'])->name('update');
+        Route::delete('/{shift}', [ShiftController::class, 'destroy'])->name('destroy');
+        Route::post('/assign', [ShiftController::class, 'assignToEmployee'])->name('assign');
+        Route::post('/assign-bulk', [ShiftController::class, 'assignBulk'])->name('assignBulk');
+        Route::get('/schedule/{employeeId}', [ShiftController::class, 'getEmployeeSchedule'])->name('schedule');
+        Route::get('/schedules', [ShiftController::class, 'schedules'])->name('schedules');
+    });
+
+    // Admin - Work Calendars
+    Route::prefix('admin/work-calendars')->name('admin.work-calendars.')->group(function () {
+        Route::get('/', [CalendarController::class, 'index'])->name('index');
+        Route::get('/create', [CalendarController::class, 'create'])->name('create');
+        Route::post('/', [CalendarController::class, 'store'])->name('store');
+        Route::get('/{calendar}', [CalendarController::class, 'show'])->name('show');
+        Route::get('/{calendar}/edit', [CalendarController::class, 'edit'])->name('edit');
+        Route::put('/{calendar}', [CalendarController::class, 'update'])->name('update');
+        Route::delete('/{calendar}', [CalendarController::class, 'destroy'])->name('destroy');
+        Route::post('/{calendarId}/toggle', [CalendarController::class, 'toggleStatus'])->name('toggle');
+    });
+
+    // Admin - Holidays
+    Route::prefix('admin/holidays')->name('admin.holidays.')->group(function () {
+        Route::get('/', [CalendarController::class, 'holidayIndex'])->name('index');
+        Route::get('/create', [CalendarController::class, 'holidayCreate'])->name('create');
+        Route::post('/', [CalendarController::class, 'holidayStore'])->name('store');
+        Route::get('/{holiday}/edit', [CalendarController::class, 'holidayEdit'])->name('edit');
+        Route::put('/{holiday}', [CalendarController::class, 'holidayUpdate'])->name('update');
+        Route::delete('/{holiday}', [CalendarController::class, 'holidayDestroy'])->name('destroy');
+        Route::post('/add-to-calendar', [CalendarController::class, 'addHoliday'])->name('addToCalendar');
+    });
+
+    // Admin - Attendance Adjustments
+    Route::prefix('admin/adjustments')->name('admin.adjustments.')->group(function () {
+        Route::get('/', [AdjustmentController::class, 'index'])->name('index');
+        Route::get('/create', [AdjustmentController::class, 'create'])->name('create');
+        Route::post('/', [AdjustmentController::class, 'store'])->name('store');
+        Route::get('/{adjustment}', [AdjustmentController::class, 'show'])->name('show');
+        Route::get('/{adjustment}/edit', [AdjustmentController::class, 'edit'])->name('edit');
+        Route::put('/{adjustment}', [AdjustmentController::class, 'update'])->name('update');
+        Route::put('/{adjustment}/update-status', [AdjustmentController::class, 'updateStatus'])->name('updateStatus');
+        Route::delete('/{adjustment}', [AdjustmentController::class, 'destroy'])->name('destroy');
+        Route::post('/{adjustment}/approve', [AdjustmentController::class, 'approve'])->name('approve');
+        Route::post('/{adjustment}/reject', [AdjustmentController::class, 'reject'])->name('reject');
+        Route::get('/my-requests', [AdjustmentController::class, 'myRequests'])->name('myRequests');
+        Route::post('/request', [AdjustmentController::class, 'requestAdjustment'])->name('request');
     });
 
     // Profile

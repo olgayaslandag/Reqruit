@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AdvanceStatusEnum;
+use App\Enums\AdvanceTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,20 +15,24 @@ class AdvanceRequest extends Model
 
     protected $fillable = [
         'employee_id',
+        'type',
         'amount',
         'reason',
         'requested_date',
         'status',
         'approver_id',
+        'approved_at',
         'rejection_reason',
         'payment_date',
         'notes',
     ];
 
     protected $casts = [
+        'type' => AdvanceTypeEnum::class,
         'amount' => 'decimal:2',
         'requested_date' => 'date',
         'payment_date' => 'date',
+        'approved_at' => 'datetime',
     ];
 
     /**

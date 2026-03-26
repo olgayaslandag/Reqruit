@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AdvanceStatusEnum;
+use App\Enums\AdvanceTypeEnum;
 use App\Models\AdvanceRequest;
 use App\Models\Employee;
 use App\Models\User;
@@ -13,9 +15,9 @@ class AdvanceRequestSeeder extends Seeder
     {
         $this->command->info('Avans talepleri oluşturuluyor...');
 
-        // Kullanıcılardan bazılarını ve çalışanları al
-        $employees = Employee::limit(10)->get();
-        $users = User::limit(5)->get();
+        // Tüm çalışanları al
+        $employees = Employee::all();
+        $users = User::limit(10)->get();
 
         if ($employees->isEmpty()) {
             $this->command->warn('Hiç çalışan bulunamadı, önce çalışan ekleyin');
@@ -23,54 +25,66 @@ class AdvanceRequestSeeder extends Seeder
             return;
         }
 
-        // Farklı durumlarda avans talepleri oluşturalım
-        $statuses = ['pending', 'approved', 'rejected', 'paid'];
-
-        $advanceTypes = [
-            'Acil Durum',
-            'Taahhüt',
-            'Araç Yakıt Tediyesi',
-            'Yol Ücreti',
-            'Eğitim Masrafı',
-            'Sağlık Harcaması',
-            'Ev Giderleri',
-            'Diğer',
+        $statuses = [
+            AdvanceStatusEnum::PENDING->value,
+            AdvanceStatusEnum::APPROVED->value,
+            AdvanceStatusEnum::REJECTED->value,
+            AdvanceStatusEnum::PAID->value,
         ];
 
-        for ($i = 0; $i < 20; $i++) {
+        $advanceTypes = AdvanceTypeEnum::values();
+
+        // 200+ avans talebi oluştur
+        $batchSize = 50;
+        $totalRequests = 250;
+
+        for ($i = 0; $i < $totalRequests; $i++) {
             $employee = $employees->random();
             $status = $statuses[array_rand($statuses)];
             $type = $advanceTypes[array_rand($advanceTypes)];
+            $typeLabel = AdvanceTypeEnum::from($type)->label();
 
-            $amount = rand(1000, 15000); // 1000-15000 TL arası
+            $amount = rand(1000, 25000);
 
             $requestData = [
                 'employee_id' => $employee->id,
+                'type' => $type,
                 'amount' => $amount,
-                'reason' => $type,
-                'requested_date' => now()->subDays(rand(0, 30)),
+                'reason' => $typeLabel,
+                'requested_date' => now()->subDays(rand(0, 180)),
                 'status' => $status,
-                'notes' => 'Otomatik oluşturulmuş avans talebi ('.($i + 1).')',
+                'notes' => 'Otomatik oluşturulmuş avans talebi #'.($i + 1),
             ];
 
-            // Eğer durum onaylanmışsa ve kullanıcı mevcutsa approver_id eklenebilir
-            if (in_array($status, ['approved', 'paid']) && $users->isNotEmpty()) {
+            // Onaylanmış veya ödenmişse
+            if (in_array($status, [AdvanceStatusEnum::APPROVED->value, AdvanceStatusEnum::PAID->value]) && $users->isNotEmpty()) {
                 $requestData['approver_id'] = $users->random()->id;
-                $requestData['payment_date'] = in_array($status, ['paid']) ? now()->subDays(rand(0, 15))->format('Y-m-d') : null;
+                $requestData['approved_at'] = now()->subDays(rand(1, 15));
+
+                if ($status === AdvanceStatusEnum::PAID->value) {
+                    $requestData['payment_date'] = now()->subDays(rand(0, 10))->format('Y-m-d');
+                }
             }
 
-            // Eğer durum reddedilmişse nedeni belirtilir
-            if ($status === 'rejected' && rand(0, 5) > 2) {
-                $requestData['rejection_reason'] = [
+            // Reddedilmişse
+            if ($status === AdvanceStatusEnum::REJECTED->value && rand(0, 1)) {
+                $rejectionReasons = [
                     'Belgeler eksik',
                     'Yetersiz sebep',
                     'Bütçe dışı',
                     'Aynı dönem içerisinde çok fazla avans talebi',
                     'İzin süreci eksik',
-                ][rand(0, 4)];
+                    'Şirket politikasına aykırı',
+                ];
+                $requestData['rejection_reason'] = $rejectionReasons[array_rand($rejectionReasons)];
             }
 
             AdvanceRequest::create($requestData);
+
+            // Batch logging
+            if (($i + 1) % $batchSize === 0) {
+                $this->command->info(($i + 1).' avans talebi oluşturuldu...');
+            }
         }
 
         $this->command->info('Toplam '.AdvanceRequest::count().' adet avans talebi oluşturuldu.');

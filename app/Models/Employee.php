@@ -118,6 +118,38 @@ class Employee extends Model
         return $this->hasMany(BonusPayment::class);
     }
 
+    // ======= PDKS Related Relationships =======
+
+    public function shiftSchedules(): HasMany
+    {
+        return $this->hasMany(ShiftSchedule::class);
+    }
+
+    public function attendanceRecords(): HasMany
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
+    public function attendanceSummaries(): HasMany
+    {
+        return $this->hasMany(AttendanceSummary::class);
+    }
+
+    public function attendanceAdjustments(): HasMany
+    {
+        return $this->hasMany(AttendanceAdjustment::class);
+    }
+
+    public function shift(): BelongsTo
+    {
+        return $this->belongsTo(Shift::class, 'default_shift_id');
+    }
+
+    public function workCalendar(): BelongsTo
+    {
+        return $this->belongsTo(WorkCalendar::class);
+    }
+
     /**
      * Tam adı döndürür.
      */

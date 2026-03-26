@@ -19,11 +19,19 @@ class PayrollSeeder extends Seeder
         // Salary Components - Maaş Kalemleri
         $components = $this->createSalaryComponents();
 
-        // Payroll Periods - Bordro Dönemleri
+        // Payroll Periods - Bordro Dönemleri (12 months)
         $periods = $this->createPayrollPeriods();
 
-        // Employees - Çalışanlar (mevcut veya oluştur)
-        $employees = $this->getOrCreateEmployees();
+        // Employees - Çalışanlar
+        $employees = Employee::all()->toArray();
+
+        if (empty($employees)) {
+            $this->command->warn('No employees found. Run EmployeeSeeder first.');
+
+            return;
+        }
+
+        $this->command->info('Processing '.count($employees).' employees');
 
         // Employee Salaries - Çalışan Maaş Yapılandırmaları
         $this->createEmployeeSalaries($employees, $components);
@@ -110,6 +118,17 @@ class PayrollSeeder extends Seeder
                 'default_amount' => 268.31,
                 'sort_order' => 6,
             ],
+            [
+                'name' => 'Sosyal Yardım',
+                'code' => 'SOCIAL_AID',
+                'type' => 'earning',
+                'category' => 'fixed',
+                'is_active' => true,
+                'is_taxable' => false,
+                'is_sgk_applicable' => false,
+                'default_amount' => 500.00,
+                'sort_order' => 7,
+            ],
 
             // Kesintiler - Deductions
             [
@@ -170,23 +189,28 @@ class PayrollSeeder extends Seeder
     }
 
     /**
-     * Bordro dönemlerini oluşturur.
+     * Bordro dönemlerini oluşturur - 24 months (2025 + 2026)
      */
     private function createPayrollPeriods(): array
     {
         $periods = [];
-        $currentYear = date('Y');
-        $currentMonth = (int) date('n');
 
-        // Geçmiş 3 ay ve mevcut ay için dönem oluştur
-        for ($i = 2; $i >= 0; $i--) {
-            $month = $currentMonth - $i;
-            $year = $currentYear;
+        // 2025: January to December (12 months)
+        $year2025 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        // 2026: January to March (3 months)
+        $year2026 = [1, 2, 3];
 
-            if ($month <= 0) {
-                $month += 12;
-                $year -= 1;
-            }
+        $allMonths = [];
+        foreach ($year2025 as $month) {
+            $allMonths[] = ['month' => $month, 'year' => 2025];
+        }
+        foreach ($year2026 as $month) {
+            $allMonths[] = ['month' => $month, 'year' => 2026];
+        }
+
+        foreach ($allMonths as $data) {
+            $month = $data['month'];
+            $year = $data['year'];
 
             $startDate = sprintf('%d-%02d-01', $year, $month);
             $endDate = date('Y-m-t', strtotime($startDate));
@@ -196,9 +220,11 @@ class PayrollSeeder extends Seeder
                 $paymentDate = sprintf('%d-01-15', $year + 1);
             }
 
-            $status = ($i === 0) ? 'published' : 'published';
+            // Status: published for past months, draft for future
+            $isPast = strtotime($endDate) < time();
+            $status = $isPast ? 'published' : 'draft';
 
-            $periods[$month] = PayrollPeriod::updateOrCreate(
+            $period = PayrollPeriod::updateOrCreate(
                 [
                     'start_date' => $startDate,
                     'end_date' => $endDate,
@@ -210,24 +236,13 @@ class PayrollSeeder extends Seeder
                     'status' => $status,
                 ]
             );
+
+            $periods[] = $period;
         }
+
+        $this->command->info('Created '.count($periods).' payroll periods (2025-2026)');
 
         return $periods;
-    }
-
-    /**
-     * Çalışanları alır veya oluşturur.
-     */
-    private function getOrCreateEmployees(): array
-    {
-        // Mevcut çalışanları al veya 5 tane oluştur
-        $employees = Employee::limit(5)->get();
-
-        if ($employees->count() < 5) {
-            $employees = Employee::factory()->count(5)->create();
-        }
-
-        return $employees->all();
     }
 
     /**
@@ -235,49 +250,66 @@ class PayrollSeeder extends Seeder
      */
     private function createEmployeeSalaries(array $employees, array $components): void
     {
+        $salaryData = [];
+
         foreach ($employees as $employee) {
+            $baseSalary = rand(20000, 55000);
+            $hireDate = $employee['hire_date'];
+
             // Temel maaş
-            EmployeeSalary::updateOrCreate(
-                [
-                    'employee_id' => $employee->id,
-                    'salary_component_id' => $components['BASIC_SALARY']->id,
-                    'start_date' => $employee->hire_date,
-                ],
-                [
-                    'amount' => fake()->randomFloat(2, 20000, 50000),
-                    'end_date' => null,
-                    'payment_frequency' => 'monthly',
-                ]
-            );
+            $salaryData[] = [
+                'employee_id' => $employee['id'],
+                'salary_component_id' => $components['BASIC_SALARY']->id,
+                'start_date' => $hireDate,
+                'amount' => $baseSalary,
+                'end_date' => null,
+                'payment_frequency' => 'monthly',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
 
             // Yemek ücreti
-            EmployeeSalary::updateOrCreate(
-                [
-                    'employee_id' => $employee->id,
-                    'salary_component_id' => $components['MEAL_ALLOWANCE']->id,
-                    'start_date' => $employee->hire_date,
-                ],
-                [
-                    'amount' => 1500.00,
-                    'end_date' => null,
-                    'payment_frequency' => 'monthly',
-                ]
-            );
+            $salaryData[] = [
+                'employee_id' => $employee['id'],
+                'salary_component_id' => $components['MEAL_ALLOWANCE']->id,
+                'start_date' => $hireDate,
+                'amount' => 1500.00,
+                'end_date' => null,
+                'payment_frequency' => 'monthly',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
 
             // Ulaşım ücreti
-            EmployeeSalary::updateOrCreate(
-                [
-                    'employee_id' => $employee->id,
-                    'salary_component_id' => $components['TRANSPORT_ALLOWANCE']->id,
-                    'start_date' => $employee->hire_date,
-                ],
-                [
-                    'amount' => 1000.00,
-                    'end_date' => null,
-                    'payment_frequency' => 'monthly',
-                ]
-            );
+            $salaryData[] = [
+                'employee_id' => $employee['id'],
+                'salary_component_id' => $components['TRANSPORT_ALLOWANCE']->id,
+                'start_date' => $hireDate,
+                'amount' => 1000.00,
+                'end_date' => null,
+                'payment_frequency' => 'monthly',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            // AGI - Asgari Geçim İndirimi
+            $salaryData[] = [
+                'employee_id' => $employee['id'],
+                'salary_component_id' => $components['AGI']->id,
+                'start_date' => $hireDate,
+                'amount' => 268.31,
+                'end_date' => null,
+                'payment_frequency' => 'monthly',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
+
+        foreach (array_chunk($salaryData, 50) as $chunk) {
+            EmployeeSalary::insert($chunk);
+        }
+
+        $this->command->info('Created '.count($salaryData).' employee salaries');
     }
 
     /**
@@ -285,49 +317,123 @@ class PayrollSeeder extends Seeder
      */
     private function createPayrollItems(array $periods, array $employees, array $components): void
     {
+        $payrollItemsData = [];
+
         foreach ($periods as $period) {
             foreach ($employees as $employee) {
-                // Kazanç kalemleri
-                PayrollItem::updateOrCreate(
-                    [
-                        'payroll_period_id' => $period->id,
-                        'employee_id' => $employee->id,
-                        'salary_component_id' => $components['BASIC_SALARY']->id,
-                    ],
-                    [
-                        'amount' => fake()->randomFloat(2, 20000, 50000),
-                        'calculated_amount' => fake()->randomFloat(2, 20000, 50000),
-                        'quantity' => 1,
-                    ]
-                );
+                $baseSalary = rand(20000, 55000);
 
-                PayrollItem::updateOrCreate(
-                    [
-                        'payroll_period_id' => $period->id,
-                        'employee_id' => $employee->id,
-                        'salary_component_id' => $components['MEAL_ALLOWANCE']->id,
-                    ],
-                    [
-                        'amount' => 1500.00,
-                        'calculated_amount' => 1500.00,
-                        'quantity' => 1,
-                    ]
-                );
+                // Basic Salary
+                $payrollItemsData[] = [
+                    'payroll_period_id' => $period->id,
+                    'employee_id' => $employee['id'],
+                    'salary_component_id' => $components['BASIC_SALARY']->id,
+                    'amount' => $baseSalary,
+                    'calculated_amount' => $baseSalary,
+                    'quantity' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
 
-                PayrollItem::updateOrCreate(
-                    [
+                // Meal Allowance
+                $payrollItemsData[] = [
+                    'payroll_period_id' => $period->id,
+                    'employee_id' => $employee['id'],
+                    'salary_component_id' => $components['MEAL_ALLOWANCE']->id,
+                    'amount' => 1500.00,
+                    'calculated_amount' => 1500.00,
+                    'quantity' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                // Transport Allowance
+                $payrollItemsData[] = [
+                    'payroll_period_id' => $period->id,
+                    'employee_id' => $employee['id'],
+                    'salary_component_id' => $components['TRANSPORT_ALLOWANCE']->id,
+                    'amount' => 1000.00,
+                    'calculated_amount' => 1000.00,
+                    'quantity' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                // AGI
+                $payrollItemsData[] = [
+                    'payroll_period_id' => $period->id,
+                    'employee_id' => $employee['id'],
+                    'salary_component_id' => $components['AGI']->id,
+                    'amount' => 268.31,
+                    'calculated_amount' => 268.31,
+                    'quantity' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                // Overtime (only for some employees)
+                if (rand(0, 1)) {
+                    $overtimeHours = rand(5, 30);
+                    $overtimeRate = 50; // per hour
+                    $overtimeAmount = $overtimeHours * $overtimeRate;
+
+                    $payrollItemsData[] = [
                         'payroll_period_id' => $period->id,
-                        'employee_id' => $employee->id,
-                        'salary_component_id' => $components['TRANSPORT_ALLOWANCE']->id,
-                    ],
-                    [
-                        'amount' => 1000.00,
-                        'calculated_amount' => 1000.00,
-                        'quantity' => 1,
-                    ]
-                );
+                        'employee_id' => $employee['id'],
+                        'salary_component_id' => $components['OVERTIME']->id,
+                        'amount' => $overtimeAmount,
+                        'calculated_amount' => $overtimeAmount,
+                        'quantity' => $overtimeHours,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+
+                // Deductions (calculated)
+                $sgkEmployee = $baseSalary * 0.14; // SGK employee share
+                $unemployment = $baseSalary * 0.02; // Unemployment insurance
+                $incomeTax = ($baseSalary - $sgkEmployee - $unemployment) * 0.15; // Simplified income tax
+
+                $payrollItemsData[] = [
+                    'payroll_period_id' => $period->id,
+                    'employee_id' => $employee['id'],
+                    'salary_component_id' => $components['SGK_EMPLOYEE']->id,
+                    'amount' => $sgkEmployee,
+                    'calculated_amount' => $sgkEmployee,
+                    'quantity' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                $payrollItemsData[] = [
+                    'payroll_period_id' => $period->id,
+                    'employee_id' => $employee['id'],
+                    'salary_component_id' => $components['UNEMPLOYMENT_INSURANCE']->id,
+                    'amount' => $unemployment,
+                    'calculated_amount' => $unemployment,
+                    'quantity' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                $payrollItemsData[] = [
+                    'payroll_period_id' => $period->id,
+                    'employee_id' => $employee['id'],
+                    'salary_component_id' => $components['INCOME_TAX']->id,
+                    'amount' => $incomeTax,
+                    'calculated_amount' => $incomeTax,
+                    'quantity' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
         }
+
+        foreach (array_chunk($payrollItemsData, 100) as $chunk) {
+            PayrollItem::insert($chunk);
+        }
+
+        $this->command->info('Created '.count($payrollItemsData).' payroll items');
     }
 
     /**
@@ -335,41 +441,57 @@ class PayrollSeeder extends Seeder
      */
     private function createBonusPayments(array $employees, array $periods): void
     {
-        foreach ($employees as $employee) {
-            // Yıllık ikramiye
-            BonusPayment::updateOrCreate(
-                [
-                    'employee_id' => $employee->id,
-                    'bonus_type' => 'annual',
-                    'payment_date' => date('Y-12-20'),
-                ],
-                [
-                    'payroll_period_id' => null,
-                    'amount' => fake()->randomFloat(2, 5000, 20000),
-                    'tax_amount' => 0,
-                    'net_amount' => fake()->randomFloat(2, 5000, 20000),
-                    'description' => 'Yıllık ikramiye ödemesi',
-                ]
-            );
+        $bonusData = [];
 
-            // Performans primi (dönemli)
-            if (count($periods) > 0) {
-                $firstPeriod = reset($periods);
-                BonusPayment::updateOrCreate(
-                    [
-                        'employee_id' => $employee->id,
-                        'payroll_period_id' => $firstPeriod->id,
-                        'bonus_type' => 'performance',
-                    ],
-                    [
-                        'amount' => fake()->randomFloat(2, 2000, 10000),
-                        'tax_amount' => fake()->randomFloat(2, 300, 1500),
-                        'net_amount' => fake()->randomFloat(2, 1500, 8500),
-                        'payment_date' => $firstPeriod->payment_date,
-                        'description' => 'Performans primi',
-                    ]
-                );
+        // Annual bonus for all employees (December 2025)
+        $annualBonusPeriod = end($periods);
+
+        foreach ($employees as $employee) {
+            $bonusAmount = rand(5000, 25000);
+            $taxAmount = $bonusAmount * 0.15;
+
+            $bonusData[] = [
+                'employee_id' => $employee['id'],
+                'payroll_period_id' => null,
+                'bonus_type' => 'annual',
+                'amount' => $bonusAmount,
+                'tax_amount' => $taxAmount,
+                'net_amount' => $bonusAmount - $taxAmount,
+                'payment_date' => '2025-12-20',
+                'description' => 'Yıllık ikramiye ödemesi',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Performance bonus for some employees (random periods)
+        $performancePeriods = array_slice($periods, 0, 6); // First 6 months
+
+        foreach ($employees as $employee) {
+            if (rand(0, 1)) { // 50% chance
+                $period = $performancePeriods[array_rand($performancePeriods)];
+                $bonusAmount = rand(2000, 12000);
+                $taxAmount = $bonusAmount * 0.15;
+
+                $bonusData[] = [
+                    'employee_id' => $employee['id'],
+                    'payroll_period_id' => $period->id,
+                    'bonus_type' => 'performance',
+                    'amount' => $bonusAmount,
+                    'tax_amount' => $taxAmount,
+                    'net_amount' => $bonusAmount - $taxAmount,
+                    'payment_date' => $period->payment_date,
+                    'description' => 'Performans primi',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
         }
+
+        foreach (array_chunk($bonusData, 50) as $chunk) {
+            BonusPayment::insert($chunk);
+        }
+
+        $this->command->info('Created '.count($bonusData).' bonus payments');
     }
 }

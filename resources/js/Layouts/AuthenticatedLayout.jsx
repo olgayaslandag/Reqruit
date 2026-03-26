@@ -12,15 +12,30 @@ export default function AuthenticatedLayout({ header, children }) {
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [payrollDropdownOpen, setPayrollDropdownOpen] = useState(false);
+    const [attendanceDropdownOpen, setAttendanceDropdownOpen] = useState(false);
 
-    // Click outside reference for desktop dropdown
+    // Click outside reference for desktop dropdowns
     const payrollDropdownRef = useRef(null);
+    const attendanceDropdownRef = useRef(null);
 
-    // Close dropdown when clicking outside
+    // Close payroll dropdown when clicking outside
     useEffect(() => {
         function handleClickOutside(event) {
             if (payrollDropdownRef.current && !payrollDropdownRef.current.contains(event.target)) {
                 setPayrollDropdownOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    // Close attendance dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (attendanceDropdownRef.current && !attendanceDropdownRef.current.contains(event.target)) {
+                setAttendanceDropdownOpen(false);
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
@@ -42,6 +57,16 @@ export default function AuthenticatedLayout({ header, children }) {
                route().current('admin.payroll-reports.*');
     };
 
+    // Helper: Check if any attendance route is active
+    const isAttendanceActive = () => {
+        return route().current('admin.attendance.*') ||
+               route().current('admin.attendance-reports.*') ||
+               route().current('admin.shifts.*') ||
+               route().current('admin.work-calendars.*') ||
+               route().current('admin.holidays.*') ||
+               route().current('admin.adjustments.*');
+    };
+
     return (
         <div className="min-h-screen bg-gray-100">
             <Flash flash={flash} />
@@ -54,7 +79,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="flex">
                             {/* Logo */}
                             <div className="flex shrink-0 items-center">
-                                <Link href="/">
+                                <Link href={route('dashboard')}>
                                     <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
                                 </Link>
                             </div>
@@ -64,6 +89,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <NavLink
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
+                                     style={{ display: 'none' }}
                                 >
                                     Ana Ekran
                                 </NavLink>
@@ -104,75 +130,108 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </NavLink>
 
                                 {/* Bordro Dropdown - Desktop */}
-                                <div className="relative" ref={payrollDropdownRef}>
-                                    <button
-                                        type="button"
-                                        onClick={() => setPayrollDropdownOpen(!payrollDropdownOpen)}
-                                        style={{ marginTop: 3 }}
-                                        className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none ${
-                                            isPayrollActive()
-                                                ? 'text-gray-900 bg-gray-100'
-                                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        Bordro
-                                        <svg
-                                            className={`w-4 h-4 transition-transform ${payrollDropdownOpen ? 'rotate-180' : ''}`}
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
+                                <div className="relative">
+                                    <Dropdown>
+                                        <Dropdown.Trigger>
+                                            <span className="inline-flex rounded-md">
+                                                <button
+                                                    type="button"
+                                                    className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none ${
+                                                        isPayrollActive()
+                                                            ? 'text-gray-900 bg-gray-100'
+                                                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                                    }`}
+                                                    style={{ marginTop: 3 }}
+                                                >
+                                                    Bordro
+                                                    <svg
+                                                        className="-me-0.5 ms-2 h-4 w-4 transition-transform"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            </span>
+                                        </Dropdown.Trigger>
 
-                                    {/* Dropdown Menu */}
-                                    {payrollDropdownOpen && (
-                                        <div className="absolute z-50 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                                            <div className="py-1">
-                                                <Link
-                                                    href={route('admin.payrolls.index')}
-                                                    className={`block px-4 py-2 text-sm ${
-                                                        route().current('admin.payrolls.*')
-                                                            ? 'bg-gray-100 text-gray-900'
-                                                            : 'text-gray-700 hover:bg-gray-100'
+                                        <Dropdown.Content align="left">
+                                            <Dropdown.Link href={route('admin.payrolls.index')}>
+                                                Dönemler
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.salary-components.index')}>
+                                                Maaş Kalemleri
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.advances.index')}>
+                                                Avans Talepleri
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.payroll-reports.index')}>
+                                                Raporlar
+                                            </Dropdown.Link>
+                                        </Dropdown.Content>
+                                    </Dropdown>
+                                </div>
+
+                                {/* Devam Kontrolü Dropdown - Desktop */}
+                                <div className="relative">
+                                    <Dropdown>
+                                        <Dropdown.Trigger>
+                                            <span className="inline-flex rounded-md">
+                                                <button
+                                                    type="button"
+                                                    className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none ${
+                                                        isAttendanceActive()
+                                                            ? 'text-gray-900 bg-gray-100'
+                                                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                                                     }`}
+                                                    style={{ marginTop: 3 }}
                                                 >
-                                                    Dönemler
-                                                </Link>
-                                                <Link
-                                                    href={route('admin.salary-components.index')}
-                                                    className={`block px-4 py-2 text-sm ${
-                                                        route().current('admin.salary-components.*')
-                                                            ? 'bg-gray-100 text-gray-900'
-                                                            : 'text-gray-700 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                    Maaş Kalemleri
-                                                </Link>
-                                                <Link
-                                                    href={route('admin.advances.index')}
-                                                    className={`block px-4 py-2 text-sm ${
-                                                        route().current('admin.advances.*')
-                                                            ? 'bg-gray-100 text-gray-900'
-                                                            : 'text-gray-700 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                    Avans Talepleri
-                                                </Link>
-                                                <Link
-                                                    href={route('admin.payroll-reports.index')}
-                                                    className={`block px-4 py-2 text-sm ${
-                                                        route().current('admin.payroll-reports.*')
-                                                            ? 'bg-gray-100 text-gray-900'
-                                                            : 'text-gray-700 hover:bg-gray-100'
-                                                    }`}
-                                                >
-                                                    Raporlar
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    )}
+                                                    Devam
+                                                    <svg
+                                                        className="-me-0.5 ms-2 h-4 w-4 transition-transform"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 20 20"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            </span>
+                                        </Dropdown.Trigger>
+
+                                        <Dropdown.Content align="left">
+                                            <Dropdown.Link href={route('admin.attendance.index')}>
+                                                Devam Kayıtları
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.attendance.scan')}>
+                                                QR Tarayıcı
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.attendance-reports.index')}>
+                                                Raporlar
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.shifts.index')}>
+                                                Vardiyalar
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.work-calendars.index')}>
+                                                Takvimler
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.holidays.index')}>
+                                                Tatiller
+                                            </Dropdown.Link>
+                                            <Dropdown.Link href={route('admin.adjustments.index')}>
+                                                Düzeltmeler
+                                            </Dropdown.Link>
+                                        </Dropdown.Content>
+                                    </Dropdown>
                                 </div>
                             </div>
                         </div>
@@ -329,6 +388,71 @@ export default function AuthenticatedLayout({ header, children }) {
                                         active={route().current('admin.payroll-reports.*')}
                                     >
                                         Raporlar
+                                    </ResponsiveNavLink>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Mobile İşe Devam Submenu - Toggle ile */}
+                        <div className="border-t border-gray-200 pt-2 pb-2">
+                            <button
+                                onClick={() => setAttendanceDropdownOpen(!attendanceDropdownOpen)}
+                                className="w-full flex items-center justify-between px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none"
+                            >
+                                <span>İşe Devam</span>
+                                <svg
+                                    className={`h-4 w-4 transition-transform ${attendanceDropdownOpen ? 'rotate-180' : ''}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {attendanceDropdownOpen && (
+                                <div className="pl-4 space-y-1 bg-gray-50">
+                                    <ResponsiveNavLink
+                                        href={route('admin.attendance.index')}
+                                        active={route().current('admin.attendance.*')}
+                                    >
+                                        Devam Kayıtları
+                                    </ResponsiveNavLink>
+                                    <ResponsiveNavLink
+                                        href={route('admin.attendance.scan')}
+                                        active={route().current('admin.attendance.scan')}
+                                    >
+                                        QR Tarayıcı
+                                    </ResponsiveNavLink>
+                                    <ResponsiveNavLink
+                                        href={route('admin.attendance-reports.index')}
+                                        active={route().current('admin.attendance-reports.*')}
+                                    >
+                                        Raporlar
+                                    </ResponsiveNavLink>
+                                    <ResponsiveNavLink
+                                        href={route('admin.shifts.index')}
+                                        active={route().current('admin.shifts.*')}
+                                    >
+                                        Vardiyalar
+                                    </ResponsiveNavLink>
+                                    <ResponsiveNavLink
+                                        href={route('admin.work-calendars.index')}
+                                        active={route().current('admin.work-calendars.*')}
+                                    >
+                                        Takvimler
+                                    </ResponsiveNavLink>
+                                    <ResponsiveNavLink
+                                        href={route('admin.holidays.index')}
+                                        active={route().current('admin.holidays.*')}
+                                    >
+                                        Tatiller
+                                    </ResponsiveNavLink>
+                                    <ResponsiveNavLink
+                                        href={route('admin.adjustments.index')}
+                                        active={route().current('admin.adjustments.*')}
+                                    >
+                                        Düzeltmeler
                                     </ResponsiveNavLink>
                                 </div>
                             )}
