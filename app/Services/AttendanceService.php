@@ -256,4 +256,156 @@ class AttendanceService
         // Additional validation rules can be added here
         return true;
     }
+
+    public function getFilteredAttendances($filters = [])
+    {
+        $query = AttendanceRecord::with(['employee.department']);
+
+        // Apply filters
+        if (isset($filters['employee_id'])) {
+            $query->where('employee_id', $filters['employee_id']);
+        }
+
+        if (isset($filters['date'])) {
+            $query->whereDate('date', $filters['date']);
+        }
+
+        if (isset($filters['start_date']) && isset($filters['end_date'])) {
+            $query->whereBetween('date', [$filters['start_date'], $filters['end_date']]);
+        }
+
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (isset($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+
+        return $query->latest()->paginate(15);
+    }
+
+    public function getEmployeeAttendances(int $employeeId, $filters = [])
+    {
+        $query = AttendanceRecord::where('employee_id', $employeeId)->with(['employee.department']);
+
+        if (isset($filters['date'])) {
+            $query->whereDate('date', $filters['date']);
+        }
+
+        if (isset($filters['start_date']) && isset($filters['end_date'])) {
+            $query->whereBetween('date', [$filters['start_date'], $filters['end_date']]);
+        }
+
+        return $query->orderBy('date', 'desc')->orderBy('time', 'asc')->paginate(15);
+    }
+
+    public function getEmployeeShiftForDate(int $employeeId, Carbon $date): ?object
+    {
+        // Get the shift schedule for this day
+        $shiftSchedule = ShiftSchedule::where('employee_id', $employeeId)
+            ->whereDate('date', $date)
+            ->first();
+
+        if ($shiftSchedule) {
+            return $shiftSchedule->shift;
+        }
+
+        // Use default shift if available
+        $employee = Employee::findOrFail($employeeId);
+
+        return $employee->default_shift_id ? $employee->shift : null;
+    }
+
+    public function clockIn(int $employeeId, ?string $dateString, ?string $timeString, array $requestData)
+    {
+        $employee = Employee::findOrFail($employeeId);
+
+        // Set current date/time if not provided
+        $date = $dateString ? Carbon::parse($dateString) : today();
+        $time = $timeString ? Carbon::parse($timeString) : now();
+
+        $metadata = [
+            'geolocation' => $requestData['geolocation'] ?? null,
+            'ip_address' => $requestData['ip_address'] ?? null,
+            'device_id' => $requestData['device_id'] ?? null,
+            'notes' => $requestData['notes'] ?? null,
+        ];
+
+        \DB::beginTransaction();
+        try {
+            // Record the attendance
+            $attendance = $this->recordAttendance(
+                $employee->id,
+                $date,
+                $time,
+                AttendanceTypeEnum::CHECK_IN,
+                AttendanceSourceEnum::from($requestData['source']),
+                $metadata
+            );
+
+            // If successful, also try to determine if this is late arrival
+            $shift = $this->getEmployeeShiftForDate($employee->id, $date);
+            if ($shift) {
+                $scheduledStart = Carbon::createFromTime($shift->start_time);
+                if ($time->gt($scheduledStart->addMinutes($shift->tolerance_minutes ?? 15))) {
+                    $attendance->status = AttendanceStatusEnum::LATE;
+                    $attendance->save();
+                }
+            }
+
+            \DB::commit();
+
+            return $attendance;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function clockOut(int $employeeId, ?string $dateString, ?string $timeString, array $requestData)
+    {
+        $employee = Employee::findOrFail($employeeId);
+
+        // Set current date/time if not provided
+        $date = $dateString ? Carbon::parse($dateString) : today();
+        $time = $timeString ? Carbon::parse($timeString) : now();
+
+        $metadata = [
+            'geolocation' => $requestData['geolocation'] ?? null,
+            'ip_address' => $requestData['ip_address'] ?? null,
+            'device_id' => $requestData['device_id'] ?? null,
+            'notes' => $requestData['notes'] ?? null,
+        ];
+
+        \DB::beginTransaction();
+        try {
+            // Record the attendance
+            $attendance = $this->recordAttendance(
+                $employee->id,
+                $date,
+                $time,
+                AttendanceTypeEnum::CHECK_OUT,
+                AttendanceSourceEnum::from($requestData['source']),
+                $metadata
+            );
+
+            // If successful, also try to determine if this is early departure
+            $shift = $this->getEmployeeShiftForDate($employee->id, $date);
+            if ($shift) {
+                $scheduledEnd = Carbon::createFromTime($shift->end_time);
+                if ($time->lt($scheduledEnd->subMinutes($shift->tolerance_minutes ?? 15))) {
+                    $attendance->status = AttendanceStatusEnum::EARLY_LEAVE;
+                    $attendance->save();
+                }
+            }
+
+            \DB::commit();
+
+            return $attendance;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
 }

@@ -306,4 +306,52 @@ class EmployeeService
     {
         return $this->maxFileSize;
     }
+
+    /**
+     * Yeni employee oluşturur (transaction ile birlikte).
+     */
+    public function createWithEducation(array $data, array $educationData = []): Employee
+    {
+        \DB::beginTransaction();
+        try {
+            // Employee oluştur
+            $employee = $this->create($data);
+
+            // Eğitim bilgilerini ekle
+            if (! empty($educationData)) {
+                $this->storeEducations($employee->id, $educationData);
+            }
+
+            \DB::commit();
+
+            return $employee;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Employee günceller (transaction ile birlikte).
+     */
+    public function updateWithEducation(int $employeeId, array $data, array $educationData = []): Employee
+    {
+        \DB::beginTransaction();
+        try {
+            // Employee güncelle
+            $employee = $this->update($employeeId, $data);
+
+            // Eğitim bilgilerini güncelle (varsa)
+            if (! empty($educationData)) {
+                $this->updateEducations($employee->id, $educationData);
+            }
+
+            \DB::commit();
+
+            return $employee;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
 }

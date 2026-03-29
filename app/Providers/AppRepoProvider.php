@@ -2,14 +2,14 @@
 
 namespace App\Providers;
 
-use App\Interfaces\DepartmentInterface;
-use App\Interfaces\FormInterface;
 use App\Interfaces\IAdvanceRepository;
+use App\Interfaces\IDepartmentRepository;
 use App\Interfaces\IEmployeeRepository;
 use App\Interfaces\IEmployeeSalaryRepository;
+use App\Interfaces\IFormRepository;
 use App\Interfaces\IPayrollRepository;
 use App\Interfaces\ISalaryComponentRepository;
-use App\Interfaces\SubmissionInterface;
+use App\Interfaces\ISubmissionRepository;
 use App\Repositories\AdvanceRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\EmployeeRepository as EmployeeRepositoryImpl;
@@ -43,9 +43,9 @@ class AppRepoProvider extends ServiceProvider
         $this->app->bind(IEmployeeSalaryRepository::class, EmployeeSalaryRepository::class);
 
         // Existing bindings
-        $this->app->bind(DepartmentInterface::class, DepartmentRepository::class);
-        $this->app->bind(FormInterface::class, FormRepository::class);
-        $this->app->bind(SubmissionInterface::class, SubmissionRepository::class);
+        $this->app->bind(IDepartmentRepository::class, DepartmentRepository::class);
+        $this->app->bind(IFormRepository::class, FormRepository::class);
+        $this->app->bind(ISubmissionRepository::class, SubmissionRepository::class);
     }
 
     /**

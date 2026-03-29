@@ -2,8 +2,8 @@
 
 namespace Database\Seeders\PDKS;
 
-use App\Models\WorkCalendar;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class WorkCalendarsSeeder extends Seeder
 {
@@ -19,7 +19,13 @@ class WorkCalendarsSeeder extends Seeder
         ];
 
         foreach ($calendars as $calendar) {
-            WorkCalendar::updateOrCreate(['name' => $calendar['name']], $calendar);
+            // Check if exists
+            $existing = DB::table('work_calendars')->where('name', $calendar['name'])->first();
+            if ($existing) {
+                DB::table('work_calendars')->where('id', $existing->id)->update($calendar);
+            } else {
+                DB::table('work_calendars')->insert($calendar);
+            }
         }
     }
 }

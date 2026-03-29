@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Interfaces\DepartmentInterface;
+use App\Interfaces\IDepartmentRepository;
 use Illuminate\Support\Str;
 
 class DepartmentService
 {
     public function __construct(
-        protected DepartmentInterface $departmentRepository
+        protected IDepartmentRepository $departmentRepository
     ) {}
 
     public function getAll(array $filters = [])
@@ -39,7 +39,7 @@ class DepartmentService
         $originalSlug = $data['slug'];
         $counter = 1;
         while ($this->departmentRepository->getAll()->contains('slug', $data['slug'])) {
-            $data['slug'] = $originalSlug . '-' . $counter++;
+            $data['slug'] = $originalSlug.'-'.$counter++;
         }
 
         return $this->departmentRepository->create($data);

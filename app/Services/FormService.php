@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Interfaces\FormInterface;
+use App\Interfaces\IFormRepository;
 use Illuminate\Support\Str;
 
 class FormService
 {
     public function __construct(
-        protected FormInterface $formRepository
+        protected IFormRepository $formRepository
     ) {}
 
     public function getAll(array $filters = [])

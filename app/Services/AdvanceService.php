@@ -216,4 +216,20 @@ class AdvanceService
                 ->send(new \App\Mail\AdvanceRejectedMailable($advance));
         }
     }
+
+    /**
+     * Avans taleplerinin durumlarına göre sayısını getirir.
+     */
+    public function getStatusCounts(): array
+    {
+        $pendingCount = $this->advanceRepository->getPending()->count();
+        $approvedCount = $this->advanceRepository->getAll(['status' => 'approved'])->count();
+        $rejectedCount = $this->advanceRepository->getAll(['status' => 'rejected'])->count();
+
+        return [
+            'pending' => $pendingCount,
+            'approved' => $approvedCount,
+            'rejected' => $rejectedCount,
+        ];
+    }
 }

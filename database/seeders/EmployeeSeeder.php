@@ -144,22 +144,26 @@ class EmployeeSeeder extends Seeder
 
         // Bulk insert employees
         foreach (array_chunk($employeeData, 50) as $chunk) {
-            Employee::insert($chunk);
+            \DB::table('employees')->insert($chunk);
         }
 
         // Get created employees for relationship seeding
-        $allEmployees = Employee::all();
+        $allEmployees = \DB::table('employees')->get();
 
         // Create some manager relationships
-        $deptEmployees = $allEmployees->groupBy('department_id');
+        $deptEmployees = collect($allEmployees)->groupBy('department_id')->toArray();
 
         foreach ($deptEmployees as $deptId => $employees) {
-            if ($employees->count() > 1) {
+            if (count($employees) > 1) {
                 // First employee is manager
-                $manager = $employees->first();
-                $employees->skip(1)->take(min(5, $employees->count() - 1))->each(function ($emp) use ($manager) {
-                    $emp->update(['manager_id' => $manager->id]);
-                });
+                $manager = $employees[0];
+                $subordinates = array_slice($employees, 1, min(5, count($employees) - 1));
+
+                foreach ($subordinates as $emp) {
+                    \DB::table('employees')
+                        ->where('id', $emp->id)
+                        ->update(['manager_id' => $manager->id]);
+                }
             }
         }
 
@@ -207,7 +211,7 @@ class EmployeeSeeder extends Seeder
         }
 
         foreach (array_chunk($educationData, 50) as $chunk) {
-            \App\Models\EmployeeEducation::insert($chunk);
+            \DB::table('employee_education')->insert($chunk);
         }
 
         $this->command->info('Created '.count($educationData).' education records');
@@ -251,7 +255,7 @@ class EmployeeSeeder extends Seeder
             }
         }
 
-        \App\Models\EmployeeCertificate::insert($certificateData);
+        \DB::table('employee_certificates')->insert($certificateData);
 
         $this->command->info('Created '.count($certificateData).' certificates');
     }
@@ -297,7 +301,7 @@ class EmployeeSeeder extends Seeder
             }
         }
 
-        \App\Models\EmployeePositionHistory::insert($positionHistoryData);
+        \DB::table('employee_position_history')->insert($positionHistoryData);
 
         $this->command->info('Created '.count($positionHistoryData).' position history records');
     }

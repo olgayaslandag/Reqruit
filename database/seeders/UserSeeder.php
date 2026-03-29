@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Enums\UserRoleEnum;
 use App\Enums\UserStatusEnum;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -130,7 +129,7 @@ class UserSeeder extends Seeder
 
         // Bulk insert
         foreach (array_chunk($users, 50) as $chunk) {
-            User::insertOrIgnore($chunk);
+            \DB::table('users')->insertOrIgnore($chunk);
         }
 
         $this->command->info('Created '.count($users).' users');

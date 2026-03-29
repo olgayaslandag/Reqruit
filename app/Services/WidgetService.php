@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Interfaces\FormInterface;
-use App\Interfaces\SubmissionInterface;
+use App\Interfaces\IFormRepository;
+use App\Interfaces\ISubmissionRepository;
 use App\Jobs\SendSubmissionNotification;
 use App\Models\Department;
 use App\Models\Form;
@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Collection;
 class WidgetService
 {
     public function __construct(
-        protected FormInterface $formRepository,
-        protected SubmissionInterface $submissionRepository
+        protected IFormRepository $formRepository,
+        protected ISubmissionRepository $submissionRepository
     ) {}
 
     public function getRootDepartments(): Collection

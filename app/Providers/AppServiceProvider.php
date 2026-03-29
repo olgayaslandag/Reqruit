@@ -2,10 +2,22 @@
 
 namespace App\Providers;
 
+use App\Interfaces\ILeaveEntitlementRepository;
+use App\Interfaces\ILeaveRequestRepository;
+use App\Interfaces\ILeaveTypeRepository;
 use App\Models\AdvanceRequest;
+use App\Models\LeaveEntitlement;
+use App\Models\LeaveRequest;
+use App\Models\LeaveType;
 use App\Models\PayrollPeriod;
 use App\Policies\AdvancePolicy;
+use App\Policies\LeaveEntitlementPolicy;
+use App\Policies\LeaveRequestPolicy;
+use App\Policies\LeaveTypePolicy;
 use App\Policies\PayrollPolicy;
+use App\Repositories\LeaveEntitlementRepository;
+use App\Repositories\LeaveRequestRepository;
+use App\Repositories\LeaveTypeRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -36,6 +48,22 @@ class AppServiceProvider extends ServiceProvider
             \App\Interfaces\IEmployeeSalaryRepository::class,
             \App\Repositories\EmployeeSalaryRepository::class
         );
+
+        // Leave Module Bindings
+        $this->app->bind(
+            ILeaveTypeRepository::class,
+            LeaveTypeRepository::class
+        );
+
+        $this->app->bind(
+            ILeaveEntitlementRepository::class,
+            LeaveEntitlementRepository::class
+        );
+
+        $this->app->bind(
+            ILeaveRequestRepository::class,
+            LeaveRequestRepository::class
+        );
     }
 
     /**
@@ -50,6 +78,11 @@ class AppServiceProvider extends ServiceProvider
 
         // AdvanceRequest modeli için policy mapping
         Gate::policy(AdvanceRequest::class, AdvancePolicy::class);
+
+        // Leave models for policy mapping
+        Gate::policy(LeaveType::class, LeaveTypePolicy::class);
+        Gate::policy(LeaveEntitlement::class, LeaveEntitlementPolicy::class);
+        Gate::policy(LeaveRequest::class, LeaveRequestPolicy::class);
 
         // Payroll report için özel yetki tanımlaması
         Gate::define('view-any-payroll-report', function ($user) {

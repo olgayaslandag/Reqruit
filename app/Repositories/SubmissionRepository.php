@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\SubmissionInterface;
+use App\Interfaces\ISubmissionRepository;
 use App\Models\Submission;
 use App\Models\SubmissionDetail;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
-class SubmissionRepository extends BaseRepository implements SubmissionInterface
+class SubmissionRepository extends BaseRepository implements ISubmissionRepository
 {
     public function __construct(Submission $model)
     {

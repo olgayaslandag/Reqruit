@@ -2,12 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\BonusPayment;
 use App\Models\Employee;
-use App\Models\EmployeeSalary;
-use App\Models\PayrollItem;
-use App\Models\PayrollPeriod;
-use App\Models\SalaryComponent;
 use Illuminate\Database\Seeder;
 
 class PayrollSeeder extends Seeder
@@ -23,7 +18,7 @@ class PayrollSeeder extends Seeder
         $periods = $this->createPayrollPeriods();
 
         // Employees - Çalışanlar
-        $employees = Employee::all()->toArray();
+        $employees = \DB::table('employees')->get()->toArray();
 
         if (empty($employees)) {
             $this->command->warn('No employees found. Run EmployeeSeeder first.');
@@ -179,10 +174,15 @@ class PayrollSeeder extends Seeder
 
         $created = [];
         foreach ($components as $component) {
-            $created[$component['code']] = SalaryComponent::updateOrCreate(
-                ['code' => $component['code']],
-                $component
-            );
+            // Check if exists
+            $existing = \DB::table('salary_components')->where('code', $component['code'])->first();
+            if ($existing) {
+                \DB::table('salary_components')->where('id', $existing->id)->update($component);
+                $created[$component['code']] = (object) ['id' => $existing->id];
+            } else {
+                $id = \DB::table('salary_components')->insertGetId($component);
+                $created[$component['code']] = (object) ['id' => $id];
+            }
         }
 
         return $created;
@@ -224,20 +224,31 @@ class PayrollSeeder extends Seeder
             $isPast = strtotime($endDate) < time();
             $status = $isPast ? 'published' : 'draft';
 
-            $period = PayrollPeriod::updateOrCreate(
-                [
-                    'start_date' => $startDate,
-                    'end_date' => $endDate,
-                ],
-                [
+            // Check if period exists
+            $existing = \DB::table('payroll_periods')
+                ->where('start_date', $startDate)
+                ->where('end_date', $endDate)
+                ->first();
+
+            if ($existing) {
+                \DB::table('payroll_periods')->where('id', $existing->id)->update([
                     'name' => sprintf('%02d/%d Dönemi', $month, $year),
                     'payment_frequency' => 'monthly',
                     'payment_date' => $paymentDate,
                     'status' => $status,
-                ]
-            );
-
-            $periods[] = $period;
+                ]);
+                $periods[] = (object) ['id' => $existing->id];
+            } else {
+                $id = \DB::table('payroll_periods')->insertGetId([
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'name' => sprintf('%02d/%d Dönemi', $month, $year),
+                    'payment_frequency' => 'monthly',
+                    'payment_date' => $paymentDate,
+                    'status' => $status,
+                ]);
+                $periods[] = (object) ['id' => $id];
+            }
         }
 
         $this->command->info('Created '.count($periods).' payroll periods (2025-2026)');
@@ -306,7 +317,7 @@ class PayrollSeeder extends Seeder
         }
 
         foreach (array_chunk($salaryData, 50) as $chunk) {
-            EmployeeSalary::insert($chunk);
+            \DB::table('employee_salaries')->insert($chunk);
         }
 
         $this->command->info('Created '.count($salaryData).' employee salaries');
@@ -430,7 +441,7 @@ class PayrollSeeder extends Seeder
         }
 
         foreach (array_chunk($payrollItemsData, 100) as $chunk) {
-            PayrollItem::insert($chunk);
+            \DB::table('payroll_items')->insert($chunk);
         }
 
         $this->command->info('Created '.count($payrollItemsData).' payroll items');
@@ -489,7 +500,7 @@ class PayrollSeeder extends Seeder
         }
 
         foreach (array_chunk($bonusData, 50) as $chunk) {
-            BonusPayment::insert($chunk);
+            \DB::table('bonus_payments')->insert($chunk);
         }
 
         $this->command->info('Created '.count($bonusData).' bonus payments');

@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
-use App\Interfaces\FormInterface;
-use App\Interfaces\SubmissionInterface;
+use App\Interfaces\IFormRepository;
+use App\Interfaces\ISubmissionRepository;
 use App\Jobs\SendSubmissionNotification;
 use App\Models\SubmissionComment;
 
 class SubmissionService
 {
     public function __construct(
-        protected SubmissionInterface $submissionRepository,
-        protected FormInterface $formRepository
+        protected ISubmissionRepository $submissionRepository,
+        protected IFormRepository $formRepository
     ) {}
 
     public function getAll(array $filters = [])

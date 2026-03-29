@@ -9,6 +9,9 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\LeaveEntitlementController;
+use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PayrollReportController;
 use App\Http\Controllers\ProfileController;
@@ -219,6 +222,36 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/annual', [PayrollReportController::class, 'annual'])
             ->middleware([\App\Http\Middleware\CheckPayrollGeneratePermission::class])
             ->name('annual');
+    });
+
+    // Admin - Leave Management
+    Route::prefix('admin/leave')->name('admin.leave.')->group(function () {
+        // Leave Types
+        Route::prefix('types')->name('types.')->group(function () {
+            Route::get('/', [LeaveTypeController::class, 'index'])->name('index');
+            Route::post('/', [LeaveTypeController::class, 'store'])->name('store');
+            Route::get('/{leaveType}', [LeaveTypeController::class, 'show'])->name('show');
+            Route::put('/{leaveType}', [LeaveTypeController::class, 'update'])->name('update');
+            Route::delete('/{leaveType}', [LeaveTypeController::class, 'destroy'])->name('destroy');
+        });
+
+        // Leave Entitlements
+        Route::prefix('entitlements')->name('entitlements.')->group(function () {
+            Route::get('/', [LeaveEntitlementController::class, 'index'])->name('index');
+            Route::post('/', [LeaveEntitlementController::class, 'store'])->name('store');
+            Route::get('/{leaveEntitlement}', [LeaveEntitlementController::class, 'show'])->name('show');
+            Route::put('/{leaveEntitlement}', [LeaveEntitlementController::class, 'update'])->name('update');
+            Route::delete('/{leaveEntitlement}', [LeaveEntitlementController::class, 'destroy'])->name('destroy');
+        });
+
+        // Leave Requests
+        Route::prefix('requests')->name('requests.')->group(function () {
+            Route::get('/', [LeaveRequestController::class, 'index'])->name('index');
+            Route::post('/', [LeaveRequestController::class, 'store'])->name('store');
+            Route::get('/{leaveRequest}', [LeaveRequestController::class, 'show'])->name('show');
+            Route::put('/{leaveRequest}', [LeaveRequestController::class, 'update'])->name('update');
+            Route::delete('/{leaveRequest}', [LeaveRequestController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // Admin - Attendance (PDKS)

@@ -8,7 +8,6 @@ use App\Models\Employee;
 use App\Services\EmployeeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class EmployeeController extends Controller
@@ -70,7 +69,6 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request)
     {
-        DB::beginTransaction();
         try {
             $data = $request->validated();
 
@@ -79,20 +77,11 @@ class EmployeeController extends Controller
             unset($data['education']);
 
             // Employee oluştur
-            $employee = $this->employeeService->create($data);
-
-            // Eğitim bilgilerini ekle
-            if (! empty($educationData)) {
-                $this->employeeService->storeEducations($employee->id, $educationData);
-            }
-
-            DB::commit();
+            $employee = $this->employeeService->createWithEducation($data, $educationData);
 
             return redirect()->route('admin.employees.index')
                 ->with('success', 'Çalışan başarıyla oluşturuldu.');
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return back()->with('error', $e->getMessage())->withInput();
         }
     }
@@ -134,7 +123,6 @@ class EmployeeController extends Controller
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        DB::beginTransaction();
         try {
             $data = $request->validated();
 
@@ -143,20 +131,11 @@ class EmployeeController extends Controller
             unset($data['education']);
 
             // Employee güncelle
-            $this->employeeService->update($employee->id, $data);
-
-            // Eğitim bilgilerini güncelle (varsa)
-            if (! empty($educationData)) {
-                $this->employeeService->updateEducations($employee->id, $educationData);
-            }
-
-            DB::commit();
+            $this->employeeService->updateWithEducation($employee->id, $data, $educationData);
 
             return redirect()->route('admin.employees.index')
                 ->with('success', 'Çalışan başarıyla güncellendi.');
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return back()->with('error', $e->getMessage())->withInput();
         }
     }

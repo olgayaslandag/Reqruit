@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\FormInterface;
+use App\Interfaces\IFormRepository;
 use App\Models\Form;
 use App\Models\FormField;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
-class FormRepository extends BaseRepository implements FormInterface
+class FormRepository extends BaseRepository implements IFormRepository
 {
     public function __construct(Form $model)
     {

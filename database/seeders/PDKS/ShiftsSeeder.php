@@ -3,8 +3,8 @@
 namespace Database\Seeders\PDKS;
 
 use App\Enums\ShiftTypeEnum;
-use App\Models\Shift;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ShiftsSeeder extends Seeder
 {
@@ -26,7 +26,13 @@ class ShiftsSeeder extends Seeder
         ];
 
         foreach ($shifts as $shift) {
-            Shift::updateOrCreate(['name' => $shift['name']], $shift);
+            // Check if exists
+            $existing = DB::table('shifts')->where('name', $shift['name'])->first();
+            if ($existing) {
+                DB::table('shifts')->where('id', $existing->id)->update($shift);
+            } else {
+                DB::table('shifts')->insert($shift);
+            }
         }
     }
 }

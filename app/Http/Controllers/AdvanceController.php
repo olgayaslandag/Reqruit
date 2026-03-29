@@ -32,9 +32,7 @@ class AdvanceController extends Controller
             'search',
         ]);
 
-        $pendingCount = \App\Models\AdvanceRequest::where('status', 'pending')->count();
-        $approvedCount = \App\Models\AdvanceRequest::where('status', 'approved')->count();
-        $rejectedCount = \App\Models\AdvanceRequest::where('status', 'rejected')->count();
+        $statusCounts = $this->advanceService->getStatusCounts();
 
         $advances = $this->advanceService->getPaginated(
             $filters,
@@ -45,9 +43,9 @@ class AdvanceController extends Controller
         return Inertia::render('Admin/Advances/Index', [
             'advances' => $advances,
             'filters' => $filters,
-            'pendingCount' => $pendingCount,
-            'approvedCount' => $approvedCount,
-            'rejectedCount' => $rejectedCount,
+            'pendingCount' => $statusCounts['pending'],
+            'approvedCount' => $statusCounts['approved'],
+            'rejectedCount' => $statusCounts['rejected'],
         ]);
     }
 

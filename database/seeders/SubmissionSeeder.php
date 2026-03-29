@@ -18,7 +18,7 @@ class SubmissionSeeder extends Seeder
 
     private function seedSubmissions(): void
     {
-        $forms = \App\Models\Form::pluck('id')->toArray();
+        $forms = \DB::table('forms')->pluck('id')->toArray();
 
         if (empty($forms)) {
             $this->command->warn('No forms found. Run ImportAllDataSeeder first.');
@@ -63,7 +63,7 @@ class SubmissionSeeder extends Seeder
 
         // Bulk insert
         foreach (array_chunk($submissionsData, 50) as $chunk) {
-            Submission::insert($chunk);
+            \DB::table('submissions')->insert($chunk);
         }
 
         $this->command->info('Created '.count($submissionsData).' submissions');
@@ -77,7 +77,7 @@ class SubmissionSeeder extends Seeder
 
     private function seedSubmissionDetails(): void
     {
-        $submissions = Submission::all();
+        $submissions = \DB::table('submissions')->get();
         $detailsData = [];
 
         $fieldNames = ['ad_soyad', 'tc_kimlik', 'telefon', 'eposta', 'adres', 'basvuru_tarihi', 'pozisyon', 'departman'];
@@ -124,6 +124,75 @@ class SubmissionSeeder extends Seeder
                     default:
                         $value = 'Sample value '.rand(1, 100);
                 }
+
+                $detailsData[] = [
+                    'submission_id' => $submission->id,
+                    'field_name' => $fieldName,
+                    'field_label' => $fieldLabel,
+                    'field_value' => $value,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        foreach (array_chunk($detailsData, 50) as $chunk) {
+            \DB::table('submission_details')->insert($chunk);
+        }
+
+        $this->command->info('Created '.count($detailsData).' submission details');
+    }
+
+    private function seedSubmissionComments(): void
+    {
+        $submissions = \DB::table('submissions')->get();
+        $users = \DB::table('users')->pluck('id')->toArray();
+
+        if (empty($users)) {
+            $users = [1];
+        }
+
+        $commentsData = [];
+
+        foreach ($submissions as $submission) {
+            // Add 0-3 comments per submission
+            $commentCount = rand(0, 3);
+
+            for ($i = 0; $i < $commentCount; $i++) {
+                $daysAgo = rand(1, 30);
+                $createdAt = now()->subDays($daysAgo);
+
+                $commentTexts = [
+                    'Başvuru incelendi, uygun bulundu.',
+                    'Dosya eksik bilgi içeriyor, tamamlanması gerekiyor.',
+                    'Mülakat randevusu ayarlandı.',
+                    'Referans kontrolü yapıldı.',
+                    'İş teklifi gönderildi.',
+                    'Aday işe başladı.',
+                    'Başvuru reddedildi.',
+                    'Daha fazla bilgi gerekiyor.',
+                    'Pozisyon için uygun değil.',
+                    'Yedek aday olarak listeye eklendi.',
+                ];
+
+                $commentsData[] = [
+                    'submission_id' => $submission->id,
+                    'user_id' => $users[array_rand($users)],
+                    'comment' => $commentTexts[array_rand($commentTexts)],
+                    'rating' => rand(1, 5),
+                    'is_private' => rand(0, 1),
+                    'created_at' => $createdAt,
+                    'updated_at' => $createdAt,
+                ];
+            }
+        }
+
+        foreach (array_chunk($commentsData, 50) as $chunk) {
+            \DB::table('submission_comments')->insert($chunk);
+        }
+
+        $this->command->info('Created '.count($commentsData).' submission comments');
+    }
 
                 $detailsData[] = [
                     'submission_id' => $submission->id,

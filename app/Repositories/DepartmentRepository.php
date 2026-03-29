@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\DepartmentInterface;
+use App\Interfaces\IDepartmentRepository;
 use App\Models\Department;
 use Illuminate\Database\Eloquent\Collection;
 
-class DepartmentRepository extends BaseRepository implements DepartmentInterface
+class DepartmentRepository extends BaseRepository implements IDepartmentRepository
 {
     public function __construct(Department $model)
     {

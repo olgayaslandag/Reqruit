@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Enums\AttendanceSourceEnum;
-use App\Enums\AttendanceStatusEnum;
 use App\Enums\AttendanceTypeEnum;
 use App\Http\Requests\StoreAttendanceRequest;
 use App\Http\Requests\UpdateAttendanceRequest;
@@ -13,7 +12,6 @@ use App\Services\AttendanceCalculationService;
 use App\Services\AttendanceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
@@ -31,30 +29,16 @@ class AttendanceController extends Controller
 
     public function index(Request $request)
     {
-        $query = AttendanceRecord::with(['employee.department']);
+        $filters = [
+            'employee_id' => $request->employee_id,
+            'date' => $request->date,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+            'type' => $request->type,
+        ];
 
-        // Apply filters
-        if ($request->has('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
-        }
-
-        if ($request->has('date')) {
-            $query->whereDate('date', $request->date);
-        }
-
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $query->whereBetween('date', [$request->start_date, $request->end_date]);
-        }
-
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->has('type')) {
-            $query->where('type', $request->type);
-        }
-
-        $attendances = $query->latest()->paginate(15);
+        $attendances = $this->attendanceService->getFilteredAttendances($filters);
 
         return inertia('Admin/Attendance/Index', [
             'attendances' => $attendances,
@@ -145,46 +129,13 @@ class AttendanceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $employee = Employee::findOrFail($request->employee_id);
-
-        // Set current date/time if not provided
-        $date = $request->date ? Carbon::parse($request->date) : today();
-        $time = $request->time ? Carbon::parse($request->time) : now();
-
-        // Combine date and time properly
-        $dateTime = Carbon::combine($date, Carbon::parse($request->time ?? now()->format('H:i')));
-
-        $metadata = [
-            'geolocation' => $request->geolocation,
-            'ip_address' => $request->ip_address,
-            'device_id' => $request->device_id,
-            'notes' => $request->notes,
-        ];
-
         try {
-            DB::beginTransaction();
-
-            // Record the attendance
-            $attendance = $this->attendanceService->recordAttendance(
-                $employee->id,
-                $date,
-                $time,
-                AttendanceTypeEnum::CHECK_IN,
-                AttendanceSourceEnum::from($request->source),
-                $metadata
+            $attendance = $this->attendanceService->clockIn(
+                $request->employee_id,
+                $request->date,
+                $request->time,
+                $request->all()
             );
-
-            // If successful, also try to determine if this is late arrival
-            $shift = $this->attendanceService->getEmployeeShiftForDate($employee->id, $date);
-            if ($shift) {
-                $scheduledStart = Carbon::createFromTime($shift->start_time);
-                if ($time->gt($scheduledStart->addMinutes($shift->tolerance_minutes ?? 15))) {
-                    $attendance->status = AttendanceStatusEnum::LATE;
-                    $attendance->save();
-                }
-            }
-
-            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -192,8 +143,6 @@ class AttendanceController extends Controller
                 'attendance' => $attendance,
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to record clock in: '.$e->getMessage(),
@@ -214,43 +163,13 @@ class AttendanceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $employee = Employee::findOrFail($request->employee_id);
-
-        // Set current date/time if not provided
-        $date = $request->date ? Carbon::parse($request->date) : today();
-        $time = $request->time ? Carbon::parse($request->time) : now();
-
-        $metadata = [
-            'geolocation' => $request->geolocation,
-            'ip_address' => $request->ip_address,
-            'device_id' => $request->device_id,
-            'notes' => $request->notes,
-        ];
-
         try {
-            DB::beginTransaction();
-
-            // Record the attendance
-            $attendance = $this->attendanceService->recordAttendance(
-                $employee->id,
-                $date,
-                $time,
-                AttendanceTypeEnum::CHECK_OUT,
-                AttendanceSourceEnum::from($request->source),
-                $metadata
+            $attendance = $this->attendanceService->clockOut(
+                $request->employee_id,
+                $request->date,
+                $request->time,
+                $request->all()
             );
-
-            // If successful, also try to determine if this is early departure
-            $shift = $this->attendanceService->getEmployeeShiftForDate($employee->id, $date);
-            if ($shift) {
-                $scheduledEnd = Carbon::createFromTime($shift->end_time);
-                if ($time->lt($scheduledEnd->subMinutes($shift->tolerance_minutes ?? 15))) {
-                    $attendance->status = AttendanceStatusEnum::EARLY_LEAVE;
-                    $attendance->save();
-                }
-            }
-
-            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -258,8 +177,6 @@ class AttendanceController extends Controller
                 'attendance' => $attendance,
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to record clock out: '.$e->getMessage(),
@@ -271,17 +188,13 @@ class AttendanceController extends Controller
     {
         $employee = Employee::findOrFail($employeeId);
 
-        $query = AttendanceRecord::where('employee_id', $employeeId)->with(['employee.department']);
+        $filters = [
+            'date' => $request->date,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ];
 
-        if ($request->has('date')) {
-            $query->whereDate('date', $request->date);
-        }
-
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $query->whereBetween('date', [$request->start_date, $request->end_date]);
-        }
-
-        $attendances = $query->orderBy('date', 'desc')->orderBy('time', 'asc')->paginate(15);
+        $attendances = $this->attendanceService->getEmployeeAttendances($employeeId, $filters);
 
         return inertia('Attendance/EmployeeAttendance', [
             'employee' => $employee,
