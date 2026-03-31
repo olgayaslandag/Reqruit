@@ -15,13 +15,14 @@ export default function Index({ statistics = {}, reportsSummary = {}, filters = 
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Devam Raporları
-                    </h5>
-                </div>
-            }
+            pageHeader={{
+                title: 'Devam Raporları',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Raporlar', url: '#' },
+                    { label: 'Devam Raporları', url: route('admin.attendance-reports.index') },
+                ],
+            }}
         >
             <Head title="Devam Raporları" />
 

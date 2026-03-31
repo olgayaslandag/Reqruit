@@ -104,7 +104,7 @@ export default function Scan() {
                                             onChange={(e) => setSelectedEmployee(e.target.value)}
                                         >
                                             <option value="">Personel Seçin</option>
-                                            {props.employees?.map((emp) => (
+                                            {(props.employees || []).map((emp) => (
                                                 <option key={emp.id} value={emp.id}>
                                                     {emp.first_name} {emp.last_name} - {emp.identity_no}
                                                 </option>
@@ -176,7 +176,7 @@ export default function Scan() {
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
-                                                {props.recentAttendances.map((record, index) => (
+                                                {(props.recentAttendances || []).map((record, index) => (
                                                     <tr key={index} className="hover:table-light">
                                                         <td className="px-4 py-3 text-nowrap fs-sm fw-medium text-dark">
                                                             {record.employee.first_name} {record.employee.last_name}

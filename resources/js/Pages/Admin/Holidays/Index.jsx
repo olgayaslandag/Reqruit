@@ -51,22 +51,15 @@ export default function Index({ holidays, filters = {} }) {
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Resmi Tatiller
-                    </h5>
-                    <Link
-                        href={route('admin.holidays.create')}
-                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Yeni Tatil
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Resmi Tatiller',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Zaman Yönetimi', url: '#' },
+                    { label: 'Resmi Tatiller', url: route('admin.holidays.index') },
+                ],
+                newUrl: route('admin.holidays.create'),
+            }}
         >
             <Head title="Resmi Tatiller" />
 
@@ -94,7 +87,7 @@ export default function Index({ holidays, filters = {} }) {
                                     onChange={(e) => handleFilterChange('type', e.target.value)}
                                 >
                                     <option value="">Tümü</option>
-                                    {categories.map(category => (
+                                    {(categories || []).map(category => (
                                         <option key={category} value={category}>
                                             {category === 'official' ? 'Resmi Tatil' : category === 'company' ? 'Şirket Tatili' : category}
                                         </option>

@@ -10,11 +10,15 @@ import { formatDate } from '@/Utils/formatters';
 export default function Index({ periods }) {
     return (
         <AuthenticatedLayout
-            header={
-                <h5 className="fw-semibold">
-                    Bordro Raporları
-                </h5>
-            }
+            pageHeader={{
+                title: 'Bordro Raporları',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Raporlar', url: '#' },
+                    { label: 'Bordro Raporları', url: route('admin.payroll-reports.index') },
+                ],
+                exportUrl: route('admin.payroll-reports.export'),
+            }}
         >
             <Head title="Bordro Raporları" />
 

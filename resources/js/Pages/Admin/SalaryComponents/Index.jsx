@@ -79,22 +79,15 @@ export default function Index({ components, filters }) {
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Maaş Kalemleri
-                    </h5>
-                    <Link
-                        href={route('admin.salary-components.create')}
-                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Yeni Kalem
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Maaş Bileşenleri',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro ve Maaş', url: '#' },
+                    { label: 'Maaş Bileşenleri', url: route('admin.salary-components.index') },
+                ],
+                newUrl: route('admin.salary-components.create'),
+            }}
         >
             <Head title="Maaş Kalemleri" />
 
@@ -178,7 +171,7 @@ export default function Index({ components, filters }) {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {allowances.map((component) => (
+                                    {(allowances || []).map((component) => (
                                         <tr key={component.id} className="hover:table-light">
                                             <td className="px-4 py-3">
                                                 <Link
@@ -274,7 +267,7 @@ export default function Index({ components, filters }) {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {deductions.map((component) => (
+                                    {(deductions || []).map((component) => (
                                         <tr key={component.id} className="hover:table-light">
                                             <td className="px-4 py-3">
                                                 <Link

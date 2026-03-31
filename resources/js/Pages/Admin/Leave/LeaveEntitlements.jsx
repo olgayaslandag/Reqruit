@@ -337,13 +337,12 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
 LeaveEntitlements.layout = page =>
     <AuthenticatedLayout
         children={page}
-        header={<div className="d-flex justify-content-between align-items-center">
-            <h5 className="fw-medium text-dark">İzin Hakları</h5>
-            <button
-                onClick={() => document.dispatchEvent(new CustomEvent('openLeaveEntitlementModal'))}
-                className="btn btn-primary btn-sm ms-auto"
-            >
-                Yeni İzin Hakkı
-            </button>
-        </div>}
+        pageHeader={{
+            title: 'İzin Hakları',
+            breadcrumbs: [
+                { label: 'Ana Sayfa', url: route('dashboard') },
+                { label: 'İzin Yönetimi', url: '#' },
+                { label: 'İzin Hakları', url: route('admin.leave.entitlements.index') },
+            ],
+        }}
     />;

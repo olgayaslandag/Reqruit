@@ -101,22 +101,16 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Avans Talepleri
-                    </h5>
-                        <Link
-                            href={route('admin.advances.create')}
-                            className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                        >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Yeni Talep
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Avans Talepleri',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro ve Maaş', url: '#' },
+                    { label: 'Avans Talepleri', url: route('admin.advances.index') },
+                ],
+                newUrl: route('admin.advances.create'),
+                exportUrl: route('admin.advances.export'),
+            }}
         >
             <Head title="Avans Talepleri" />
 
@@ -214,7 +208,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {advances?.data?.length > 0 ? (
-                                    advances.data.map((advance) => (
+                                    (advances?.data || []).map((advance) => (
                                         <tr key={advance.id} className="hover:table-light">
                                             <td className="px-4 py-3">
                                                 <div className="fs-sm fw-medium text-dark">
@@ -254,12 +248,9 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                         className="p-1 text-muted hover:text-primary"
                                                         title="Görüntüle"
                                                     >
-                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
+                                                        <i className="ti ti-eye"></i>
                                                     </Link>
-                                                    
+
                                                     {advance.status === 'pending' && (
                                                         <>
                                                             <button
@@ -267,43 +258,35 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                                 className="p-1 text-success hover:text-success"
                                                                 title="Onayla"
                                                             >
-                                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                                </svg>
+                                                                <i className="ti ti-check"></i>
                                                             </button>
                                                             <button
                                                                 onClick={() => handleReject(advance.id)}
                                                                 className="p-1 text-danger hover:text-danger"
                                                                 title="Reddet"
                                                             >
-                                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                                </svg>
+                                                                <i className="ti ti-x"></i>
                                                             </button>
                                                         </>
                                                     )}
-                                                    
+
                                                     {advance.status === 'approved' && (
                                                         <button
                                                             onClick={() => handleMarkAsPaid(advance.id)}
                                                             className="p-1 text-info hover:text-info"
                                                             title="Ödendi"
                                                         >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                            </svg>
+                                                            <i className="ti ti-cash"></i>
                                                         </button>
                                                     )}
-                                                    
+
                                                     {advance.status === 'pending' && (
                                                         <button
                                                             onClick={() => handleCancel(advance.id)}
                                                             className="p-1 text-muted hover:text-danger"
                                                             title="İptal"
                                                         >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                            </svg>
+                                                            <i className="ti ti-x"></i>
                                                         </button>
                                                     )}
                                                 </div>
@@ -325,7 +308,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                     {advances?.meta && advances.meta.last_page > 1 && (
                         <div className="mt-4 d-flex justify-content-center">
                             <div className="d-flex gap-1">
-                                {advances.meta.links.map((link, index) => (
+                                {(advances?.meta?.links || []).map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}

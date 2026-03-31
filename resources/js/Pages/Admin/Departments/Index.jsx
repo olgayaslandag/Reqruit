@@ -24,7 +24,7 @@ export default function Index({ departments }) {
         return result;
     };
 
-    const flatDepartments = flattenDepartments(departments);
+    const flatDepartments = flattenDepartments(departments || []);
 
     const openModal = (department = null) => {
         if (department) {
@@ -111,7 +111,7 @@ export default function Index({ departments }) {
                 </td>
                 <td className="px-4 py-3 text-nowrap">{department.slug}</td>
                 <td className="px-4 py-3">
-                    {department.emails?.map((email, i) => (
+                    {(department.emails || []).map((email, i) => (
                         <span key={i} className="badge bg-light text-dark me-1">
                             {email}
                         </span>
@@ -124,14 +124,14 @@ export default function Index({ departments }) {
                             className="btn btn-link btn-sm text-primary"
                             title="Düzenle"
                         >
-                            <i className="bi bi-pencil"></i>
+                            <i className="ti ti-edit"></i>
                         </button>
                         <button
                             onClick={() => handleDelete(department.id)}
                             className="btn btn-link btn-sm text-danger"
                             title="Sil"
                         >
-                            <i className="bi bi-trash"></i>
+                            <i className="ti ti-trash"></i>
                         </button>
                     </div>
                 </td>
@@ -147,24 +147,19 @@ export default function Index({ departments }) {
         return rows;
     };
 
-    const allRows = departments.flatMap(dept => collectDepartmentRows(dept));
+    const allRows = (departments || []).flatMap(dept => collectDepartmentRows(dept));
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold mb-0">
-                        Departmanlar
-                    </h5>
-                    <button
-                        onClick={() => openModal()}
-                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                    >
-                        <i className="bi bi-plus-lg"></i>
-                        Yeni Departman
-                    </button>
-                </div>
-            }
+            pageHeader={{
+                title: 'Departmanlar',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Departmanlar', url: route('admin.departments.index') },
+                ],
+                newUrl: route('admin.departments.create'),
+                exportUrl: route('admin.departments.export'),
+            }}
         >
             <Head title="Departmanlar" />
 
@@ -243,7 +238,7 @@ export default function Index({ departments }) {
                                                     onClick={() => removeEmailField(index)}
                                                     className="btn btn-outline-danger"
                                                 >
-                                                    <i className="bi bi-x-lg"></i>
+                                                    <i className="ti ti-x"></i>
                                                 </button>
                                             </div>
                                         ))}
@@ -252,7 +247,7 @@ export default function Index({ departments }) {
                                             onClick={addEmailField}
                                             className="btn btn-link text-primary p-0"
                                         >
-                                            <i className="bi bi-plus-lg me-1"></i>
+                                            <i className="ti ti-plus me-1"></i>
                                             E-posta ekle
                                         </button>
                                     </div>

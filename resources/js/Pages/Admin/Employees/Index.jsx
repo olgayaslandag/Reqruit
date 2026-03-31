@@ -59,7 +59,7 @@ export default function Index({ employees, filters, employeeTree }) {
                 <td className="px-4 py-3">
                     <div className="d-flex align-items-center" style={{ paddingLeft: indent }}>
                         {hasChildren ? (
-                            <i className="bi bi-chevron-down me-2 text-muted"></i>
+                            <i className="ti ti-chevron-right me-2 text-muted"></i>
                         ) : level > 0 ? (
                             <span className="me-2 text-muted">└</span>
                         ) : (
@@ -108,21 +108,21 @@ export default function Index({ employees, filters, employeeTree }) {
                             className="text-muted"
                             title="Görüntüle"
                         >
-                            <i className="bi bi-eye"></i>
+                            <i className="ti ti-eye"></i>
                         </Link>
                         <Link
                             href={route('admin.employees.edit', employee.id)}
                             className="text-muted"
                             title="Düzenle"
                         >
-                            <i className="bi bi-pencil"></i>
+                            <i className="ti ti-edit"></i>
                         </Link>
                         <button
                             onClick={() => handleDelete(employee.id)}
                             className="text-muted"
                             title="Sil"
                         >
-                            <i className="bi bi-trash"></i>
+                            <i className="ti ti-trash"></i>
                         </button>
                     </div>
                 </td>
@@ -144,20 +144,16 @@ export default function Index({ employees, filters, employeeTree }) {
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold mb-0">
-                        Çalışanlar
-                    </h5>
-                    <Link
-                        href={route('admin.employees.create')}
-                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                    >
-                        <i className="bi bi-plus-lg"></i>
-                        Yeni Çalışan
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Çalışanlar',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'İnsan Kaynakları', url: '#' },
+                    { label: 'Çalışanlar', url: route('admin.employees.index') },
+                ],
+                newUrl: route('admin.employees.create'),
+                exportUrl: route('admin.employees.export'),
+            }}
         >
             <Head title="Çalışanlar" />
 
@@ -236,7 +232,7 @@ export default function Index({ employees, filters, employeeTree }) {
                                         type="submit"
                                         className="btn btn-primary w-100"
                                     >
-                                        <i className="bi bi-search me-1"></i>
+                                        <i className="ti ti-search me-1"></i>
                                         Ara
                                     </button>
                                 </div>

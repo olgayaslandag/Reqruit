@@ -11,7 +11,15 @@
       "WebFetch(domain:github.com)",
       "Bash(find /tmp/mantis -name NavItem* -type f)",
       "Bash(grep -l \"paginate\\\\|\\\\.map\\(\" /projects/reqruit/resources/js/Pages/Admin/*/Index.jsx)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(grep -rl header={ /projects/reqruit/resources/js/Pages/Admin --include=*.jsx)",
+      "Bash(curl -s http://localhost:8000/login -I)",
+      "Bash(curl -s http://localhost:8000/admin/submissions)",
+      "Bash(curl -s -c /tmp/cookies.txt -b /tmp/cookies.txt http://localhost:8000/login)",
+      "Bash(curl -s http://localhost:8000/login -H \"Accept: text/html\")",
+      "Bash(php:*)",
+      "Bash(npm list:*)",
+      "Bash(npm uninstall:*)"
     ]
   }
 }

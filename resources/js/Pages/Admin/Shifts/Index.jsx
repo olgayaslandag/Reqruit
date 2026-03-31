@@ -45,22 +45,15 @@ export default function Index({ shifts, employees = [], departments = [], filter
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Vardiyalar
-                    </h5>
-                    <Link
-                        href={route('admin.shifts.create')}
-                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Yeni Vardiya
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Vardiyalar',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Zaman Yönetimi', url: '#' },
+                    { label: 'Vardiyalar', url: route('admin.shifts.index') },
+                ],
+                newUrl: route('admin.shifts.create'),
+            }}
         >
             <Head title="Vardiyalar" />
 
@@ -88,7 +81,7 @@ export default function Index({ shifts, employees = [], departments = [], filter
                                     onChange={(e) => handleFilterChange('department_id', e.target.value)}
                                 >
                                     <option value="">Tümü</option>
-                                    {departments?.map((dept) => (
+                                    {(departments || []).map((dept) => (
                                         <option key={dept.id} value={dept.id}>
                                             {dept.title}
                                         </option>
@@ -220,7 +213,7 @@ export default function Index({ shifts, employees = [], departments = [], filter
                                         </div>
                                         <div>
                                             <div className="d-flex space-x-2">
-                                                {shifts.meta.links.filter(link => link.url).map((link, index) => (
+                                                {(shifts?.meta?.links || []).filter(link => link.url).map((link, index) => (
                                                     <Link
                                                         key={index}
                                                         href={link.url}

@@ -63,22 +63,16 @@ export default function Index({ payrollPeriods, filters }) {
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Bordro Dönemleri
-                    </h5>
-                    <Link
-                        href={route('admin.payrolls.create')}
-                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Yeni Dönem
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Bordro Dönemleri',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro ve Maaş', url: '#' },
+                    { label: 'Bordro Dönemleri', url: route('admin.payrolls.index') },
+                ],
+                newUrl: route('admin.payrolls.create'),
+                exportUrl: route('admin.payrolls.export'),
+            }}
         >
             <Head title="Bordro Dönemleri" />
 
@@ -159,7 +153,7 @@ export default function Index({ payrollPeriods, filters }) {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {payrollPeriods?.data?.length > 0 ? (
-                                    payrollPeriods.data.map((period) => (
+                                    (payrollPeriods?.data || []).map((period) => (
                                         <tr key={period.id} className="hover:table-light">
                                             <td className="px-4 py-3">
                                                 <Link
@@ -202,45 +196,36 @@ export default function Index({ payrollPeriods, filters }) {
                                                         className="p-1 text-muted hover:text-primary"
                                                         title="Görüntüle"
                                                     >
-                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
+                                                        <i className="ti ti-eye"></i>
                                                     </Link>
-                                                    
+
                                                     {period.status === 'draft' && (
                                                         <Link
                                                             href={route('admin.payrolls.edit', period.id)}
                                                             className="p-1 text-muted hover:text-primary"
                                                             title="Düzenle"
                                                         >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                            </svg>
+                                                            <i className="ti ti-edit"></i>
                                                         </Link>
                                                     )}
-                                                    
+
                                                     {period.status === 'draft' && (
                                                         <button
                                                             onClick={() => handleDelete(period.id)}
                                                             className="p-1 text-muted hover:text-danger"
                                                             title="Sil"
                                                         >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                            </svg>
+                                                            <i className="ti ti-trash"></i>
                                                         </button>
                                                     )}
-                                                    
+
                                                     {['pending', 'approved'].includes(period.status) && (
                                                         <Link
                                                             href={route('admin.payrolls.approve', period.id)}
                                                             className="p-1 text-muted hover:text-success"
                                                             title="Onayla"
                                                         >
-                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
+                                                            <i className="ti ti-check"></i>
                                                         </Link>
                                                     )}
                                                 </div>
@@ -262,7 +247,7 @@ export default function Index({ payrollPeriods, filters }) {
                     {payrollPeriods?.meta && payrollPeriods.meta.last_page > 1 && (
                         <div className="mt-4 d-flex justify-content-center">
                             <div className="d-flex gap-1">
-                                {payrollPeriods.meta.links.map((link, index) => (
+                                {(payrollPeriods?.meta?.links || []).map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}

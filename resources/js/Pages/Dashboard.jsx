@@ -37,7 +37,14 @@ export default function Dashboard({ stats, weeklySubmissions }) {
     const maxCount = Math.max(...(weeklySubmissions?.map(d => d.count) ?? [1]), 1);
 
     return (
-        <AuthenticatedLayout header="Ana Ekran">
+        <AuthenticatedLayout
+            pageHeader={{
+                title: 'Ana Ekran',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                ],
+            }}
+        >
             <Head title="Ana Ekran" />
 
             <div className="py-5">
@@ -67,7 +74,7 @@ export default function Dashboard({ stats, weeklySubmissions }) {
                     </div>
 
                     <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 mb-4">
-                        {statsData.map((stat, index) => {
+                        {(statsData || []).map((stat, index) => {
                             let href = '#';
                             if (stat.label === 'Toplam Başvuru' || stat.label.includes('Başvuru')) {
                                 href = '/admin/submissions';
@@ -96,7 +103,7 @@ export default function Dashboard({ stats, weeklySubmissions }) {
                     </div>
 
                     <div className="row row-cols-1 row-cols-md-3 g-4">
-                        {menuItems.map((item, index) => (
+                        {(menuItems || []).map((item, index) => (
                             <div key={index} className="col">
                                 <Link
                                     href={item.href}

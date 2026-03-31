@@ -168,7 +168,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                         onChange={(e) => setData('gender', e.target.value)}
                                     >
                                         <option value="">Seçiniz</option>
-                                        {genderOptions.map((option) => (
+                                        {(genderOptions || []).map((option) => (
                                             <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
@@ -267,7 +267,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                         onChange={(e) => setData('marital_status', e.target.value)}
                                     >
                                         <option value="">Seçiniz</option>
-                                        {maritalStatusOptions.map((option) => (
+                                        {(maritalStatusOptions || []).map((option) => (
                                             <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
@@ -326,7 +326,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                         required
                                     >
                                         <option value="">Seçiniz</option>
-                                        {departments.map((dept) => (
+                                        {(departments || []).map((dept) => (
                                             <option key={dept.id} value={dept.id}>
                                                 {dept.title}
                                             </option>
@@ -342,7 +342,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.employment_type}
                                         onChange={(e) => setData('employment_type', e.target.value)}
                                     >
-                                        {employmentTypeOptions.map((option) => (
+                                        {(employmentTypeOptions || []).map((option) => (
                                             <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
@@ -357,7 +357,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.contract_type}
                                         onChange={(e) => setData('contract_type', e.target.value)}
                                     >
-                                        {contractTypeOptions.map((option) => (
+                                        {(contractTypeOptions || []).map((option) => (
                                             <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
@@ -373,7 +373,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                         onChange={(e) => setData('manager_id', e.target.value || '')}
                                     >
                                         <option value="">Yok</option>
-                                        {managers.map((manager) => (
+                                        {(managers || []).map((manager) => (
                                             <option key={manager.id} value={manager.id}>
                                                 {manager.first_name} {manager.last_name}
                                             </option>
@@ -427,7 +427,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                                     onChange={(e) => updateEducation(index, 'degree', e.target.value)}
                                                 >
                                                     <option value="">Seçiniz</option>
-                                                    {degreeOptions.map((option) => (
+                                                    {(degreeOptions || []).map((option) => (
                                                         <option key={option.value} value={option.value}>
                                                             {option.label}
                                                         </option>

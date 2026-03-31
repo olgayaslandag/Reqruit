@@ -54,22 +54,16 @@ export default function Index({ users, filters }) {
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Kullanıcılar
-                    </h5>
-                    <Link
-                        href="/admin/users/create"
-                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Yeni Kullanıcı
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Kullanıcılar',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'İnsan Kaynakları', url: '#' },
+                    { label: 'Kullanıcılar', url: route('admin.users.index') },
+                ],
+                newUrl: route('admin.users.create'),
+                exportUrl: route('admin.users.export'),
+            }}
         >
             <Head title="Kullanıcılar" />
 
@@ -87,7 +81,7 @@ export default function Index({ users, filters }) {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                                 <button type="submit" className="btn btn-primary">
-                                    <i className="bi bi-search"></i> Ara
+                                    <i className="ti ti-search"></i> Ara
                                 </button>
                             </form>
                         </div>
@@ -106,7 +100,7 @@ export default function Index({ users, filters }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.data.map((user) => (
+                                {(users?.data || []).map((user) => (
                                     <tr key={user.id}>
                                         <td className="px-4 py-3">
                                             <Link
@@ -139,21 +133,21 @@ export default function Index({ users, filters }) {
                                                     className="btn btn-link btn-sm text-primary p-0"
                                                     title="Düzenle"
                                                 >
-                                                    <i className="bi bi-pencil"></i>
+                                                    <i className="ti ti-edit"></i>
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(user.id)}
                                                     className="btn btn-link btn-sm text-danger p-0"
                                                     title="Sil"
                                                 >
-                                                    <i className="bi bi-trash"></i>
+                                                    <i className="ti ti-trash"></i>
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
 
-                                {users.data.length === 0 && (
+                                {(users?.data?.length === 0 || !users?.data) && (
                                     <tr>
                                         <td colSpan="6" className="px-4 py-8 text-center fs-sm text-muted">
                                             Kullanıcı bulunamadı.

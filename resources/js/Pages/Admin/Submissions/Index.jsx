@@ -87,7 +87,15 @@ export default function Index({ submissions, forms, departments, filters }) {
     };
 
     return (
-        <AuthenticatedLayout header="Başvurular">
+        <AuthenticatedLayout
+            pageHeader={{
+                title: 'Başvurular',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Başvurular', url: route('admin.submissions.index') },
+                ],
+            }}
+        >
             <Head title="Başvurular" />
 
             <div className="py-5">
@@ -134,7 +142,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                                     onChange={(e) => setFilterForm(e.target.value)}
                                 >
                                     <option value="">Tümü</option>
-                                    {forms.map((form) => (
+                                    {(forms || []).map((form) => (
                                         <option key={form.id} value={form.id}>
                                             {form.name}
                                         </option>
@@ -150,7 +158,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                                     onChange={(e) => setFilterDepartment(e.target.value)}
                                 >
                                     <option value="">Tümü</option>
-                                    {departments.map((dept) => (
+                                    {(departments || []).map((dept) => (
                                         <option key={dept.id} value={dept.id}>
                                             {dept.title}
                                         </option>
@@ -185,7 +193,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {submissions.map((submission) => (
+                                {(submissions || []).map((submission) => (
                                     <tr key={submission.id}>
                                         <td className="px-4 py-3">
                                             <Link

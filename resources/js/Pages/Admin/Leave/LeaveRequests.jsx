@@ -432,13 +432,12 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
 LeaveRequests.layout = page =>
     <AuthenticatedLayout
         children={page}
-        header={<div className="d-flex justify-content-between align-items-center">
-            <h5 className="fw-medium text-dark">İzin Talepleri</h5>
-            <button
-                onClick={() => document.dispatchEvent(new CustomEvent('openLeaveRequestModal'))}
-                className="btn btn-primary btn-sm ms-auto"
-            >
-                Yeni İzin Talebi
-            </button>
-        </div>}
+        pageHeader={{
+            title: 'İzin Talepleri',
+            breadcrumbs: [
+                { label: 'Ana Sayfa', url: route('dashboard') },
+                { label: 'İzin Yönetimi', url: '#' },
+                { label: 'İzin Talepleri', url: route('admin.leave.requests.index') },
+            ],
+        }}
     />;
