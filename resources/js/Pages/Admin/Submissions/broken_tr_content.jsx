@@ -2,38 +2,38 @@
                                             <td className="px-4 py-3">
                                                 <Link
                                                     href={`/admin/submissions/${submission.id}`}
-                                                    className="text-sm font-medium text-gray-900 hover:text-indigo-600 hover:underline"
+                                                    className="fs-sm fw-medium text-dark hover:text-primary hover:underline"
                                                 >
                                                     {submission.applicant_name}
                                                 </Link>
-                                                <div className="text-xs text-gray-500">{submission.applicant_email}</div>
+                                                <div className="fs-xs text-muted">{submission.applicant_email}</div>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-4 py-3 text-nowrap fs-sm text-muted">
                                                 {new Date(submission.created_at).toLocaleDateString('tr-TR')}
                                             </td>
-                                            <td className="px-4 py-3 text-xs text-gray-900">
+                                            <td className="px-4 py-3 fs-xs text-dark">
                                                 {submission.form?.name}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
+                                            <td className="px-4 py-3 text-nowrap fs-xs text-muted">
                                                 {submission.form?.department?.title || '-'}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
+                                            <td className="px-4 py-3 text-nowrap">
                                                 {getStatusBadge(submission.status)}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
+                                            <td className="px-4 py-3 text-nowrap">
                                                 {getInvestigationBadge(submission.investigation)}
                                             </td>
-                                            <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                            <td className="px-4 py-3 text-center fs-sm text-muted">
                                                 {submission.comment_count || '-'}
                                             </td>
                                             <td className="px-4 py-3 text-center">
                                                 {renderStars(submission.avg_rating)}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                            <td className="px-4 py-3 text-nowrap text-right">
+                                                <div className="d-flex align-items-center justify-content-end">
                                                     <Link
                                                         href={`/admin/submissions/${submission.id}`}
-                                                        className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition"
+                                                        className="p-2 text-info hover:text-info hover:bg-blue-50 rounded"
                                                         title="Görüntüle"
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,7 +43,7 @@
                                                     </Link>
                                                     <button
                                                         onClick={() => handleDelete(submission.id)}
-                                                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition"
+                                                        className="p-2 text-danger hover:text-danger hover:bg-red-50 rounded"
                                                         title="Sil"
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -25,14 +25,14 @@ export default function Edit({ advance }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold text-dark">
                         Avans Talebini Güncelle - #{advance.id}
-                    </h2>
-                    <div className="flex gap-2">
+                    </h5>
+                    <div className="d-flex gap-2">
                         <Link
                             href={route('admin.advances.show', advance.id)}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                         >
                             Geri Dön
                         </Link>
@@ -43,17 +43,17 @@ export default function Edit({ advance }) {
             <Head title={`Avans Talebini Güncelle - #${advance.id}`} />
 
             <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="mw-100 mx-auto">
+                    <div className="bg-white overflow-hidden shadow-sm-sm">
+                        <div className="p-4 text-dark">
+                            <form onSubmit={handleSubmit} className="mb-3">
+                                <div className="d-grid d-grid-cols-1 gap-4">
                                     {/* Çalişan Seçimi */}
                                     <div>
                                         <InputLabel htmlFor="employee_id" value="Çalişan" />
                                         <Select
                                             id="employee_id"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.employee_id}
                                             onChange={(e) => setData('employee_id', e.target.value)}
                                             required
@@ -75,7 +75,7 @@ export default function Edit({ advance }) {
                                             id="amount"
                                             type="number"
                                             step="0.01"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.amount}
                                             onChange={(e) => setData('amount', e.target.value)}
                                             required
@@ -90,7 +90,7 @@ export default function Edit({ advance }) {
                                         <TextInput
                                             id="requested_date"
                                             type="date"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.requested_date}
                                             onChange={(e) => setData('requested_date', e.target.value)}
                                             required
@@ -103,7 +103,7 @@ export default function Edit({ advance }) {
                                         <InputLabel htmlFor="status" value="Durum" />
                                         <Select
                                             id="status"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.status}
                                             onChange={(e) => setData('status', e.target.value)}
                                         >
@@ -120,10 +120,9 @@ export default function Edit({ advance }) {
                                 {/* Nedeni */}
                                 <div>
                                     <InputLabel htmlFor="reason" value="Nedeni" />
-                                    <textarea
-                                        id="reason"
+                                    <textarea className="form-control mt-1 d-block w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" id="reason"
                                         rows="3"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        
                                         value={data.reason}
                                         onChange={(e) => setData('reason', e.target.value)}
                                     />
@@ -133,10 +132,9 @@ export default function Edit({ advance }) {
                                 {/* Notlar */}
                                 <div>
                                     <InputLabel htmlFor="notes" value="Notlar" />
-                                    <textarea
-                                        id="notes"
+                                    <textarea className="form-control mt-1 d-block w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" id="notes"
                                         rows="3"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        
                                         value={data.notes}
                                         onChange={(e) => setData('notes', e.target.value)}
                                     />
@@ -144,21 +142,21 @@ export default function Edit({ advance }) {
                                 </div>
 
                                 {/* Butonlar */}
-                                <div className="flex items-center gap-4">
+                                <div className="d-flex align-items-center gap-3">
                                     <PrimaryButton disabled={processing}>
                                         Güncelle
                                     </PrimaryButton>
 
                                     <Link
                                         href={route('admin.advances.show', advance.id)}
-                                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                                     >
                                         İptal
                                     </Link>
                                 </div>
 
                                 {recentlySuccessful && (
-                                    <p className="text-sm text-gray-600">Kaydedildi.</p>
+                                    <p className="fs-sm text-muted">Kaydedildi.</p>
                                 )}
                             </form>
                         </div>

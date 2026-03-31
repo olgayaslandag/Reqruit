@@ -95,40 +95,38 @@ export default function Request({ employee, salaryInfo }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center gap-4">
+                <div className="d-flex align-items-center gap-3">
                     <Link
                         href={route('admin.advances.index')}
-                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition"
+                        className="p-2 text-muted hover:text-dark hover:bg-light rounded"
                         title="Geri"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </Link>
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    <h5 className="fw-semibold">
                         Yeni Avans Talebi
-                    </h2>
+                    </h5>
                 </div>
             }
         >
             <Head title="Yeni Avans Talebi" />
 
             <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="mw-100 mx-auto">
+                    <div className="d-grid d-grid-cols-1 gap-4">
                         {/* Form */}
-                        <div className="lg:col-span-2 bg-white rounded-lg shadow">
-                            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                        <div className="bg-white rounded-3 shadow-sm">
+                            <form onSubmit={handleSubmit} className="p-4 mb-3">
                                 {/* Çalışan Seçimi (Admin ise) */}
                                 {!employee && (
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Çalışan <span className="text-red-500">*</span>
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                            Çalışan <span className="text-danger">*</span>
                                         </label>
-                                        <select
-                                            value={data.employee_id}
+                                        <select className="form-control" value={data.employee_id}
                                             onChange={(e) => setData('employee_id', e.target.value)}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         >
                                             <option value="">Çalışan seçin</option>
                                             {props.employees?.map((emp) => (
@@ -143,25 +141,25 @@ export default function Request({ employee, salaryInfo }) {
 
                                 {/* Avans Türü */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Avans Türü <span className="text-red-500">*</span>
+                                    <label className="d-block fs-sm fw-medium text-dark mb-2">
+                                        Avans Türü <span className="text-danger">*</span>
                                     </label>
-                                    <div className="grid grid-cols-3 gap-3">
+                                    <div className="d-grid d-grid-cols-3 gap-2">
                                         {advanceTypes.map((type) => (
                                             <button
                                                 key={type.value}
                                                 type="button"
                                                 onClick={() => setData('type', type.value)}
-                                                className={`p-3 rounded-lg border-2 text-center transition ${
+                                                className={`p-3 rounded border-2 text-center  ${
                                                     data.type === type.value
                                                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                                        : 'border-gray-200 hover:border-gray-300'
+                                                        : 'border-secondary hover:border-secondary'
                                                 }`}
                                             >
                                                 <svg className="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={type.icon} />
                                                 </svg>
-                                                <span className="text-xs font-medium">{type.label}</span>
+                                                <span className="fs-xs fw-medium">{type.label}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -170,25 +168,23 @@ export default function Request({ employee, salaryInfo }) {
 
                                 {/* Tutar */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Tutar (TL) <span className="text-red-500">*</span>
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                        Tutar (TL) <span className="text-danger">*</span>
                                     </label>
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            value={data.amount}
-                                            onChange={(e) => setData('amount', e.target.value)}
-                                            placeholder="0,00"
-                                            min="0"
-                                            step="0.01"
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 pl-12"
-                                        />
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                        <div className="position-relative">
+                                            <input className="form-control" type="number"
+                                                value={data.amount}
+                                                onChange={(e) => setData('amount', e.target.value)}
+                                                placeholder="0,00"
+                                                min="0"
+                                                step="0.01"
+                                            />
+                                        <span className="position-absolute left-3 top-1/2 -translate-y-1/2 text-muted">
                                             ₺
                                         </span>
                                     </div>
                                     {calculation && (
-                                        <p className="text-xs text-gray-500 mt-1">
+                                        <p className="fs-xs text-muted mt-1">
                                             Maksimum avans tutarı: {formatCurrency(maxAdvanceAmount)} (Brüt maaşın %40'ı)
                                         </p>
                                     )}
@@ -196,28 +192,24 @@ export default function Request({ employee, salaryInfo }) {
                                 </div>
 
                                 {/* Tarih ve Taksit */}
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="d-grid d-grid-cols-2 gap-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Talep Tarihi <span className="text-red-500">*</span>
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                            Talep Tarihi <span className="text-danger">*</span>
                                         </label>
-                                        <input
-                                            type="date"
+                                        <input className="form-control" type="date"
                                             value={data.request_date}
                                             onChange={(e) => setData('request_date', e.target.value)}
                                             min={new Date().toISOString().split('T')[0]}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         />
                                         <InputError message={errors.request_date} className="mt-1" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Taksit Sayısı
                                         </label>
-                                        <select
-                                            value={data.installments}
+                                        <select className="form-control" value={data.installments}
                                             onChange={(e) => setData('installments', parseInt(e.target.value))}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         >
                                             <option value={1}>1 Taksit</option>
                                             <option value={2}>2 Taksit</option>
@@ -231,47 +223,43 @@ export default function Request({ employee, salaryInfo }) {
 
                                 {/* IBAN */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         IBAN (Opsiyonel)
                                     </label>
-                                    <input
-                                        type="text"
+                                    <input className="form-control" type="text"
                                         value={data.iban}
                                         onChange={(e) => setData('iban', e.target.value.toUpperCase())}
                                         placeholder="TR00 0000 0000 0000 0000 0000 00"
                                         maxLength={26}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 uppercase"
                                     />
                                     <InputError message={errors.iban} className="mt-1" />
                                 </div>
 
                                 {/* Açıklama/Neden */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Açıklama {data.type === 'emergency' && <span className="text-red-500">*</span>}
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                        Açıklama {data.type === 'emergency' && <span className="text-danger">*</span>}
                                     </label>
-                                    <textarea
-                                        value={data.description}
+                                    <textarea className="form-control" value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                         rows={3}
                                         placeholder="Avans talebinin nedeni..."
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                     />
                                     <InputError message={errors.description} className="mt-1" />
                                 </div>
 
                                 {/* Butonlar */}
-                                <div className="flex justify-end gap-3 pt-4 border-t">
+                                <div className="d-flex justify-content-end pt-4 border-t">
                                     <Link
                                         href={route('admin.advances.index')}
-                                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                                        className="px-4 py-2 border border-secondary rounded text-dark hover:table-light"
                                     >
                                         İptal
                                     </Link>
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                                        className="btn btn-primary btn-sm disabled:opacity-50"
                                     >
                                         {processing ? 'Gönderiliyor...' : 'Talep Oluştur'}
                                     </button>
@@ -280,54 +268,54 @@ export default function Request({ employee, salaryInfo }) {
                         </div>
 
                         {/* Bilgi Paneli */}
-                        <div className="space-y-6">
+                        <div className="mb-3">
                             {/* Maaş Bilgisi */}
                             {calculation ? (
-                                <div className="bg-white rounded-lg shadow p-4">
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Maaş Bilgileri</h3>
+                                <div className="bg-white rounded-3 shadow-sm p-4">
+                                    <h5 className="fw-semibold">Maaş Bilgileri</h5>
                                     <div className="space-y-3">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Brüt Maaş</span>
-                                            <span className="font-medium">{formatCurrency(calculation.gross_salary)}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="text-muted">Brüt Maaş</span>
+                                            <span className="fw-medium">{formatCurrency(calculation.gross_salary)}</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Net Maaş</span>
-                                            <span className="font-medium">{formatCurrency(calculation.net_salary)}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="text-muted">Net Maaş</span>
+                                            <span className="fw-medium">{formatCurrency(calculation.net_salary)}</span>
                                         </div>
                                         <div className="border-t pt-3">
-                                            <div className="flex justify-between text-green-600">
-                                                <span className="text-sm">Maksimum Avans</span>
-                                                <span className="font-medium">{formatCurrency(maxAdvanceAmount)}</span>
+                                            <div className="d-flex justify-content-between text-success">
+                                                <span className="fs-sm">Maksimum Avans</span>
+                                                <span className="fw-medium">{formatCurrency(maxAdvanceAmount)}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             ) : data.employee_id ? (
-                                <div className="bg-white rounded-lg shadow p-4">
-                                    <p className="text-sm text-gray-500">Maaş bilgisi yükleniyor...</p>
+                                <div className="bg-white rounded-3 shadow-sm p-4">
+                                    <p className="fs-sm text-muted">Maaş bilgisi yükleniyor...</p>
                                 </div>
                             ) : (
-                                <div className="bg-white rounded-lg shadow p-4">
-                                    <p className="text-sm text-gray-500">Çalışan seçiniz.</p>
+                                <div className="bg-white rounded-3 shadow-sm p-4">
+                                    <p className="fs-sm text-muted">Çalışan seçiniz.</p>
                                 </div>
                             )}
 
                             {/* Taksit Hesaplama */}
                             {calculation && data.amount && (
-                                <div className="bg-white rounded-lg shadow p-4">
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Ödeme Planı</h3>
+                                <div className="bg-white rounded-3 shadow-sm p-4">
+                                    <h5 className="fw-semibold">Ödeme Planı</h5>
                                     <div className="space-y-3">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Toplam Tutar</span>
-                                            <span className="font-medium">{formatCurrency(data.amount)}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="text-muted">Toplam Tutar</span>
+                                            <span className="fw-medium">{formatCurrency(data.amount)}</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Taksit Sayısı</span>
-                                            <span className="font-medium">{data.installments}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="text-muted">Taksit Sayısı</span>
+                                            <span className="fw-medium">{data.installments}</span>
                                         </div>
-                                        <div className="flex justify-between border-t pt-3">
-                                            <span className="text-gray-500">Aylık Kesinti</span>
-                                            <span className="font-bold text-indigo-600">
+                                        <div className="d-flex justify-content-between border-t pt-3">
+                                            <span className="text-muted">Aylık Kesinti</span>
+                                            <span className="fw-bold text-primary">
                                                 {formatCurrency((data.amount / (data.installments || 1)).toFixed(2))}
                                             </span>
                                         </div>
@@ -336,29 +324,29 @@ export default function Request({ employee, salaryInfo }) {
                             )}
 
                             {/* Kurallar */}
-                            <div className="bg-white rounded-lg shadow p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Avans Kuralları</h3>
-                                <ul className="text-sm text-gray-600 space-y-2">
-                                    <li className="flex items-start gap-2">
-                                        <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="bg-white rounded-3 shadow-sm p-4">
+                                <h5 className="fw-semibold">Avans Kuralları</h5>
+                                <ul className="fs-sm text-muted space-y-2">
+                                    <li className="d-flex align-items-start gap-2">
+                                        <svg className="w-4 h-4 text-success mt-0.5 d-flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span>Maksimum maaşın %40'ı kadar avans alınabilir.</span>
                                     </li>
-                                    <li className="flex items-start gap-2">
-                                        <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <li className="d-flex align-items-start gap-2">
+                                        <svg className="w-4 h-4 text-success mt-0.5 d-flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span>Minimum avans tutarı 1.000 TL'dir.</span>
                                     </li>
-                                    <li className="flex items-start gap-2">
-                                        <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <li className="d-flex align-items-start gap-2">
+                                        <svg className="w-4 h-4 text-success mt-0.5 d-flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span>Maksimum 12 taksit seçilebilir.</span>
                                     </li>
-                                    <li className="flex items-start gap-2">
-                                        <svg className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <li className="d-flex align-items-start gap-2">
+                                        <svg className="w-4 h-4 text-success mt-0.5 d-flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span>Onay süreci yöneticinize göre değişir.</span>

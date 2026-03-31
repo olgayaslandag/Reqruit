@@ -46,13 +46,13 @@ export default function Index({ shifts, employees = [], departments = [], filter
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Vardiyalar
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.shifts.create')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -65,31 +65,27 @@ export default function Index({ shifts, employees = [], departments = [], filter
             <Head title="Vardiyalar" />
 
             <div className="py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto px-4">
                     {/* Filtreleme ve Arama Paneli */}
-                    <div className="bg-white rounded-lg shadow-md mb-6 p-4">
-                        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white rounded-3 shadow-sm-md mb-5 p-4">
+                        <form onSubmit={handleSearch} className="d-grid d-grid-cols-1 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Arama
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Vardiya adı, açıklama..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Departman
                                 </label>
-                                <select
-                                    value={localFilters.department_id}
+                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={localFilters.department_id}
                                     onChange={(e) => handleFilterChange('department_id', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     {departments?.map((dept) => (
@@ -100,10 +96,10 @@ export default function Index({ shifts, employees = [], departments = [], filter
                                 </select>
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="d-flex gap-2">
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 self-end"
+                                    className="btn btn-primary btn-sm ms-auto"
                                 >
                                     Ara
                                 </button>
@@ -112,34 +108,34 @@ export default function Index({ shifts, employees = [], departments = [], filter
                     </div>
 
                     {/* Vardiya Listesi */}
-                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Vardiya Tanımları</h3>
+                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Vardiya Tanımları</h5>
                         </div>
                         
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                        <div className="overflow-auto">
+                            <table className="w-100 divide-y divide-gray-200">
+                                <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Vardiya Adı
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Departman
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Giriş Saati
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Çıkış Saati
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Mola Süresi
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             İşlemler
                                         </th>
                                     </tr>
@@ -147,53 +143,53 @@ export default function Index({ shifts, employees = [], departments = [], filter
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {shifts?.data && shifts.data.length > 0 ? (
                                         shifts.data.map((shift) => (
-                                            <tr key={shift.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">
+                                            <tr key={shift.id} className="hover:table-light">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <div className="fs-sm fw-medium text-dark">
                                                         {shift.name}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="fs-sm text-muted">
                                                         {shift.description}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td className="px-6 py-4 text-nowrap fs-sm text-muted">
                                                     {shift.department?.title || '-'}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap fs-sm fw-bold text-dark">
                                                     {shift.start_time}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap fs-sm fw-bold text-dark">
                                                     {shift.end_time}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td className="px-6 py-4 text-nowrap fs-sm text-muted">
                                                     {shift.break_duration || '00:00'} saat
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                         shift.status === 'active' 
-                                                            ? 'bg-green-100 text-green-800' 
-                                                            : 'bg-red-100 text-red-800'
+                                                            ? 'bg-success bg-opacity-10 text-success' 
+                                                            : 'bg-danger bg-opacity-10 text-danger'
                                                     }`}>
                                                         {shift.status === 'active' ? 'Aktif' : 'Pasif'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div className="flex justify-end gap-2">
+                                                <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
+                                                    <div className="d-flex justify-content-end">
                                                         <Link
                                                             href={route('admin.shifts.schedules', shift.id)}
-                                                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs"
+                                                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 fs-xs"
                                                         >
                                                             Atamalar
                                                         </Link>
                                                         <Link
                                                             href={route('admin.shifts.edit', shift.id)}
-                                                            className="text-indigo-600 hover:text-indigo-900"
+                                                            className="text-primary hover:text-indigo-900"
                                                         >
                                                             Düzenle
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDelete(shift.id)}
-                                                            className="text-red-600 hover:text-red-900 ml-4"
+                                                            className="text-danger hover:text-red-900 ml-4"
                                                         >
                                                             Sil
                                                         </button>
@@ -203,7 +199,7 @@ export default function Index({ shifts, employees = [], departments = [], filter
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-12 text-center text-sm text-gray-500">
+                                            <td colSpan="7" className="px-6 py-12 text-center fs-sm text-muted">
                                                 Vardiya tanımı bulunamadı.
                                             </td>
                                         </tr>
@@ -214,24 +210,24 @@ export default function Index({ shifts, employees = [], departments = [], filter
 
                         {/* Pagination */}
                         {shifts?.meta && shifts.meta.last_page > 1 && (
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                                <nav className="flex items-center justify-between">
-                                    <div className="flex items-center justify-between flex-1">
+                            <div className="px-6 py-4 table-light border-t border-secondary">
+                                <nav className="d-flex align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center justify-content-between d-flex-1">
                                         <div>
-                                            <p className="text-sm text-gray-700">
+                                            <p className="fs-sm text-dark">
                                                 {shifts.meta.from} - {shifts.meta.to} arası, toplam {shifts.meta.total} öğe
                                             </p>
                                         </div>
                                         <div>
-                                            <div className="flex space-x-2">
+                                            <div className="d-flex space-x-2">
                                                 {shifts.meta.links.filter(link => link.url).map((link, index) => (
                                                     <Link
                                                         key={index}
                                                         href={link.url}
-                                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                                        className={`position-relative d-inline-d-flex align-items-center px-4 py-2 border fs-sm fw-medium ${
                                                             link.active
-                                                                ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                                                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                                ? 'z-10 bg-indigo-50 border-indigo-500 text-primary'
+                                                                : 'bg-white border-secondary text-dark hover:table-light'
                                                         }`}
                                                         dangerousInnerHTML={{ __html: link.label }}
                                                     >
@@ -247,41 +243,41 @@ export default function Index({ shifts, employees = [], departments = [], filter
                     </div>
 
                     {/* Vardiya Türü Listesi */}
-                    <div className="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Yaygın Vardiya Türleri</h3>
+                    <div className="mt-8 bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Yaygın Vardiya Türleri</h5>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
-                            <div className="border rounded-lg p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">Tam Zamanlı</h4>
-                                <p className="text-sm text-gray-600">09:00 - 18:00 | 1 saat mola</p>
-                                <p className="text-xs text-gray-500 mt-1">Standart hafta içi saatler</p>
+                        <div className="d-grid d-grid-cols-1 gap-3 p-4">
+                            <div className="border rounded p-4">
+                                <h5 className="fw-medium text-dark mb-2">Tam Zamanlı</h5>
+                                <p className="fs-sm text-muted">09:00 - 18:00 | 1 saat mola</p>
+                                <p className="fs-xs text-muted mt-1">Standart hafta içi saatler</p>
                             </div>
-                            <div className="border rounded-lg p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">Gece Vardiyası</h4>
-                                <p className="text-sm text-gray-600">22:00 - 06:00 | 1 saat mola</p>
-                                <p className="text-xs text-gray-500 mt-1">22:00 saatinden sonra biten vardiyalar</p>
+                            <div className="border rounded p-4">
+                                <h5 className="fw-medium text-dark mb-2">Gece Vardiyası</h5>
+                                <p className="fs-sm text-muted">22:00 - 06:00 | 1 saat mola</p>
+                                <p className="fs-xs text-muted mt-1">22:00 saatinden sonra biten vardiyalar</p>
                             </div>
-                            <div className="border rounded-lg p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">Geçmiş Vardiyası</h4>
-                                <p className="text-sm text-gray-600">07:00 - 15:00 | 45 dk mola</p>
-                                <p className="text-xs text-gray-500 mt-1">Erken sabah başlayan vardiyalar</p>
+                            <div className="border rounded p-4">
+                                <h5 className="fw-medium text-dark mb-2">Geçmiş Vardiyası</h5>
+                                <p className="fs-sm text-muted">07:00 - 15:00 | 45 dk mola</p>
+                                <p className="fs-xs text-muted mt-1">Erken sabah başlayan vardiyalar</p>
                             </div>
-                            <div className="border rounded-lg p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">Part-Time</h4>
-                                <p className="text-sm text-gray-600">12:00 - 20:00 | 30 dk mola</p>
-                                <p className="text-xs text-gray-500 mt-1">Kısmi zamanlı çalışanlar için</p>
+                            <div className="border rounded p-4">
+                                <h5 className="fw-medium text-dark mb-2">Part-Time</h5>
+                                <p className="fs-sm text-muted">12:00 - 20:00 | 30 dk mola</p>
+                                <p className="fs-xs text-muted mt-1">Kısmi zamanlı çalışanlar için</p>
                             </div>
-                            <div className="border rounded-lg p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">Haftasonu Servisi</h4>
-                                <p className="text-sm text-gray-600">10:00 - 22:00 | 1 saat mola</p>
-                                <p className="text-xs text-gray-500 mt-1">Hafta sonu çalışanları için</p>
+                            <div className="border rounded p-4">
+                                <h5 className="fw-medium text-dark mb-2">Haftasonu Servisi</h5>
+                                <p className="fs-sm text-muted">10:00 - 22:00 | 1 saat mola</p>
+                                <p className="fs-xs text-muted mt-1">Hafta sonu çalışanları için</p>
                             </div>
-                            <div className="border rounded-lg p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">Esnek Vardiya</h4>
-                                <p className="text-sm text-gray-600">08:00-22:00 arası | 1-2 saat</p>
-                                <p className="text-xs text-gray-500 mt-1">Giriş-çıkış süreleri değişebilen</p>
+                            <div className="border rounded p-4">
+                                <h5 className="fw-medium text-dark mb-2">Esnek Vardiya</h5>
+                                <p className="fs-sm text-muted">08:00-22:00 arası | 1-2 saat</p>
+                                <p className="fs-xs text-muted mt-1">Giriş-çıkış süreleri değişebilen</p>
                             </div>
                         </div>
                     </div>

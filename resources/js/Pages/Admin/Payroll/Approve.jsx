@@ -115,15 +115,15 @@ export default function Approve({ period, employees, approvalHistory, approvers 
     // Onay durumu badge
     const getApprovalStatusBadge = (status) => {
         const statusConfig = {
-            pending: { label: 'Beklemede', class: 'bg-yellow-100 text-yellow-800' },
-            approved: { label: 'Onaylandı', class: 'bg-green-100 text-green-800' },
-            rejected: { label: 'Reddedildi', class: 'bg-red-100 text-red-800' },
+            pending: { label: 'Beklemede', class: 'bg-warning bg-opacity-10 text-warning' },
+            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
+            rejected: { label: 'Reddedildi', class: 'bg-danger bg-opacity-10 text-danger' },
         };
         
-        const config = statusConfig[status] || { label: status, class: 'bg-gray-100 text-gray-800' };
+        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
         
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.class}`}>
+            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
                 {config.label}
             </span>
         );
@@ -132,11 +132,11 @@ export default function Approve({ period, employees, approvalHistory, approvers 
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
+                <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center gap-3">
                         <Link
                             href={route('admin.payrolls.show', period.id)}
-                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition"
+                            className="p-2 text-muted hover:text-dark hover:bg-light rounded"
                             title="Geri"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,10 +144,10 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                             </svg>
                         </Link>
                         <div>
-                            <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                            <h5 className="fw-semibold">
                                 Bordro Onayı
-                            </h2>
-                            <p className="text-sm text-gray-500">
+                            </h5>
+                            <p className="fs-sm text-muted">
                                 {period.name} - {formatDate(period.start_date)} / {formatDate(period.end_date)}
                             </p>
                         </div>
@@ -158,63 +158,63 @@ export default function Approve({ period, employees, approvalHistory, approvers 
             <Head title="Bordro Onayı" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Özet */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Toplam Çalışan</div>
-                            <div className="text-2xl font-bold text-gray-900">{totals.count}</div>
+                    <div className="d-grid d-grid-cols-1 gap-3 mb-5">
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Toplam Çalışan</div>
+                            <div className="fs-2 fw-bold text-dark">{totals.count}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Toplam Brüt</div>
-                            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totals.gross)}</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Toplam Brüt</div>
+                            <div className="fs-2 fw-bold text-dark">{formatCurrency(totals.gross)}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Toplam Net</div>
-                            <div className="text-2xl font-bold text-green-600">{formatCurrency(totals.net)}</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Toplam Net</div>
+                            <div className="fs-2 fw-bold text-success">{formatCurrency(totals.net)}</div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="d-grid d-grid-cols-1 gap-4">
                         {/* Çalışan Listesi */}
-                        <div className="lg:col-span-2 bg-white rounded-lg shadow">
-                            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                                <h3 className="text-lg font-semibold text-gray-800">Çalışan Listesi</h3>
-                                <div className="flex gap-2">
+                        <div className="bg-white rounded-3 shadow-sm">
+                            <div className="p-4 border-b border-secondary d-flex justify-content-between align-items-center">
+                                <h5 className="fw-semibold">Çalışan Listesi</h5>
+                                <div className="d-flex gap-2">
                                     <button
                                         onClick={toggleSelectAll}
-                                        className="text-sm text-indigo-600 hover:text-indigo-800"
+                                        className="fs-sm text-primary hover:text-indigo-800"
                                     >
                                         {selectedEmployees.length === employees.length ? 'Tümünü Kaldır' : 'Tümünü Seç'}
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
+                            <div className="overflow-auto">
+                                <table className="w-100 divide-y divide-gray-200">
+                                    <thead className="table-light">
                                         <tr>
                                             <th className="px-4 py-3 text-left">
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedEmployees.length === employees.length && employees.length > 0}
                                                     onChange={toggleSelectAll}
-                                                    className="rounded border-gray-300"
+                                                    className="rounded border-secondary"
                                                 />
                                             </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                 Çalışan
                                             </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                 Brüt
                                             </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                 Net
                                             </th>
-                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                 Durum
                                             </th>
-                                            <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                            <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
                                                 İşlem
                                             </th>
                                         </tr>
@@ -223,28 +223,28 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                                         {employees.map((employee) => {
                                             const calc = calculateEmployeePayroll(employee);
                                             return (
-                                                <tr key={employee.id} className="hover:bg-gray-50">
+                                                <tr key={employee.id} className="hover:table-light">
                                                     <td className="px-4 py-3">
                                                         <input
                                                             type="checkbox"
                                                             checked={selectedEmployees.includes(employee.id)}
                                                             onChange={() => toggleEmployee(employee.id)}
                                                             disabled={employee.approval_status === 'approved'}
-                                                            className="rounded border-gray-300"
+                                                            className="rounded border-secondary"
                                                         />
                                                     </td>
                                                     <td className="px-4 py-3">
-                                                        <div className="text-sm font-medium text-gray-900">
+                                                        <div className="fs-sm fw-medium text-dark">
                                                             {employee.name}
                                                         </div>
-                                                        <div className="text-xs text-gray-500">
+                                                        <div className="fs-xs text-muted">
                                                             {employee.position_title}
                                                         </div>
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900">
+                                                    <td className="px-4 py-3 fs-sm text-dark">
                                                         {formatCurrency(calc.gross)}
                                                     </td>
-                                                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                                                    <td className="px-4 py-3 fs-sm fw-medium text-dark">
                                                         {formatCurrency(calc.net)}
                                                     </td>
                                                     <td className="px-4 py-3">
@@ -254,7 +254,7 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                                                         {employee.approval_status === 'pending' && (
                                                             <button
                                                                 onClick={() => handleReject(employee.id)}
-                                                                className="text-red-600 hover:text-red-800 text-sm"
+                                                                className="text-danger hover:text-danger fs-sm"
                                                             >
                                                                 Reddet
                                                             </button>
@@ -269,39 +269,38 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                         </div>
 
                         {/* Onay Paneli */}
-                        <div className="space-y-6">
+                        <div className="mb-3">
                             {/* Onay Formu */}
-                            <div className="bg-white rounded-lg shadow p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Onayla</h3>
+                            <div className="bg-white rounded-3 shadow-sm p-4">
+                                <h5 className="fw-semibold">Onayla</h5>
                                 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Seçili Çalışan
                                         </label>
-                                        <div className="text-2xl font-bold text-indigo-600">
+                                        <div className="fs-2 fw-bold text-primary">
                                             {selectedEmployees.length} / {employees.length}
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Not (Opsiyonel)
                                         </label>
-                                        <textarea
-                                            value={approvalNote}
+                                        <textarea value={approvalNote}
                                             onChange={(e) => setApprovalNote(e.target.value)}
                                             rows={3}
                                             placeholder="Onay notu..."
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                            className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                         />
                                     </div>
 
-                                    <div className="flex flex-col gap-2">
+                                    <div className="d-flex d-flex-column gap-2">
                                         <button
                                             onClick={handleApprove}
                                             disabled={processing || selectedEmployees.length === 0}
-                                            className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+                                            className="btn btn-success btn-sm w-100 disabled:opacity-50"
                                         >
                                             Seçili Onayla ({selectedEmployees.length})
                                         </button>
@@ -309,7 +308,7 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                                         <button
                                             onClick={handleApproveAll}
                                             disabled={processing}
-                                            className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                                            className="btn btn-primary btn-sm w-100 disabled:opacity-50"
                                         >
                                             Tamamını Onayla
                                         </button>
@@ -318,30 +317,30 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                             </div>
 
                             {/* Onay Geçmişi */}
-                            <div className="bg-white rounded-lg shadow p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Onay Geçmişi</h3>
+                            <div className="bg-white rounded-3 shadow-sm p-4">
+                                <h5 className="fw-semibold">Onay Geçmişi</h5>
                                 
                                 {approvalHistory?.length > 0 ? (
                                     <div className="space-y-3">
                                         {approvalHistory.map((item, index) => (
                                             <div key={index} className="border-l-2 border-indigo-500 pl-3 py-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-medium text-gray-900">
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <span className="fs-sm fw-medium text-dark">
                                                         {item.approver_name}
                                                     </span>
-                                                    <span className={`px-2 py-0.5 text-xs rounded-full ${
+                                                    <span className={`px-2 py-0.5 fs-xs rounded-pill ${
                                                         item.action === 'approved' 
-                                                            ? 'bg-green-100 text-green-800' 
-                                                            : 'bg-red-100 text-red-800'
+                                                            ? 'bg-success bg-opacity-10 text-success' 
+                                                            : 'bg-danger bg-opacity-10 text-danger'
                                                     }`}>
                                                         {item.action === 'approved' ? 'Onaylandı' : 'Reddedildi'}
                                                     </span>
                                                 </div>
-                                                <div className="text-xs text-gray-500">
+                                                <div className="fs-xs text-muted">
                                                     {formatDate(item.created_at)}
                                                 </div>
                                                 {item.note && (
-                                                    <div className="text-sm text-gray-600 mt-1">
+                                                    <div className="fs-sm text-muted mt-1">
                                                         {item.note}
                                                     </div>
                                                 )}
@@ -349,30 +348,30 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500">Henüz onay geçmişi yok.</p>
+                                    <p className="fs-sm text-muted">Henüz onay geçmişi yok.</p>
                                 )}
                             </div>
 
                             {/* Onay Yetkilileri */}
-                            <div className="bg-white rounded-lg shadow p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-4">Onay Sırası</h3>
+                            <div className="bg-white rounded-3 shadow-sm p-4">
+                                <h5 className="fw-semibold">Onay Sırası</h5>
                                 
                                 <div className="space-y-2">
                                     {approvers.map((approver, index) => (
-                                        <div key={approver.id} className="flex items-center gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-medium">
+                                        <div key={approver.id} className="d-flex align-items-center gap-2">
+                                            <div className="w-6 h-6 rounded-pill bg-indigo-100 text-primary d-flex align-items-center justify-content-center fs-xs fw-medium">
                                                 {index + 1}
                                             </div>
                                             <div>
-                                                <div className="text-sm font-medium text-gray-900">
+                                                <div className="fs-sm fw-medium text-dark">
                                                     {approver.name}
                                                 </div>
-                                                <div className="text-xs text-gray-500">
+                                                <div className="fs-xs text-muted">
                                                     {approver.role}
                                                 </div>
                                             </div>
                                             {approver.status === 'approved' && (
-                                                <svg className="w-5 h-5 text-green-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-5 h-5 text-success ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                 </svg>
                                             )}

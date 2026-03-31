@@ -1,14 +1,19 @@
-export default function Checkbox({ className = '', ...props }) {
+import React from 'react';
+
+const Checkbox = React.forwardRef(({ className = '', ...props }, ref) => {
+    const combinedClassName = `form-check-input ${className}`.trim();
+
     return (
         <input
             {...props}
+            ref={ref}
             type="checkbox"
-            className={
-                'rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 ' +
-                className
-            }
+            className={combinedClassName}
         />
     );
-}
+});
 
+Checkbox.displayName = 'Checkbox';
+
+export default Checkbox;
 export { Checkbox };

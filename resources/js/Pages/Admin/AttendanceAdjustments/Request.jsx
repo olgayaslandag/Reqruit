@@ -82,13 +82,13 @@ export default function Request({ employees, attendanceRecords }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Devam Düzeltme Talebi Oluştur
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.adjustments.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                     >
                         Geri
                     </Link>
@@ -98,27 +98,23 @@ export default function Request({ employees, attendanceRecords }) {
             <Head title="Yeni Talep" />
 
             <div className="py-6">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Talep Oluştur</h3>
-                            <p className="mt-1 text-sm text-gray-600">Varolan devam kaydında yapılacak düzeltmeleri buradan talep edebilirsiniz</p>
+                <div className="mw-100 mx-auto px-4">
+                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Talep Oluştur</h5>
+                            <p className="mt-1 fs-sm text-muted">Varolan devam kaydında yapılacak düzeltmeleri buradan talep edebilirsiniz</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-6">
-                            <div className="space-y-6">
+                        <form onSubmit={handleSubmit} className="p-4">
+                            <div className="mb-3">
                                 {/* Personel ve Tarih Selection */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="d-grid d-grid-cols-1 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Personel *
                                         </label>
-                                        <select
-                                            value={formData.employee_id}
+                                        <select className="form-control" value={formData.employee_id}
                                             onChange={(e) => handleChange('employee_id', e.target.value)}
-                                            className={`w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
-                                                errors.employee_id ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                                            }`}
                                         >
                                             <option value="">Personel Seçin</option>
                                             {employees?.map(emp => (
@@ -127,38 +123,34 @@ export default function Request({ employees, attendanceRecords }) {
                                                 </option>
                                             ))}
                                         </select>
-                                        {errors.employee_id && <p className="mt-1 text-sm text-red-600">{errors.employee_id}</p>}
+                                        {errors.employee_id && <p className="mt-1 fs-sm text-danger">{errors.employee_id}</p>}
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Tarih *
                                         </label>
-                                        <input
-                                            type="date"
+                                        <input className="form-control" type="date"
                                             value={formData.date}
                                             onChange={(e) => handleChange('date', e.target.value)}
-                                            className={`w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
-                                                errors.date ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                                            }`}
                                         />
-                                        {errors.date && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
+                                        {errors.date && <p className="mt-1 fs-sm text-danger">{errors.date}</p>}
                                     </div>
                                 </div>
 
                                 {/* Değişim Tipi */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-3">
                                         Düzeltme Türü
                                     </label>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                    <div className="d-grid d-grid-cols-1 gap-2">
                                         {[
                                             { value: 'clock_in', label: 'Giriş Saati', desc: 'Sadece giriş saatinde değişiklik' },
                                             { value: 'clock_out', label: 'Çıkış Saati', desc: 'Sadece çıkış saatinde değişiklik' },
                                             { value: 'both', label: 'Giriş + Çıkış', desc: 'İki saatte de değişiklik' },
                                             { value: 'duration', label: 'Süre Düzenle', desc: 'Çalışma süresi düzenlemesi' }
                                         ].map(type => (
-                                            <div key={type.value} className="flex items-start">
+                                            <div key={type.value} className="d-flex align-items-start">
                                                 <input
                                                     type="radio"
                                                     id={`type-${type.value}`}
@@ -166,11 +158,11 @@ export default function Request({ employees, attendanceRecords }) {
                                                     value={type.value}
                                                     checked={formData.type === type.value}
                                                     onChange={(e) => handleTypeChange(e.target.value)}
-                                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 mt-1"
+                                                    className="h-4 w-4 text-primary focus: border-secondary mt-1"
                                                 />
-                                                <label htmlFor={`type-${type.value}`} className="ml-2 block">
-                                                    <span className="block text-sm font-medium text-gray-700">{type.label}</span>
-                                                    <span className="block text-xs text-gray-500">{type.desc}</span>
+                                                <label htmlFor={`type-${type.value}`} className="ml-2 d-block">
+                                                    <span className="d-block fs-sm fw-medium text-dark">{type.label}</span>
+                                                    <span className="d-block fs-xs text-muted">{type.desc}</span>
                                                 </label>
                                             </div>
                                         ))}
@@ -178,69 +170,61 @@ export default function Request({ employees, attendanceRecords }) {
                                 </div>
 
                                 {/* Saat Seçimleri */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className={`border rounded-lg p-4 ${formData.type === 'clock_out' || formData.type === 'both' || formData.type === 'duration' ? 'opacity-50 pointer-events-none' : ''}`}>
-                                        <h4 className="text-sm font-medium text-gray-700 mb-3">Giriş Saati Düzeltmesi</h4>
-                                        <p className="text-xs text-gray-500 mb-3">
+                                <div className="d-grid d-grid-cols-1 gap-4">
+                                    <div className={`border rounded p-4 ${formData.type === 'clock_out' || formData.type === 'both' || formData.type === 'duration' ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        <h5 className="fw-medium text-dark mb-3">Giriş Saati Düzeltmesi</h5>
+                                        <p className="fs-xs text-muted mb-3">
                                             Orijinal saat: {formData.original_clock_in || '-'} 
                                             {formData.original_clock_in && <span className="ml-2">→ Yeni saat: {formData.new_clock_in}</span>}
                                         </p>
                                         <div className="space-y-3">
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                <label className="d-block fs-xs fw-medium text-muted mb-1">
                                                     Orijinal Giriş Saati
                                                 </label>
-                                                <input
-                                                    type="time"
+                                                <input className="form-control" type="time"
                                                     value={formData.original_clock_in.split(' ')[1]?.substring(0, 5) || ''}
                                                     onChange={(e) => handleChange('original_clock_in', `${formData.date} ${e.target.value}:00`)}
-                                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                                     disabled={formData.type === 'clock_out'}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                <label className="d-block fs-xs fw-medium text-muted mb-1">
                                                     Yeni Giriş Saati
                                                 </label>
-                                                <input
-                                                    type="time"
+                                                <input className="form-control" type="time"
                                                     value={formData.new_clock_in.split(' ')[1]?.substring(0, 5) || ''}
                                                     onChange={(e) => handleChange('new_clock_in', `${formData.date} ${e.target.value}:00`)}
-                                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                                     disabled={formData.type === 'clock_out'}
                                                 />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className={`border rounded-lg p-4 ${formData.type === 'clock_in' ? 'opacity-50 pointer-events-none' : ''}`}>
-                                        <h4 className="text-sm font-medium text-gray-700 mb-3">Çıkış Saati Düzeltmesi</h4>
-                                        <p className="text-xs text-gray-500 mb-3">
+                                    <div className={`border rounded p-4 ${formData.type === 'clock_in' ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        <h5 className="fw-medium text-dark mb-3">Çıkış Saati Düzeltmesi</h5>
+                                        <p className="fs-xs text-muted mb-3">
                                             Orijinal saat: {formData.original_clock_out || '-'} 
                                             {formData.original_clock_out && <span className="ml-2">→ Yeni saat: {formData.new_clock_out}</span>}
                                         </p>
                                         <div className="space-y-3">
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                <label className="d-block fs-xs fw-medium text-muted mb-1">
                                                     Orijinal Çıkış Saati
                                                 </label>
-                                                <input
-                                                    type="time"
+                                                <input className="form-control" type="time"
                                                     value={formData.original_clock_out.split(' ')[1]?.substring(0, 5) || ''}
                                                     onChange={(e) => handleChange('original_clock_out', `${formData.date} ${e.target.value}:00`)}
-                                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                                     disabled={formData.type === 'clock_in'}
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                <label className="d-block fs-xs fw-medium text-muted mb-1">
                                                     Yeni Çıkış Saati
                                                 </label>
-                                                <input
-                                                    type="time"
+                                                <input className="form-control" type="time"
                                                     value={formData.new_clock_out.split(' ')[1]?.substring(0, 5) || ''}
                                                     onChange={(e) => handleChange('new_clock_out', `${formData.date} ${e.target.value}:00`)}
-                                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                                     disabled={formData.type === 'clock_in'}
                                                 />
                                             </div>
@@ -250,25 +234,21 @@ export default function Request({ employees, attendanceRecords }) {
 
                                 {/* Talep Sebebi */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Talep Nedeni * 
                                     </label>
-                                    <textarea
-                                        value={formData.reason}
+                                    <textarea className="form-control" value={formData.reason}
                                         onChange={(e) => handleChange('reason', e.target.value)}
                                         rows={4}
-                                        className={`w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
-                                            errors.reason ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                                        }`}
                                         placeholder="Neden bu düzeltmeyi talep ettiniz? (Zorunlu sebep belirtmelisiniz)"
                                     ></textarea>
-                                    {errors.reason && <p className="mt-1 text-sm text-red-600">{errors.reason}</p>}
+                                    {errors.reason && <p className="mt-1 fs-sm text-danger">{errors.reason}</p>}
                                 </div>
 
                                 {/* Onay Gerekliliği */}
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <h4 className="text-sm font-medium text-blue-800 mb-2">Dikkat</h4>
-                                    <div className="text-sm text-blue-700">
+                                <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                                    <h5 className="fw-medium text-info mb-2">Dikkat</h5>
+                                    <div className="fs-sm text-info">
                                         <p>
                                             Bu talep管理部门 tarafından onaylandığında sistemdeki mevcut devam kaydı değiştirilecektir.
                                             Talebiniz onaylandığında fazla mesai hesaplamaları ve devam oranları bu yeni saatlere göre tekrar hesaplanacaktır.
@@ -278,17 +258,17 @@ export default function Request({ employees, attendanceRecords }) {
                             </div>
 
                             {/* Submit Butonu */}
-                            <div className="mt-8 flex justify-end gap-3">
+                            <div className="mt-8 d-flex justify-content-end">
                                 <Link
                                     href={route('admin.adjustments.index')}
-                                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                                 >
                                     İptal
                                 </Link>
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                                    className="btn btn-primary disabled:opacity-50"
                                 >
                                     {loading ? 'Talep İşleniyor...' : 'Talep Oluştur'}
                                 </button>
@@ -297,19 +277,19 @@ export default function Request({ employees, attendanceRecords }) {
                     </div>
 
                     {/* Hızlı Erişim Linkleri */}
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <h4 className="text-sm font-medium text-gray-800 mb-2">Geçmiş Düzeltmeler</h4>
+                    <div className="mt-6 d-grid d-grid-cols-1 gap-3">
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <h5 className="fw-medium text-dark mb-2">Geçmiş Düzeltmeler</h5>
                             <Link
                                 href={route('admin.adjustments.index')}
-                                className="text-indigo-600 hover:text-indigo-800 text-sm"
+                                className="text-primary hover:text-indigo-800 fs-sm"
                             >
                                 Onaylanmış ve beklemedeki tüm talepler →
                             </Link>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <h4 className="text-sm font-medium text-gray-800 mb-2">Tercih Edilen Saatler</h4>
-                            <p className="text-sm text-gray-600">
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <h5 className="fw-medium text-dark mb-2">Tercih Edilen Saatler</h5>
+                            <p className="fs-sm text-muted">
                                 Geleneksel saat: 09:00 - 18:00, 
                                 Mola süresi: 1 saat (13:00-14:00)
                             </p>

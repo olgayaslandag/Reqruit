@@ -1,9 +1,21 @@
-import { router } from '@inertiajs/react';
+import { useState } from 'react';
+import { router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import Pagination from '@/Components/Pagination';
+import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 
-export default function Index({ forms, departments }) {
+export default function Index({ forms, departments, filters }) {
+    const { props } = usePage();
+    const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        router.get(route('admin.forms.index'), {
+            search: searchTerm,
+        }, { replace: true });
+    };
+
     const handleDelete = (id) => {
         confirmDelete('Bu formu silmek istediğinize emin misiniz?', () => {
             router.delete(`/admin/forms/${id}`, {
@@ -15,13 +27,13 @@ export default function Index({ forms, departments }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Formlar
-                    </h2>
+                    </h5>
                     <Link
                         href="/admin/forms/create"
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -34,72 +46,96 @@ export default function Index({ forms, departments }) {
             <Head title="Formlar" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-200 table table-sm">
-                            <thead className="bg-gray-50">
+                <div className="mw-100 mx-auto">
+                    {/* Arama */}
+                    <div className="card shadow-sm mb-4">
+                        <div className="card-body p-3">
+                            <form onSubmit={handleSearch} className="d-flex gap-2">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Form ara..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                <button type="submit" className="btn btn-primary">
+                                    <i className="bi bi-search"></i> Ara
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div className="card shadow-sm">
+                        <table className="w-100 table table-sm mb-0">
+                            <thead className="table-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Form Adı</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departman</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alan Sayısı</th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">İşlemler</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Form Adı</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Departman</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Alan Sayısı</th>
+                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">İşlemler</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {forms.map((form) => (
+                            <tbody>
+                                {forms.data.map((form) => (
                                     <tr key={form.id}>
                                         <td className="px-4 py-3">
                                             <Link
                                                 href={`/admin/forms/${form.id}/edit`}
-                                                className="text-sm font-medium text-gray-900 hover:text-indigo-600 hover:underline"
+                                                className="fs-sm fw-medium text-dark"
                                             >
                                                 {form.name}
                                             </Link>
-                                            <div className="text-sm text-gray-500">/{form.slug}</div>
+                                            <div className="fs-sm text-muted">/{form.slug}</div>
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
+                                        <td className="px-4 py-3 text-nowrap">
                                             {form.department?.title || '-'}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
+                                        <td className="px-4 py-3 text-nowrap">
                                             {form.fields?.length || 0}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-right">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-4 py-3 text-nowrap text-right">
+                                            <div className="d-flex align-items-center justify-content-end gap-2">
                                                 <Link
                                                     href={`/admin/forms/${form.id}/edit`}
-                                                    className="p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-md transition"
+                                                    className="btn btn-link btn-sm text-primary p-0"
                                                     title="Düzenle"
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
+                                                    <i className="bi bi-pencil"></i>
                                                 </Link>
                                                 <Link
                                                     href={`/forms/${form.slug}`}
                                                     target="_blank"
-                                                    className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-md transition"
+                                                    className="btn btn-link btn-sm text-success p-0"
                                                     title="Önizleme"
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                                    </svg>
+                                                    <i className="bi bi-box-arrow-up-right"></i>
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(form.id)}
-                                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition"
+                                                    className="btn btn-link btn-sm text-danger p-0"
                                                     title="Sil"
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
+                                                    <i className="bi bi-trash"></i>
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
+                                {(!forms.data || forms.data.length === 0) && (
+                                    <tr>
+                                        <td colSpan="4" className="px-4 py-8 text-center fs-sm text-muted">
+                                            Form bulunamadı.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
+
+                    {/* Pagination */}
+                    {forms.meta && forms.meta.last_page > 1 && (
+                        <Pagination meta={forms.meta} baseUrl={route('admin.forms.index')} />
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>

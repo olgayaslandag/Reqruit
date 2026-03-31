@@ -61,13 +61,13 @@ export default function Index({ calendars, filters = {} }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         İş Takvimleri
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.work-calendars.create')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -80,32 +80,28 @@ export default function Index({ calendars, filters = {} }) {
             <Head title="İş Takvimleri" />
 
             <div className="py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto px-4">
                     {/* Filtreleme ve Arama Paneli */}
-                    <div className="bg-white rounded-lg shadow-md mb-6 p-4">
-                        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white rounded-3 shadow-sm-md mb-5 p-4">
+                        <form onSubmit={handleSearch} className="d-grid d-grid-cols-1 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Arama
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Takvim adı..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
 
-                            <div className="flex gap-2">
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="d-flex gap-2">
+                                <div className="d-flex-1">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Status
                                     </label>
-                                    <select
-                                        value={localFilters.status}
+                                    <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={localFilters.status}
                                         onChange={(e) => handleFilterChange('status', e.target.value)}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         <option value="">Tümü</option>
                                         <option value="active">Aktif</option>
@@ -117,7 +113,7 @@ export default function Index({ calendars, filters = {} }) {
                                 
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 self-end"
+                                    className="btn btn-primary btn-sm ms-auto"
                                 >
                                     Ara
                                 </button>
@@ -126,34 +122,34 @@ export default function Index({ calendars, filters = {} }) {
                     </div>
 
                     {/* Takvim Listesi */}
-                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Tanımlı İş Takvimleri</h3>
+                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Tanımlı İş Takvimleri</h5>
                         </div>
                         
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                        <div className="overflow-auto">
+                            <table className="w-100 divide-y divide-gray-200">
+                                <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Takvim Adı
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Periyot
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Toplam Gün
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             İş Günü
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Tatil Günü
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             İşlemler
                                         </th>
                                     </tr>
@@ -161,62 +157,62 @@ export default function Index({ calendars, filters = {} }) {
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {calendars?.data && calendars.data.length > 0 ? (
                                         calendars.data.map((calendar) => (
-                                            <tr key={calendar.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">
+                                            <tr key={calendar.id} className="hover:table-light">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <div className="fs-sm fw-medium text-dark">
                                                         {calendar.name}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="fs-sm text-muted">
                                                         {calendar.description}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <div className="font-medium">
+                                                <td className="px-6 py-4 text-nowrap fs-sm text-muted">
+                                                    <div className="fw-medium">
                                                         {calendar.start_date ? new Date(calendar.start_date).toLocaleDateString('tr-TR') + ' - ' + new Date(calendar.end_date).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
                                                     </div>
-                                                    <div className="text-xs text-gray-400">
+                                                    <div className="fs-xs text-muted">
                                                         {calendar.start_date ? new Date(calendar.start_date).getFullYear() : '-'}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
                                                     {calendar.total_days || 0} gün
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <td className="px-6 py-4 text-nowrap fs-sm">
+                                                    <span className="d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium bg-success bg-opacity-10 text-success">
                                                         {calendar.working_days || 0} gün
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <td className="px-6 py-4 text-nowrap fs-sm">
+                                                    <span className="d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium bg-danger bg-opacity-10 text-danger">
                                                         {calendar.holiday_days || 0} gün
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                         calendar.is_active === true || calendar.is_active === 1
-                                                            ? 'bg-green-100 text-green-800' 
-                                                            : 'bg-red-100 text-red-800'
+                                                            ? 'bg-success bg-opacity-10 text-success' 
+                                                            : 'bg-danger bg-opacity-10 text-danger'
                                                     }`}>
                                                         {calendar.is_active === true || calendar.is_active === 1 ? 'Aktif' : 'Pasif'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div className="flex justify-end gap-2">
+                                                <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
+                                                    <div className="d-flex justify-content-end">
                                                         <Link
                                                             href={route('admin.work-calendars.show', calendar.id)}
-                                                            className="text-blue-600 hover:text-blue-900"
+                                                            className="text-info hover:text-blue-900"
                                                         >
                                                             Görüntüle
                                                         </Link>
                                                         <Link
                                                             href={route('admin.work-calendars.edit', calendar.id)}
-                                                            className="text-indigo-600 hover:text-indigo-900"
+                                                            className="text-primary hover:text-indigo-900"
                                                         >
                                                             Düzenle
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDelete(calendar.id)}
-                                                            className="text-red-600 hover:text-red-900 ml-4"
+                                                            className="text-danger hover:text-red-900 ml-4"
                                                         >
                                                             Sil
                                                         </button>
@@ -226,7 +222,7 @@ export default function Index({ calendars, filters = {} }) {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-12 text-center text-sm text-gray-500">
+                                            <td colSpan="7" className="px-6 py-12 text-center fs-sm text-muted">
                                                 Takvim tanımı bulunamadı.
                                             </td>
                                         </tr>
@@ -237,24 +233,24 @@ export default function Index({ calendars, filters = {} }) {
 
                         {/* Pagination */}
                         {calendars?.meta && calendars.meta.last_page > 1 && (
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                                <nav className="flex items-center justify-between">
-                                    <div className="flex items-center justify-between flex-1">
+                            <div className="px-6 py-4 table-light border-t border-secondary">
+                                <nav className="d-flex align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center justify-content-between d-flex-1">
                                         <div>
-                                            <p className="text-sm text-gray-700">
+                                            <p className="fs-sm text-dark">
                                                 {calendars.meta.from} - {calendars.meta.to} arası, toplam {calendars.meta.total} öğe
                                             </p>
                                         </div>
                                         <div>
-                                            <div className="flex space-x-2">
+                                            <div className="d-flex space-x-2">
                                                 {calendars.meta.links.filter(link => link.url).map((link, index) => (
                                                     <Link
                                                         key={index}
                                                         href={link.url}
-                                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                                        className={`position-relative d-inline-d-flex align-items-center px-4 py-2 border fs-sm fw-medium ${
                                                             link.active
-                                                                ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                                                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                                ? 'z-10 bg-indigo-50 border-indigo-500 text-primary'
+                                                                : 'bg-white border-secondary text-dark hover:table-light'
                                                         }`}
                                                         dangerousInnerHTML={{ __html: link.label }}
                                                     >
@@ -270,11 +266,11 @@ export default function Index({ calendars, filters = {} }) {
                     </div>
 
                     {/* Takvim Türlerine Göre Hızlı Filtreleme */}
-                    <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="mt-6 d-grid d-grid-cols-2 gap-3">
                         {getCalendarYears(calendars?.data || []).map(year => (
-                            <div key={year} className="bg-white rounded-lg shadow p-4">
-                                <h4 className="font-medium text-gray-900 mb-2">{year} Yılı Takvimi</h4>
-                                <p className="text-sm text-gray-600">
+                            <div key={year} className="bg-white rounded-3 shadow-sm p-4">
+                                <h5 className="fw-medium text-dark mb-2">{year} Yılı Takvimi</h5>
+                                <p className="fs-sm text-muted">
                                     {calendars?.data?.filter(c => 
                                         new Date(c.start_date).getFullYear() <= year && 
                                         new Date(c.end_date).getFullYear() >= year
@@ -285,27 +281,27 @@ export default function Index({ calendars, filters = {} }) {
                     </div>
 
                     {/* Hızlı İstatistikler */}
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <div className="mt-6 d-grid d-grid-cols-1 gap-3">
+                        <div className="bg-blue-50 border border-blue-200 rounded p-4">
                             <div className="text-center">
-                                <h4 className="text-lg font-medium text-blue-800">Aktif Takvim</h4>
-                                <p className="text-3xl font-bold text-blue-600 mt-2">
+                                <h5 className="fw-medium text-info">Aktif Takvim</h5>
+                                <p className="h2 fw-bold text-info mt-2">
                                     {calendars?.data?.filter(c => c.status === 'active').length || 0}
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                        <div className="bg-green-50 border border-green-200 rounded p-4">
                             <div className="text-center">
-                                <h4 className="text-lg font-medium text-green-800">Yılbaşı Tatlileri</h4>
-                                <p className="text-3xl font-bold text-green-600 mt-2">
+                                <h5 className="fw-medium text-success">Yılbaşı Tatlileri</h5>
+                                <p className="h2 fw-bold text-success mt-2">
                                     {calendars?.data?.reduce((acc, c) => acc + (c.holiday_days || 0), 0) || 0}
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                        <div className="bg-purple-50 border border-purple-200 rounded p-4">
                             <div className="text-center">
-                                <h4 className="text-lg font-medium text-purple-800">Toplam Hedef Gün</h4>
-                                <p className="text-3xl font-bold text-purple-600 mt-2">
+                                <h5 className="fw-medium">Toplam Hedef Gün</h5>
+                                <p className="h2 fw-bold text-purple-600 mt-2">
                                     {calendars?.data?.reduce((acc, c) => acc + (c.working_days || 0), 0) || 0}
                                 </p>
                             </div>

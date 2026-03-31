@@ -52,13 +52,13 @@ export default function Index({ adjustments, filters = {} }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Devam Düzeltme Talepleri
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.adjustments.request')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -71,31 +71,27 @@ export default function Index({ adjustments, filters = {} }) {
             <Head title="Devam Düzeltme Talepleri" />
 
             <div className="py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto px-4">
                     {/* Filtreleme ve Arama Paneli */}
-                    <div className="bg-white rounded-lg shadow-md mb-6 p-4">
-                        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="bg-white rounded-3 shadow-sm-md mb-5 p-4">
+                        <form onSubmit={handleSearch} className="d-grid d-grid-cols-1 gap-3">
+                            <div className="">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Arama
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control" type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Personel adı, açıklama..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Durum
                                 </label>
-                                <select
-                                    value={localFilters.status}
+                                <select className="form-control" value={localFilters.status}
                                     onChange={(e) => handleFilterChange('status', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     <option value="pending">Bekliyor</option>
@@ -106,13 +102,11 @@ export default function Index({ adjustments, filters = {} }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Tür
                                 </label>
-                                <select
-                                    value={localFilters.type}
+                                <select className="form-control" value={localFilters.type}
                                     onChange={(e) => handleFilterChange('type', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     <option value="clock_in">Giriş Düzeltmesi</option>
@@ -122,10 +116,10 @@ export default function Index({ adjustments, filters = {} }) {
                                 </select>
                             </div>
 
-                            <div className="md:col-start-4">
+                            <div className="">
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 w-full h-full"
+                                    className="btn btn-primary btn-sm w-100"
                                 >
                                     Ara
                                 </button>
@@ -134,34 +128,34 @@ export default function Index({ adjustments, filters = {} }) {
                     </div>
 
                     {/* Taleplerin Listesi */}
-                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Devam Düzeltme Talepleri</h3>
+                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Devam Düzeltme Talepleri</h5>
                         </div>
                         
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                        <div className="overflow-auto">
+                            <table className="w-100 divide-y divide-gray-200">
+                                <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Personel
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Tarih
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Değişim Türü
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Orijinal Saat
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Yeni Saat
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Durum
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             İşlemler
                                         </th>
                                     </tr>
@@ -169,74 +163,74 @@ export default function Index({ adjustments, filters = {} }) {
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {adjustments?.data && adjustments.data.length > 0 ? (
                                         adjustments.data.map((adjustment) => (
-                                            <tr key={adjustment.id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">
+                                            <tr key={adjustment.id} className="hover:table-light">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <div className="fs-sm fw-medium text-dark">
                                                         {adjustment.employee?.first_name} {adjustment.employee?.last_name}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="fs-sm text-muted">
                                                         {adjustment.employee?.identity_no}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    <div className="font-medium">
+                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
+                                                    <div className="fw-medium">
                                                         {new Date(adjustment.date).toLocaleDateString('tr-TR')}
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="fs-xs text-muted">
                                                         {new Date(adjustment.created_at).toLocaleTimeString('tr-TR')}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                <td className="px-6 py-4 text-nowrap fs-sm">
+                                                    <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                         adjustment.type === 'clock_in' 
-                                                            ? 'bg-blue-100 text-blue-800' 
+                                                            ? 'bg-primary bg-opacity-10 text-info' 
                                                             : adjustment.type === 'clock_out'
-                                                                ? 'bg-green-100 text-green-800'
+                                                                ? 'bg-success bg-opacity-10 text-success'
                                                                 : adjustment.type === 'both'
                                                                     ? 'bg-purple-100 text-purple-800'
-                                                                    : 'bg-yellow-100 text-yellow-800'
+                                                                    : 'bg-warning bg-opacity-10 text-warning'
                                                     }`}>
                                                         {adjustment.type === 'clock_in' ? 'Giriş Saati' : 
                                                          adjustment.type === 'clock_out' ? 'Çıkış Saati' : 
                                                          adjustment.type === 'both' ? 'Giris+Çıkış' : 'Süre Düzeltmesi'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <div className="fs-sm text-dark">
                                                         {adjustment.original_clock_in ? new Date(adjustment.original_clock_in).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="fs-sm text-muted">
                                                         {adjustment.original_clock_out ? new Date(adjustment.original_clock_out).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <div className="fs-sm text-dark">
                                                         {adjustment.new_clock_in ? new Date(adjustment.new_clock_in).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="fs-sm text-muted">
                                                         {adjustment.new_clock_out ? new Date(adjustment.new_clock_out).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                         adjustment.status === 'pending' 
-                                                            ? 'bg-yellow-100 text-yellow-800' 
+                                                            ? 'bg-warning bg-opacity-10 text-warning' 
                                                             : adjustment.status === 'approved'
-                                                                ? 'bg-green-100 text-green-800'
+                                                                ? 'bg-success bg-opacity-10 text-success'
                                                                 : adjustment.status === 'rejected'
-                                                                    ? 'bg-red-100 text-red-800'
-                                                                    : 'bg-gray-100 text-gray-800'
+                                                                    ? 'bg-danger bg-opacity-10 text-danger'
+                                                                    : 'bg-light text-dark'
                                                     }`}>
                                                         {adjustment.status === 'pending' ? 'Bekliyor' : 
                                                          adjustment.status === 'approved' ? 'Onaylandı' : 
                                                          adjustment.status === 'rejected' ? 'Reddedildi' : 'İptal'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                    <div className="flex justify-end gap-2">
+                                                <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
+                                                    <div className="d-flex justify-content-end">
                                                         <Link
                                                             href={route('admin.adjustments.show', adjustment.id)}
-                                                            className="text-blue-600 hover:text-blue-900"
+                                                            className="text-info hover:text-blue-900"
                                                         >
                                                             Görüntüle
                                                         </Link>
@@ -245,13 +239,13 @@ export default function Index({ adjustments, filters = {} }) {
                                                             <>
                                                                 <button
                                                                     onClick={() => updateAdjustmentStatus(adjustment.id, 'approved')}
-                                                                    className="text-green-600 hover:text-green-900 ml-2"
+                                                                    className="text-success hover:text-green-900 ml-2"
                                                                 >
                                                                     Onayla
                                                                 </button>
                                                                 <button
                                                                     onClick={() => updateAdjustmentStatus(adjustment.id, 'rejected')}
-                                                                    className="text-red-600 hover:text-red-900 ml-2"
+                                                                    className="text-danger hover:text-red-900 ml-2"
                                                                 >
                                                                     Reddet
                                                                 </button>
@@ -263,7 +257,7 @@ export default function Index({ adjustments, filters = {} }) {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="7" className="px-6 py-12 text-center text-sm text-gray-500">
+                                            <td colSpan="7" className="px-6 py-12 text-center fs-sm text-muted">
                                                 Devam düzeltme talebi bulunamadı.
                                             </td>
                                         </tr>
@@ -274,24 +268,24 @@ export default function Index({ adjustments, filters = {} }) {
 
                         {/* Pagination */}
                         {adjustments?.meta && adjustments.meta.last_page > 1 && (
-                            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                                <nav className="flex items-center justify-between">
-                                    <div className="flex items-center justify-between flex-1">
+                            <div className="px-6 py-4 table-light border-t border-secondary">
+                                <nav className="d-flex align-items-center justify-content-between">
+                                    <div className="d-flex align-items-center justify-content-between d-flex-1">
                                         <div>
-                                            <p className="text-sm text-gray-700">
+                                            <p className="fs-sm text-dark">
                                                 {adjustments.meta.from} - {adjustments.meta.to} arası, toplam {adjustments.meta.total} öğe
                                             </p>
                                         </div>
                                         <div>
-                                            <div className="flex space-x-2">
+                                            <div className="d-flex space-x-2">
                                                 {adjustments.meta.links.filter(link => link.url).map((link, index) => (
                                                     <Link
                                                         key={index}
                                                         href={link.url}
-                                                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                                        className={`position-relative d-inline-d-flex align-items-center px-4 py-2 border fs-sm fw-medium ${
                                                             link.active
-                                                                ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                                                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                                ? 'z-10 bg-indigo-50 border-indigo-500 text-primary'
+                                                                : 'bg-white border-secondary text-dark hover:table-light'
                                                         }`}
                                                     >
                                                         {link.label.replace(/\&\w+;/g, match => {
@@ -309,28 +303,28 @@ export default function Index({ adjustments, filters = {} }) {
                     </div>
 
                     {/* Durumlara Göre Hızlı Gözat */}
-                    <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-                            <h4 className="font-medium text-yellow-800">Bekliyor</h4>
-                            <p className="text-2xl font-bold text-yellow-600 mt-2">
+                    <div className="mt-6 d-grid d-grid-cols-2 gap-3">
+                        <div className="bg-yellow-50 border border-yellow-200 rounded p-4 text-center">
+                            <h5 className="fw-medium text-warning">Bekliyor</h5>
+                            <p className="fs-2 fw-bold text-warning mt-2">
                                 {adjustments?.data?.filter(a => a.status === 'pending').length || 0}
                             </p>
                         </div>
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                            <h4 className="font-medium text-green-800">Onaylandı</h4>
-                            <p className="text-2xl font-bold text-green-600 mt-2">
+                        <div className="bg-green-50 border border-green-200 rounded p-4 text-center">
+                            <h5 className="fw-medium text-success">Onaylandı</h5>
+                            <p className="fs-2 fw-bold text-success mt-2">
                                 {adjustments?.data?.filter(a => a.status === 'approved').length || 0}
                             </p>
                         </div>
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-                            <h4 className="font-medium text-red-800">Reddedildi</h4>
-                            <p className="text-2xl font-bold text-red-600 mt-2">
+                        <div className="bg-red-50 border border-red-200 rounded p-4 text-center">
+                            <h5 className="fw-medium text-danger">Reddedildi</h5>
+                            <p className="fs-2 fw-bold text-danger mt-2">
                                 {adjustments?.data?.filter(a => a.status === 'rejected').length || 0}
                             </p>
                         </div>
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-                            <h4 className="font-medium text-blue-800">Toplam</h4>
-                            <p className="text-2xl font-bold text-blue-600 mt-2">
+                        <div className="bg-blue-50 border border-blue-200 rounded p-4 text-center">
+                            <h5 className="fw-medium text-info">Toplam</h5>
+                            <p className="fs-2 fw-bold text-info mt-2">
                                 {adjustments?.data?.length || 0}
                             </p>
                         </div>

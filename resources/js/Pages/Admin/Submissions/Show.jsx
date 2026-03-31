@@ -54,14 +54,14 @@ export default function Show({ submission }) {
     const getStatusBadge = (status) => {
         const statusInfo = STATUSES.find(s => s.value === status);
         const colors = {
-            blue: 'bg-blue-100 text-blue-800',
-            yellow: 'bg-yellow-100 text-yellow-800',
+            blue: 'bg-primary bg-opacity-10 text-info',
+            yellow: 'bg-warning bg-opacity-10 text-warning',
             purple: 'bg-purple-100 text-purple-800',
-            green: 'bg-green-100 text-green-800',
-            red: 'bg-red-100 text-red-800',
+            green: 'bg-success bg-opacity-10 text-success',
+            red: 'bg-danger bg-opacity-10 text-danger',
         };
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[statusInfo?.color] || 'bg-gray-100'}`}>
+            <span className={`px-2 py-1 rounded-pill fs-xs fw-medium ${colors[statusInfo?.color] || 'bg-light'}`}>
                 {statusInfo?.label || status}
             </span>
         );
@@ -70,12 +70,12 @@ export default function Show({ submission }) {
     const getInvestigationBadge = (investigation) => {
         const info = INVESTIGATIONS.find(i => i.value === investigation);
         const colors = {
-            yellow: 'bg-yellow-100 text-yellow-800',
-            green: 'bg-green-100 text-green-800',
-            gray: 'bg-gray-100 text-gray-800',
+            yellow: 'bg-warning bg-opacity-10 text-warning',
+            green: 'bg-success bg-opacity-10 text-success',
+            gray: 'bg-light text-dark',
         };
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[info?.color] || 'bg-gray-100'}`}>
+            <span className={`px-2 py-1 rounded-pill fs-xs fw-medium ${colors[info?.color] || 'bg-light'}`}>
                 {info?.label || '-'}
             </span>
         );
@@ -94,37 +94,37 @@ export default function Show({ submission }) {
             <Head title={`Başvuru: ${submission.reference_no}`} />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Header */}
-                    <div className="bg-white rounded-lg shadow mb-6">
-                        <div className="p-6">
-                            <div className="flex justify-between items-start">
+                    <div className="bg-white rounded-3 shadow-sm mb-5">
+                        <div className="p-4">
+                            <div className="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <div className="flex items-center gap-3 mb-2">
+                                    <div className="d-flex align-items-center gap-2 mb-2">
                                         <Link
                                             href="/admin/submissions"
-                                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition"
+                                            className="p-2 text-muted hover:text-dark hover:bg-light rounded"
                                             title="Geri"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                             </svg>
                                         </Link>
-                                        <h1 className="text-2xl font-semibold">
+                                        <h1 className="fs-2 fw-semibold">
                                             Başvuru: {submission.reference_no}
                                         </h1>
                                     </div>
-                                    <p className="text-gray-600 mt-1 ml-11">
+                                    <p className="text-muted mt-1 ml-11">
                                         {submission.form?.name} - {submission.form?.department?.title}
                                     </p>
-                                    <p className="text-sm text-gray-500 mt-1 ml-11">
+                                    <p className="fs-sm text-muted mt-1 ml-11">
                                         Gönderim Tarihi: {new Date(submission.created_at).toLocaleString('tr-TR')}
                                     </p>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="d-flex align-items-center gap-2">
                                     <button
                                         onClick={handleDelete}
-                                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition"
+                                        className="p-2 text-danger hover:text-danger hover:bg-red-50 rounded"
                                         title="Sil"
                                     >
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,9 +132,9 @@ export default function Show({ submission }) {
                                         </svg>
                                     </button>
                                     <select
+                                        className="form-control border-secondary rounded-3 shadow-sm-sm"
                                         value={newStatus}
                                         onChange={(e) => setNewStatus(e.target.value)}
-                                        className="border-gray-300 rounded-md shadow-sm"
                                     >
                                         {STATUSES.map((status) => (
                                             <option key={status.value} value={status.value}>
@@ -144,7 +144,7 @@ export default function Show({ submission }) {
                                     </select>
                                     <button
                                         onClick={handleStatusChange}
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                        className="btn btn-primary btn-sm"
                                     >
                                         Durumu Güncelle
                                     </button>
@@ -153,12 +153,12 @@ export default function Show({ submission }) {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="d-grid d-grid-cols-3 gap-4">
                         {/* Form Details */}
                         <div className="col-span-2">
-                            <div className="bg-white rounded-lg shadow mb-6">
-                                <div className="p-6">
-                                    <h2 className="text-lg font-semibold mb-4">Başvuru Detayları</h2>
+                            <div className="bg-white rounded-3 shadow-sm mb-5">
+                                <div className="p-4">
+                                    <h5 className="fw-semibold mb-3">Başvuru Detayları</h5>
                                     <div className="space-y-4">
                                         {submission.details?.map((detail, index) => {
                                             const field = submission.form?.fields?.find(f => f.name === detail.field_name);
@@ -166,25 +166,25 @@ export default function Show({ submission }) {
                                             
                                             return (
                                                 <div key={index} className="border-b pb-4 last:border-b-0">
-                                                    <label className="block text-sm font-medium text-gray-500 mb-1 flex items-center gap-2">
+                                                    <label className="d-block fs-sm fw-medium text-muted mb-1 d-flex align-items-center gap-2">
                                                         {isFile && (
-                                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                                             </svg>
                                                         )}
                                                         {detail.field_label || detail.field_name}
                                                     </label>
-                                                    <div className="text-gray-900">
+                                                    <div className="text-dark">
                                                         {isFile && detail.field_value?.startsWith('http') ? (
-                                                            <div className="flex items-center gap-3">
-                                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <svg className="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                                                 </svg>
                                                                 <a
                                                                     href={detail.field_value}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="text-indigo-600 hover:text-indigo-900 font-medium"
+                                                                    className="text-primary hover:text-indigo-900 fw-medium"
                                                                 >
                                                                     Dosyayı Görüntüle / İndir
                                                                 </a>
@@ -194,7 +194,7 @@ export default function Show({ submission }) {
                                                                 href={detail.field_value}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="text-indigo-600 hover:text-indigo-900"
+                                                                className="text-primary hover:text-indigo-900"
                                                             >
                                                                 Dosyayı Görüntüle
                                                             </a>
@@ -210,18 +210,18 @@ export default function Show({ submission }) {
                             </div>
 
                             {/* İstihbarat */}
-                            <div className="bg-white rounded-lg shadow">
-                                <div className="p-6">
-                                    <h2 className="text-lg font-semibold mb-4">İstihbarat</h2>
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-sm text-gray-600">Mevcut Durum:</span>
+                            <div className="bg-white rounded-3 shadow-sm">
+                                <div className="p-4">
+                                    <h5 className="fw-semibold mb-3">İstihbarat</h5>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <span className="fs-sm text-muted">Mevcut Durum:</span>
                                         {getInvestigationBadge(submission.investigation)}
                                     </div>
-                                    <div className="mt-4 flex items-center gap-4">
+                                    <div className="mt-4 d-flex align-items-center gap-3">
                                         <select
+                                            className="form-control border-secondary rounded-3 shadow-sm-sm d-flex-1"
                                             value={newInvestigation}
                                             onChange={(e) => setNewInvestigation(e.target.value)}
-                                            className="border-gray-300 rounded-md shadow-sm flex-1"
                                         >
                                             {INVESTIGATIONS.map((inv) => (
                                                 <option key={inv.value} value={inv.value}>
@@ -231,7 +231,7 @@ export default function Show({ submission }) {
                                         </select>
                                         <button
                                             onClick={handleInvestigationChange}
-                                            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                        className="btn btn-primary btn-sm"
                                         >
                                             Güncelle
                                         </button>
@@ -242,28 +242,28 @@ export default function Show({ submission }) {
 
                         {/* Comments */}
                         <div className="col-span-1">
-                            <div className="bg-white rounded-lg shadow">
-                                <div className="p-6">
-                                    <h2 className="text-lg font-semibold mb-4">Değerlendirmeler</h2>
+                            <div className="bg-white rounded-3 shadow-sm">
+                                <div className="p-4">
+                                    <h5 className="fw-semibold mb-3">Değerlendirmeler</h5>
                                     
                                     {/* Add Comment Form */}
-                                    <form onSubmit={handleCommentSubmit} className="mb-6">
+                                    <form onSubmit={handleCommentSubmit} className="mb-5">
                                         <div className="mb-3">
                                             <textarea
+                                                className="form-control w-100 border-secondary rounded-3 shadow-sm-sm"
                                                 value={commentData.comment}
                                                 onChange={(e) => setCommentData('comment', e.target.value)}
                                                 placeholder="Yorumunuzu yazın..."
-                                                className="w-full border-gray-300 rounded-md shadow-sm"
                                                 rows={3}
                                                 required
                                             />
                                         </div>
                                         <div className="mb-3">
-                                            <label className="block text-sm text-gray-600 mb-1">Puan (1-5)</label>
+                                            <label className="d-block fs-sm text-muted mb-1">Puan (1-5)</label>
                                             <select
+                                                className="form-control w-100 border-secondary rounded-3 shadow-sm-sm"
                                                 value={commentData.rating}
                                                 onChange={(e) => setCommentData('rating', e.target.value)}
-                                                className="w-full border-gray-300 rounded-md shadow-sm"
                                             >
                                                 <option value="">Puan vermek için seçin</option>
                                                 {[1, 2, 3, 4, 5].map((n) => (
@@ -271,18 +271,18 @@ export default function Show({ submission }) {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="mb-3 flex items-center">
+                                        <div className="mb-3 d-flex align-items-center">
                                             <input
                                                 type="checkbox"
                                                 checked={commentData.is_private}
                                                 onChange={(e) => setCommentData('is_private', e.target.checked)}
-                                                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                                className="h-4 w-4 text-primary border-secondary rounded"
                                             />
-                                            <label className="ml-2 text-sm text-gray-700">Gizli not</label>
+                                            <label className="ml-2 fs-sm text-dark">Gizli not</label>
                                         </div>
                                         <button
                                             type="submit"
-                                            className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                            className="btn btn-primary btn-sm w-100"
                                         >
                                             Yorum Ekle
                                         </button>
@@ -291,19 +291,19 @@ export default function Show({ submission }) {
                                     {/* Comments List */}
                                     <div className="space-y-4">
                                         {submission.comments?.map((comment) => (
-                                            <div key={comment.id} className={`p-3 rounded ${comment.is_private ? 'bg-yellow-50' : 'bg-gray-50'}`}>
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div className="font-medium text-sm">
+                                            <div key={comment.id} className={`p-3 rounded ${comment.is_private ? 'bg-yellow-50' : 'table-light'}`}>
+                                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                                    <div className="fw-medium fs-sm">
                                                         {comment.user?.name || 'Kullanıcı'}
                                                     </div>
                                                     {comment.rating && (
-                                                        <div className="text-yellow-500">
+                                                        <div className="text-warning">
                                                             {'★'.repeat(comment.rating)}
                                                         </div>
                                                     )}
                                                 </div>
-                                                <p className="text-sm text-gray-700">{comment.comment}</p>
-                                                <div className="text-xs text-gray-500 mt-2">
+                                                <p className="fs-sm text-dark">{comment.comment}</p>
+                                                <div className="fs-xs text-muted mt-2">
                                                     {new Date(comment.created_at).toLocaleString('tr-TR')}
                                                     {comment.is_private && ' • Gizli'}
                                                 </div>

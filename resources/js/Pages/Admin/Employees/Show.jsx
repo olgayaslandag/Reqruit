@@ -107,19 +107,19 @@ export default function Show({ employee }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
+                <div className="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        <h5 className="fw-semibold text-dark">
                             {employee.first_name} {employee.last_name}
-                        </h2>
-                        <p className="text-sm text-gray-600">
+                        </h5>
+                        <p className="fs-sm text-muted">
                             {employee.email} • {employee.phone}
                         </p>
                     </div>
                     
                     <button
                         onClick={() => handleDocumentDelete(123)} // sadece test
-                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                        className="btn btn-danger btn-sm"
                     >
                         Sil
                     </button>
@@ -129,11 +129,11 @@ export default function Show({ employee }) {
             <Head title={`${employee.first_name} ${employee.last_name}`} />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Tabs */}
-                    <div className="bg-white rounded-lg shadow">
-                        <div className="border-b border-gray-200">
-                            <nav className="flex -mb-px">
+                    <div className="bg-white rounded-3 shadow-sm">
+                        <div className="border-b border-secondary">
+                            <nav className="d-flex -mb-px">
                                 {[
                                     { id: 'info', label: 'Bilgi', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
                                     { id: 'education', label: 'Eğitim', icon: 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z' },
@@ -144,10 +144,10 @@ export default function Show({ employee }) {
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`w-1/5 py-4 px-1 text-center border-b-2 font-medium text-sm ${
+                                        className={`w-1/5 py-4 px-1 text-center border-b-2 fw-medium fs-sm ${
                                             activeTab === tab.id
-                                                ? 'border-indigo-500 text-indigo-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                ? 'border-indigo-500 text-primary'
+                                                : 'border-transparent text-muted hover:text-dark hover:border-secondary'
                                         }`}
                                     >
                                         <svg className="w-6 h-6 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@ export default function Show({ employee }) {
                             </nav>
                         </div>
 
-                        <div className="p-6">
+                        <div className="p-4">
                             {/* Info Tab */}
                             {activeTab === 'info' && (
                                 <div>Bilgi içeriği burada</div>

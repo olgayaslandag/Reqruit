@@ -4,63 +4,61 @@ export default function Welcome({ auth }) {
     return (
         <>
             <Head title="Reqruit - Başvuru Yönetim Sistemi" />
-            <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600">
-                <div className="min-h-screen flex flex-col">
-                    <header className="py-6 px-8">
-                        <nav className="flex justify-between items-center max-w-7xl mx-auto">
-                            <div className="text-2xl font-bold text-white">Reqruit</div>
-                            <div className="flex gap-4">
-                                {auth.user ? (
-                                    <Link
-                                        href={route('dashboard')}
-                                        className="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition"
-                                    >
-                                        Panele Git
-                                    </Link>
-                ) : (
-                    <Link
-                        href={route('login')}
-                        className="px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition"
-                    >
-                        Giriş Yap
-                    </Link>
-                )}
-                            </div>
-                        </nav>
-                    </header>
-
-                    <main className="flex-1 flex items-center justify-center">
-                        <div className="text-center text-white px-4">
-                            <h1 className="text-5xl font-bold mb-6">
-                                Başvuru Yönetim Sistemi
-                            </h1>
-                            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-                                Departmanlarınız için dinamik formlar oluşturun, 
-                                başvuruları yönetin ve iş akışınızı hızlandırın.
-                            </p>
-                            <div className="flex gap-4 justify-center">
+            <div className="d-flex d-flex-column min-vh-100 bg-primary bg-gradient">
+                <header className="py-4 px-4">
+                    <nav className="d-flex justify-content-between align-items-center container">
+                        <div className="h4 text-white mb-0">Reqruit</div>
+                        <div>
+                            {auth.user ? (
+                                <Link
+                                    href={route('dashboard')}
+                                    className="btn btn-light"
+                                >
+                                    Panele Git
+                                </Link>
+                            ) : (
                                 <Link
                                     href={route('login')}
-                                    className="px-6 py-3 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-gray-100 transition text-lg"
+                                    className="btn btn-light"
                                 >
                                     Giriş Yap
                                 </Link>
-                                {auth.user && (
-                                    <Link
-                                        href={route('dashboard')}
-                                        className="px-6 py-3 bg-indigo-700 text-white rounded-lg font-semibold hover:bg-indigo-800 transition text-lg"
-                                    >
-                                        Panel
-                                    </Link>
-                                )}
-                            </div>
+                            )}
                         </div>
-                    </main>
+                    </nav>
+                </header>
 
-                    <footer className="py-6 text-center text-white/70">
-                        <p>© 2026 Reqruit. Tüm hakları saklıdır.</p>
-                    </footer>
-                </div>
+                <main className="d-flex-grow-1 d-flex align-items-center justify-content-center">
+                    <div className="text-center text-white px-4">
+                        <h1 className="display-3 fw-bold mb-4">
+                            Başvuru Yönetim Sistemi
+                        </h1>
+                        <p className="lead mb-5 mx-auto" style={{ maxWidth: '720px' }}>
+                            Departmanlarınız için dinamik formlar oluşturun,
+                            başvuruları yönetin ve iş akışınızı hızlandırın.
+                        </p>
+                        <div className="d-flex gap-2 justify-content-center">
+                            <Link
+                                href={route('login')}
+                                className="btn btn-light btn-lg"
+                            >
+                                Giriş Yap
+                            </Link>
+                            {auth.user && (
+                                <Link
+                                    href={route('dashboard')}
+                                    className="btn btn-outline-light btn-lg"
+                                >
+                                    Panel
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+                </main>
+
+                <footer className="py-3 text-center text-white-50">
+                    <p className="mb-0">© 2026 Reqruit. Tüm hakları saklıdır.</p>
+                </footer>
             </div>
         </>
     );

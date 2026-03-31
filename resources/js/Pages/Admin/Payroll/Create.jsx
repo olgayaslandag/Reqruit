@@ -113,34 +113,34 @@ export default function Create() {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center gap-4">
+                <div className="d-flex align-items-center gap-3">
                     <Link
                         href={route('admin.payrolls.index')}
-                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition"
+                        className="p-2 text-muted hover:text-dark hover:bg-light rounded"
                         title="Geri"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </Link>
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    <h5 className="fw-semibold">
                         Yeni Bordro Dönemi Oluştur
-                    </h2>
+                    </h5>
                 </div>
             }
         >
             <Head title="Yeni Bordro Dönemi" />
 
             <div className="py-12">
-                <div className="max-w-2xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white rounded-lg shadow">
-                        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <div className="mw-100 mx-auto">
+                    <div className="bg-white rounded-3 shadow-sm">
+                        <form onSubmit={handleSubmit} className="p-4 mb-3">
                             {/* Dönem Tipi */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="d-block fs-sm fw-medium text-dark mb-2">
                                     Dönem Tipi
                                 </label>
-                                <div className="grid grid-cols-3 gap-3">
+                                <div className="d-grid d-grid-cols-3 gap-2">
                                     {[
                                         { value: 'monthly', label: 'Aylık', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
                                         { value: 'biweekly', label: 'İki Haftalık', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
@@ -150,16 +150,16 @@ export default function Create() {
                                             key={type.value}
                                             type="button"
                                             onClick={() => handlePeriodTypeChange(type.value)}
-                                            className={`p-4 rounded-lg border-2 text-center transition ${
+                                            className={`p-4 rounded border-2 text-center  ${
                                                 periodType === type.value
                                                     ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                                                    : 'border-gray-200 hover:border-gray-300'
+                                                    : 'border-secondary hover:border-secondary'
                                             }`}
                                         >
                                             <svg className="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={type.icon} />
                                             </svg>
-                                            <span className="text-sm font-medium">{type.label}</span>
+                                            <span className="fs-sm fw-medium">{type.label}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -167,42 +167,39 @@ export default function Create() {
 
                             {/* Dönem Adı */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Dönem Adı <span className="text-red-500">*</span>
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                    Dönem Adı <span className="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="text"
+                                <input type="text"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     placeholder="Örn: Ocak 2026 Bordrosu"
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                 />
                                 <InputError message={errors.name} className="mt-1" />
                             </div>
 
                             {/* Tarih Aralığı */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="d-grid d-grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Başlangıç Tarihi <span className="text-red-500">*</span>
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                        Başlangıç Tarihi <span className="text-danger">*</span>
                                     </label>
-                                    <input
-                                        type="date"
+                                    <input type="date"
                                         value={data.start_date}
                                         onChange={(e) => handleDateChange('start_date', e.target.value)}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                     />
                                     <InputError message={errors.start_date} className="mt-1" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Bitiş Tarihi <span className="text-red-500">*</span>
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                        Bitiş Tarihi <span className="text-danger">*</span>
                                     </label>
-                                    <input
-                                        type="date"
+                                    <input type="date"
                                         value={data.end_date}
                                         onChange={(e) => handleDateChange('end_date', e.target.value)}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                     />
                                     <InputError message={errors.end_date} className="mt-1" />
                                 </div>
@@ -210,50 +207,48 @@ export default function Create() {
 
                             {/* Çalışma Günü */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Çalışma Günü Sayısı <span className="text-red-500">*</span>
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
+                                    Çalışma Günü Sayısı <span className="text-danger">*</span>
                                 </label>
-                                <input
-                                    type="number"
+                                <input type="number"
                                     value={data.work_days}
                                     onChange={(e) => setData('work_days', parseInt(e.target.value) || 0)}
                                     min="1"
                                     max="31"
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                 />
                                 <InputError message={errors.work_days} className="mt-1" />
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="fs-xs text-muted mt-1">
                                     Normal çalışma günü: 30 gün (Pazartesi-Cuma)
                                 </p>
                             </div>
 
                             {/* Açıklama */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Açıklama
                                 </label>
-                                <textarea
-                                    value={data.description}
+                                <textarea value={data.description}
                                     onChange={(e) => setData('description', e.target.value)}
                                     rows={3}
                                     placeholder="Bu dönem için notlar..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                 />
                                 <InputError message={errors.description} className="mt-1" />
                             </div>
 
                             {/* Butonlar */}
-                            <div className="flex justify-end gap-3 pt-4 border-t">
+                            <div className="d-flex justify-content-end pt-4 border-t">
                                 <Link
                                     href={route('admin.payrolls.index')}
-                                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                                    className="px-4 py-2 border border-secondary rounded text-dark hover:table-light"
                                 >
                                     İptal
                                 </Link>
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                                    className="btn btn-primary btn-sm disabled:opacity-50"
                                 >
                                     {processing ? 'Oluşturuluyor...' : 'Oluştur'}
                                 </button>

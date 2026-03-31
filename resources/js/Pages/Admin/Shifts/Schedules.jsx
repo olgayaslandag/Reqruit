@@ -95,14 +95,14 @@ export default function Schedules({ schedules, shifts, employees, departments })
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Vardiya Atamaları
-                    </h2>
-                    <div className="flex gap-2">
+                    </h5>
+                    <div className="d-flex gap-2">
                         <button
                             onClick={() => handleExport('excel')}
-                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm flex items-center gap-2"
+                            className="btn btn-success btn-sm d-flex align-items-center gap-2"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -111,7 +111,7 @@ export default function Schedules({ schedules, shifts, employees, departments })
                         </button>
                         <Link
                             href={route('admin.shifts.index')}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                         >
                             Geri
                         </Link>
@@ -122,18 +122,18 @@ export default function Schedules({ schedules, shifts, employees, departments })
             <Head title="Vardiya Atamaları" />
 
             <div className="py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto px-4">
                     {/* Filtreleme Paneli */}
-                    <div className="bg-white rounded-lg shadow-md mb-6 p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white rounded-3 shadow-sm-md mb-5 p-4">
+                        <div className="d-grid d-grid-cols-1 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Departman
                                 </label>
                                 <select
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                     value={filter.department_id}
                                     onChange={(e) => setFilter({ ...filter, department_id: e.target.value })}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     {departments?.map(dept => (
@@ -144,13 +144,13 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Vardiya
                                 </label>
                                 <select
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                     value={filter.shift_id}
                                     onChange={(e) => setFilter({ ...filter, shift_id: e.target.value })}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     {shifts?.map(shift => (
@@ -164,18 +164,18 @@ export default function Schedules({ schedules, shifts, employees, departments })
                     </div>
 
                     {/* Grup Atama Paneli */}
-                    <div className="bg-white rounded-lg shadow-md mb-6 p-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">Toplu Vardiya Atama</h3>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white rounded-3 shadow-sm-md mb-5 p-4">
+                        <h5 className="fw-medium">Toplu Vardiya Atama</h5>
+
+                        <div className="d-grid d-grid-cols-1 gap-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Departman
                                 </label>
                                 <select
-                                    value={bulkAssignment.selectedEmployees.length > 0 ? '': bulkAssignment.department_id}
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
+                                    value={bulkAssignment.selectedEmployees.length > 0 ? '' : bulkAssignment.department_id}
                                     onChange={(e) => setBulkAssignment({...bulkAssignment, department_id: e.target.value})}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Departman Seç...</option>
                                     {departments?.map(dept => (
@@ -186,17 +186,17 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Personel Seçimi
                                 </label>
                                 <select
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500 h-32"
                                     multiple
                                     value={bulkAssignment.selectedEmployees}
                                     onChange={(e) => {
                                         const selected = Array.from(e.target.selectedOptions).map(option => option.value);
                                         setBulkAssignment({...bulkAssignment, selectedEmployees: selected});
                                     }}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 h-32"
                                 >
                                     {filteredEmployees?.map(emp => (
                                         <option key={emp.id} value={emp.id}>
@@ -206,13 +206,13 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Vardiya
                                 </label>
                                 <select
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                     value={bulkAssignment.shiftId}
                                     onChange={(e) => setBulkAssignment({...bulkAssignment, shiftId: e.target.value})}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Vardiya Seç...</option>
                                     {shifts?.map(shift => (
@@ -223,19 +223,19 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Tarih Aralığı
                                 </label>
                                 <input
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                     type="date"
                                     value={bulkAssignment.start_date}
                                     onChange={(e) => setBulkAssignment({...bulkAssignment, start_date: e.target.value})}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mb-1"
                                 />
                                 <select
+                                    className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
                                     value={bulkAssignment.recurrence}
                                     onChange={(e) => setBulkAssignment({...bulkAssignment, recurrence: e.target.value})}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="single">Tek Seferlik</option>
                                     <option value="weekly">Haftalık Tekrarlı</option>
@@ -244,7 +244,7 @@ export default function Schedules({ schedules, shifts, employees, departments })
                             </div>
                         </div>
                         
-                        <div className="mt-4 flex justify-end">
+                        <div className="mt-4 d-flex justify-content-end">
                             <button
                                 onClick={() => {
                                     // Bulk assignment logic
@@ -268,7 +268,7 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                     }
                                 }}
                                 disabled={!bulkAssignment.selectedEmployees.length || !bulkAssignment.shiftId}
-                                className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                                className="btn btn-primary disabled:opacity-50"
                             >
                                 Toplu Atama Yap
                             </button>
@@ -276,31 +276,31 @@ export default function Schedules({ schedules, shifts, employees, departments })
                     </div>
 
                     {/* Atama Tablosu */}
-                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Vardiya Atama Tablosu</h3>
+                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Vardiya Atama Tablosu</h5>
                         </div>
                         
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                        <div className="overflow-auto">
+                            <table className="w-100 divide-y divide-gray-200">
+                                <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Personel
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Departman
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Vardiya
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Tarih
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             Saatler
                                         </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
                                             İşlemler
                                         </th>
                                     </tr>
@@ -308,51 +308,51 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {filteredSchedules.length > 0 ? (
                                         filteredSchedules.map((schedule, index) => (
-                                            <tr key={schedule.id || schedule.temp_id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="flex items-center">
-                                                        <div className="flex-shrink-0 h-10 w-10">
+                                            <tr key={schedule.id || schedule.temp_id} className="hover:table-light">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <div className="d-flex align-items-center">
+                                                        <div className="d-flex-shrink-0 h-10 w-10">
                                                             <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
                                                         </div>
                                                         <div className="ml-4">
-                                                            <div className="text-sm font-medium text-gray-900">
+                                                            <div className="fs-sm fw-medium text-dark">
                                                                 {schedule.employee?.first_name} {schedule.employee?.last_name}
                                                             </div>
-                                                            <div className="text-sm text-gray-500">
+                                                            <div className="fs-sm text-muted">
                                                                 {schedule.employee?.identity_no}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
                                                     {schedule.employee?.department?.title || '-'}
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <span className="px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill bg-primary bg-opacity-10 text-info">
                                                         {schedule.shift?.name}
                                                     </span>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="fs-xs text-muted">
                                                         {schedule.shift?.description}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
                                                     {new Date(schedule.date).toLocaleDateString('tr-TR')}
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="fs-xs text-muted">
                                                         {(new Date(schedule.date)).toLocaleDateString('tr-TR', { weekday: 'short' })}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900">
+                                                <td className="px-6 py-4 text-nowrap">
+                                                    <div className="fs-sm fw-medium text-dark">
                                                         {schedule.shift?.start_time} - {schedule.shift?.end_time}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="fs-sm text-muted">
                                                         Mola: {schedule.shift?.break_duration}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
                                                     <button
                                                         onClick={() => handleRemoveAssignment(schedule.id)}
-                                                        className="text-red-600 hover:text-red-900"
+                                                        className="text-danger hover:text-red-900"
                                                     >
                                                         Kaldır
                                                     </button>
@@ -361,7 +361,7 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="6" className="px-6 py-12 text-center text-sm text-gray-500">
+                                            <td colSpan="6" className="px-6 py-12 text-center fs-sm text-muted">
                                                 Vardiya ataması bulunamadı.
                                             </td>
                                         </tr>
@@ -372,34 +372,34 @@ export default function Schedules({ schedules, shifts, employees, departments })
                     </div>
 
                     {/* Haftalık Takvim Tablosu Seçeneği */}
-                    <div className="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Haftalık Vardiya Planı</h3>
+                    <div className="mt-8 bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Haftalık Vardiya Planı</h5>
                         </div>
                         
-                        <div className="p-6">
-                            <div className="overflow-x-auto">
-                                <table className="w-full border-collapse border border-gray-200">
+                        <div className="p-4">
+                            <div className="overflow-auto">
+                                <table className="w-100 border-collapse border border-secondary">
                                     <thead>
                                         <tr>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Personel</th>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Pzt</th>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Sal</th>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Çar</th>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Per</th>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Cum</th>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Cts</th>
-                                            <th className="border border-gray-200 p-2 bg-gray-50">Paz</th>
+                                            <th className="border border-secondary p-2 table-light">Personel</th>
+                                            <th className="border border-secondary p-2 table-light">Pzt</th>
+                                            <th className="border border-secondary p-2 table-light">Sal</th>
+                                            <th className="border border-secondary p-2 table-light">Çar</th>
+                                            <th className="border border-secondary p-2 table-light">Per</th>
+                                            <th className="border border-secondary p-2 table-light">Cum</th>
+                                            <th className="border border-secondary p-2 table-light">Cts</th>
+                                            <th className="border border-secondary p-2 table-light">Paz</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {filteredEmployees?.slice(0, 5).map(employee => (
                                             <tr key={employee.id}>
-                                                <td className="border border-gray-200 p-2 font-medium">
-                                                    <div className="text-sm">
+                                                <td className="border border-secondary p-2 fw-medium">
+                                                    <div className="fs-sm">
                                                         {employee.first_name} {employee.last_name}
                                                     </div>
-                                                    <div className="text-xs text-gray-500">
+                                                    <div className="fs-xs text-muted">
                                                         {employee.department?.title}
                                                     </div>
                                                 </td>
@@ -410,14 +410,14 @@ export default function Schedules({ schedules, shifts, employees, departments })
                                                     );
                                                     
                                                     return (
-                                                        <td key={day} className="border border-gray-200 p-1 text-center align-top">
+                                                        <td key={day} className="border border-secondary p-1 text-center align-top">
                                                             {assignmentForDay ? (
-                                                                <div className="text-xs bg-blue-100 text-blue-800 p-1 rounded">
+                                                                <div className="fs-xs bg-primary bg-opacity-10 text-info p-1 rounded">
                                                                     {assignmentForDay.shift?.name}<br/>
-                                                                    <span className="text-xs">{assignmentForDay.shift?.start_time}-{assignmentForDay.shift?.end_time}</span>
+                                                                    <span className="fs-xs">{assignmentForDay.shift?.start_time}-{assignmentForDay.shift?.end_time}</span>
                                                                 </div>
                                                             ) : (
-                                                                <div className="text-gray-300 text-xs">-</div>
+                                                                <div className="text-gray-300 fs-xs">-</div>
                                                             )}
                                                         </td>
                                                     );

@@ -124,17 +124,15 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
 
     return (
         <div className="py-12">
-            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div className="bg-white rounded-lg shadow">  {/* No p-6 as required */}
+            <div className="mw-100 mx-auto">
+                <div className="bg-white rounded-3 shadow-sm">  {/* No p-4 as required */}
 
 
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <form onSubmit={(e) => { e.preventDefault(); handleApplyFilters(); }} className="flex flex-wrap gap-4 items-end">
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Çalışan</label>
-                                <select
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                    value={filters.employee_id}
+                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
+                        <form onSubmit={(e) => { e.preventDefault(); handleApplyFilters(); }} className="d-flex d-flex-wrap gap-3 align-items-end">
+                            <div className="d-flex-1 min-w-[200px]">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">Çalışan</label>
+                                <select className="form-control" value={filters.employee_id}
                                     onChange={(e) => handleFilterChange('employee_id', e.target.value)}
                                 >
                                     <option value="">Tümü</option>
@@ -145,10 +143,8 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                             </div>
 
                             <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Yıl</label>
-                                <select
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                    value={filters.year}
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">Yıl</label>
+                                <select className="form-control" value={filters.year}
                                     onChange={(e) => handleFilterChange('year', e.target.value)}
                                 >
                                     <option value={2024}>2024</option>
@@ -160,7 +156,7 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                             <div>
                                 <button
                                     type="submit"
-                                    className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    className="btn btn-success btn-sm"
                                 >
                                     Filtrele
                                 </button>
@@ -169,46 +165,46 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                     </div>
 
                     <div className="overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                        <div className="overflow-auto">
+                            <table className="w-100 divide-y divide-gray-200">
+                                <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Çalışan</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İzin Türü</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hakedilen Gün</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kullanılan Gün</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kalan Gün</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hesaplanan Yıl</th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Çalışan</th>
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">İzin Türü</th>
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Hakedilen Gün</th>
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Kullanılan Gün</th>
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Kalan Gün</th>
+                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Hesaplanan Yıl</th>
+                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">İşlemler</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {(entitlements || []).map((entitlement) => (
-                                        <tr key={entitlement.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getEmployeeName(entitlement.employee_id)}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getLeaveTypeName(entitlement.leave_type_id)}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{entitlement.entitled_days}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{entitlement.used_days}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                        <tr key={entitlement.id} className="hover:table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-dark">{getEmployeeName(entitlement.employee_id)}</td>
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-dark">{getLeaveTypeName(entitlement.leave_type_id)}</td>
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-dark">{entitlement.entitled_days}</td>
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-muted">{entitlement.used_days}</td>
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-muted">
+                                                <span className={`px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill ${
                                                     (entitlement.entitled_days - entitlement.used_days) > 10
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-yellow-100 text-yellow-800'
+                                                        ? 'bg-success bg-opacity-10 text-success'
+                                                        : 'bg-warning bg-opacity-10 text-warning'
                                                 }`}>
                                                     {entitlement.entitled_days - entitlement.used_days}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(entitlement.calculation_year_start).getFullYear()}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-muted">{new Date(entitlement.calculation_year_start).getFullYear()}</td>
+                                            <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
                                                 <button
                                                     onClick={() => handleEdit(entitlement)}
-                                                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                    className="text-primary hover:text-indigo-900 mr-4"
                                                 >
                                                     Güncelle
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(entitlement.id)}
-                                                    className="text-red-600 hover:text-red-900"
+                                                    className="text-danger hover:text-red-900"
                                                 >
                                                     Sil
                                                 </button>
@@ -223,20 +219,15 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
 
                 {/* Modal */}
                 {showModal && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-                        <div className="relative p-5 bg-white rounded-lg shadow-xl w-full max-w-md">
-                            <h3 className="text-lg font-bold mb-4">{editingId ? 'İzin Hakkı Düzenle' : 'Yeni İzin Hakkı Ekle'}</h3>
+                    <div className="position-fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-100 w-100 d-flex align-items-center justify-content-center">
+                        <div className="position-relative p-5 bg-white rounded-3 shadow-sm-xl w-100 mw-100">
+                            <h5 className="fw-medium">{editingId ? 'İzin Hakkı Düzenle' : 'Yeni İzin Hakkı Ekle'}</h5>
 
                             <form onSubmit={handleSubmit}>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="d-grid d-grid-cols-1 gap-3">
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Çalışan</label>
-                                        <select
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                            value={formData.employee_id}
-                                            onChange={(e) => setFormData({...formData, employee_id: parseInt(e.target.value)})}
-                                            required
-                                        >
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Çalışan</label>
+                                        <select className="form-control" value={formData.employee_id} onChange={(e) => setFormData({...formData, employee_id: parseInt(e.target.value)})} required>
                                             <option value="">Seçin...</option>
                                             {(employees || []).map(emp => (
                                                 <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
@@ -245,10 +236,8 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">İzin Türü</label>
-                                        <select
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                            value={formData.leave_type_id}
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">İzin Türü</label>
+                                        <select className="form-control" value={formData.leave_type_id}
                                             onChange={(e) => setFormData({...formData, leave_type_id: parseInt(e.target.value)})}
                                             required
                                         >
@@ -260,12 +249,9 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Hakedilen Gün</label>
-                                        <input
-                                            type="number"
-                                            min="1"
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Hakedilen Gün</label>
+                                        <input type="number" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" min="1"
                                             max="365"
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                             value={formData.entitled_days}
                                             onChange={(e) => setFormData({...formData, entitled_days: parseInt(e.target.value)}) || 0}
                                             required
@@ -273,22 +259,17 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Kullanılan Gün</label>
-                                        <input
-                                            type="number"
-                                            min="0"
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Kullanılan Gün</label>
+                                        <input type="number" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" min="0"
                                             max={formData.entitled_days}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                             value={formData.used_days}
                                             onChange={(e) => setFormData({...formData, used_days: parseInt(e.target.value)}) || 0}
                                         />
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Hesap Yılı Başlangıcı</label>
-                                        <input
-                                            type="date"
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Hesap Yılı Başlangıcı</label>
+                                        <input type="date" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"  
                                             value={formData.calculation_year_start}
                                             onChange={(e) => setFormData({...formData, calculation_year_start: e.target.value})}
                                             required
@@ -296,10 +277,8 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Hak Kazanma Tarihi</label>
-                                        <input
-                                            type="date"
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Hak Kazanma Tarihi</label>
+                                        <input type="date" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"  
                                             value={formData.accrual_date}
                                             onChange={(e) => setFormData({...formData, accrual_date: e.target.value})}
                                             required
@@ -307,25 +286,22 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                                     </div>
 
                                     <div className="mb-4 col-span-2">
-                                        <label className="flex items-center">
+                                        <label className="d-flex align-items-center">
                                             <input
                                                 type="checkbox"
-                                                className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                className="rounded border-secondary text-primary shadow-sm-sm focus:border-indigo-300 focus:ring focus: focus:"
                                                 checked={formData.can_carry_over}
                                                 onChange={(e) => setFormData({...formData, can_carry_over: e.target.checked})}
                                             />
-                                            <span className="ml-2 text-sm font-medium text-gray-700">Devredilebilir</span>
+                                            <span className="ml-2 fs-sm fw-medium text-dark">Devredilebilir</span>
                                         </label>
                                     </div>
 
                                     {formData.can_carry_over && (
                                         <div className="mb-4">
-                                            <label className="block text-gray-700 text-sm font-medium mb-1">Maks. Devir Günü</label>
-                                            <input
-                                                type="number"
-                                                min="0"
+                                            <label className="d-block text-dark fs-sm fw-medium mb-1">Maks. Devir Günü</label>
+                                            <input type="number" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" min="0"
                                                 max="365"
-                                                className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                                 value={formData.max_carry_over_days}
                                                 onChange={(e) => setFormData({...formData, max_carry_over_days: parseInt(e.target.value)}) || 0}
                                                 required
@@ -334,17 +310,17 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
                                     )}
                                 </div>
 
-                                <div className="flex justify-end space-x-2 mt-6">
+                                <div className="d-flex justify-content-end space-x-2 mt-6">
                                     <button
                                         type="button"
                                         onClick={resetForm}
-                                        className="px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        className="px-4 py-2 bg-gray-500 border border-transparent rounded fw-semibold fs-xs text-white text-uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus: focus:  -out"
                                     >
                                         İptal
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        className="btn btn-primary btn-sm"
                                     >
                                         {editingId ? 'Güncelle' : 'Oluştur'}
                                     </button>
@@ -361,11 +337,11 @@ export default function LeaveEntitlements({ entitlements: initialEntitlements, e
 LeaveEntitlements.layout = page =>
     <AuthenticatedLayout
         children={page}
-        header={<div className="flex justify-between items-center">
-            <h2 className="text-lg font-medium text-gray-900">İzin Hakları</h2>
+        header={<div className="d-flex justify-content-between align-items-center">
+            <h5 className="fw-medium text-dark">İzin Hakları</h5>
             <button
                 onClick={() => document.dispatchEvent(new CustomEvent('openLeaveEntitlementModal'))}
-                className="ml-3 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                className="btn btn-primary btn-sm ms-auto"
             >
                 Yeni İzin Hakkı
             </button>

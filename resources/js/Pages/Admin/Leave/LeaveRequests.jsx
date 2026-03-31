@@ -150,28 +150,24 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
 
     const getStatusColor = (status) => {
         switch(status) {
-            case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'approved': return 'bg-green-100 text-green-800';
-            case 'rejected': return 'bg-red-100 text-red-800';
-            case 'cancelled': return 'bg-gray-100 text-gray-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'pending': return 'bg-warning bg-opacity-10 text-warning';
+            case 'approved': return 'bg-success bg-opacity-10 text-success';
+            case 'rejected': return 'bg-danger bg-opacity-10 text-danger';
+            case 'cancelled': return 'bg-light text-dark';
+            default: return 'bg-light text-dark';
         }
     };
 
     return (
         <div className="py-12">
-            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div className="bg-white rounded-lg shadow">
+            <div className="mw-100 mx-auto">
+                <div className="bg-white rounded-3 shadow-sm">
 
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <form onSubmit={(e) => { e.preventDefault(); handleApplyFilters(); }} className="flex flex-wrap gap-4 items-end">
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Çalışan</label>
-                                <select
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                    value={filters.employee_id}
-                                    onChange={(e) => handleFilterChange('employee_id', e.target.value)}
-                                >
+                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
+                        <form onSubmit={(e) => { e.preventDefault(); handleApplyFilters(); }} className="d-flex d-flex-wrap gap-3 align-items-end">
+                            <div className="d-flex-1 min-w-[200px]">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">Çalışan</label>
+                                <select className="form-control" value={filters.employee_id} onChange={(e) => handleFilterChange('employee_id', e.target.value)}>
                                     <option value="">Tümü</option>
                                     {(employees || []).map(emp => (
                                         <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
@@ -180,12 +176,8 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                             </div>
 
                             <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Durum</label>
-                                <select
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                    value={filters.status}
-                                    onChange={(e) => handleFilterChange('status', e.target.value)}
-                                >
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">Durum</label>
+                                <select className="form-control" value={filters.status} onChange={(e) => handleFilterChange('status', e.target.value)}>
                                     <option value="">Tümü</option>
                                     <option value="pending">Beklemede</option>
                                     <option value="approved">Onaylı</option>
@@ -195,12 +187,8 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                             </div>
 
                             <div className="w-32">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Yıl</label>
-                                <select
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                    value={filters.year}
-                                    onChange={(e) => handleFilterChange('year', e.target.value)}
-                                >
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">Yıl</label>
+                                <select className="form-control" value={filters.year} onChange={(e) => handleFilterChange('year', e.target.value)}>
                                     <option value={2024}>2024</option>
                                     <option value={2025}>2025</option>
                                     <option value={2026}>2026</option>
@@ -210,7 +198,7 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                             <div>
                                 <button
                                     type="submit"
-                                    className="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    className="btn btn-success btn-sm"
                                 >
                                     Filtrele
                                 </button>
@@ -219,52 +207,52 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                     </div>
 
                     <div className="overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <table className="w-100 divide-y divide-gray-200">
+                            <thead className="table-light">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Çalışan</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İzin Türü</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Başlangıç</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bitiş</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yarım Gün</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durum</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Açıklama</th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Çalışan</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">İzin Türü</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Başlangıç</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Bitiş</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Yarım Gün</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Durum</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Açıklama</th>
+                                    <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {(leaveRequests || []).map((request) => (
-                                    <tr key={request.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getEmployeeName(request.employee_id)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getLeaveTypeName(request.leave_type_id)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(request.start_date).toLocaleDateString('tr-TR')}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(request.end_date).toLocaleDateString('tr-TR')}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${request.is_half_day ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+                                    <tr key={request.id} className="hover:table-light">
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-dark">{getEmployeeName(request.employee_id)}</td>
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-dark">{getLeaveTypeName(request.leave_type_id)}</td>
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-muted">{new Date(request.start_date).toLocaleDateString('tr-TR')}</td>
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-muted">{new Date(request.end_date).toLocaleDateString('tr-TR')}</td>
+                                        <td className="px-6 py-4 text-nowrap fs-sm">
+                                            <span className={`px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill ${request.is_half_day ? 'bg-primary bg-opacity-10 text-info' : 'bg-light text-dark'}`}>
                                                 {request.is_half_day ? 'Evet' : 'Hayır'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(request.status)}`}>
+                                        <td className="px-6 py-4 text-nowrap fs-sm">
+                                            <span className={`px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill ${getStatusColor(request.status)}`}>
                                                 {request.status === 'pending' && 'Beklemede'}
                                                 {request.status === 'approved' && 'Onaylandı'}
                                                 {request.status === 'rejected' && 'Reddedildi'}
                                                 {request.status === 'cancelled' && 'İptal Edildi'}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">{request.reason}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td className="px-6 py-4 fs-sm text-muted">{request.reason}</td>
+                                        <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
                                             {(request.status === 'pending') && (
                                                 <>
                                                     <button
                                                         onClick={() => handleApprove(request)}
-                                                        className="text-green-600 hover:text-green-900 mr-4"
+                                                        className="text-success hover:text-green-900 mr-4"
                                                     >
                                                         Onayla
                                                     </button>
                                                     <button
                                                         onClick={() => handleReject(request)}
-                                                        className="text-red-600 hover:text-red-900 mr-4"
+                                                        className="text-danger hover:text-red-900 mr-4"
                                                     >
                                                         Reddet
                                                     </button>
@@ -274,13 +262,13 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                                                 <>
                                                     <button
                                                         onClick={() => handleEdit(request)}
-                                                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                        className="text-primary hover:text-indigo-900 mr-4"
                                                     >
                                                         Güncelle
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(request.id)}
-                                                        className="text-red-600 hover:text-red-900"
+                                                        className="text-danger hover:text-red-900"
                                                     >
                                                         Sil
                                                     </button>
@@ -296,20 +284,15 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
 
                 {/* Add/Edit Modal */}
                 {showModal && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-                        <div className="relative p-5 bg-white rounded-lg shadow-xl w-full max-w-md">
-                            <h3 className="text-lg font-bold mb-4">{editingId ? 'İzin Talebi Düzenle' : 'Yeni İzin Talebi Ekle'}</h3>
+                    <div className="position-fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-100 w-100 d-flex align-items-center justify-content-center">
+                        <div className="position-relative p-5 bg-white rounded-3 shadow-sm-xl w-100 mw-100">
+                            <h5 className="fw-medium">{editingId ? 'İzin Talebi Düzenle' : 'Yeni İzin Talebi Ekle'}</h5>
 
                             <form onSubmit={handleSubmit}>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="d-grid d-grid-cols-1 gap-3">
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Çalışan</label>
-                                        <select
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                            value={formData.employee_id}
-                                            onChange={(e) => setFormData({...formData, employee_id: parseInt(e.target.value)})}
-                                            required
-                                        >
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Çalışan</label>
+                                        <select className="form-control" value={formData.employee_id} onChange={(e) => setFormData({...formData, employee_id: parseInt(e.target.value)})} required>
                                             <option value="">Seçin...</option>
                                             {(employees || []).map(emp => (
                                                 <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
@@ -318,13 +301,8 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">İzin Türü</label>
-                                        <select
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                            value={formData.leave_type_id}
-                                            onChange={(e) => setFormData({...formData, leave_type_id: parseInt(e.target.value)})}
-                                            required
-                                        >
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">İzin Türü</label>
+                                        <select className="form-control" value={formData.leave_type_id} onChange={(e) => setFormData({...formData, leave_type_id: parseInt(e.target.value)})} required>
                                             <option value="">Seçin...</option>
                                             {(leaveTypes || []).map(type => (
                                                 <option key={type.id} value={type.id}>{type.name}</option>
@@ -333,10 +311,8 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Başlangıç Tarihi</label>
-                                        <input
-                                            type="date"
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Başlangıç Tarihi</label>
+                                        <input type="date" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"  
                                             value={formData.start_date}
                                             onChange={(e) => setFormData({...formData, start_date: e.target.value})}
                                             required
@@ -344,10 +320,8 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                                     </div>
 
                                     <div className="mb-4">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Bitiş Tarihi</label>
-                                        <input
-                                            type="date"
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Bitiş Tarihi</label>
+                                        <input type="date" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"  
                                             value={formData.end_date}
                                             onChange={(e) => setFormData({...formData, end_date: e.target.value})}
                                             required
@@ -355,33 +329,32 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                                     </div>
 
                                     <div className="mb-4 col-span-2">
-                                        <label className="flex items-center">
+                                        <label className="d-flex align-items-center">
                                             <input
                                                 type="checkbox"
-                                                className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                className="rounded border-secondary text-primary shadow-sm-sm focus:border-indigo-300 focus:ring focus: focus:"
                                                 checked={formData.is_half_day}
                                                 onChange={(e) => setFormData({...formData, is_half_day: e.target.checked})}
                                             />
-                                            <span className="ml-2 text-sm font-medium text-gray-700">Yarım Gün</span>
+                                            <span className="ml-2 fs-sm fw-medium text-dark">Yarım Gün</span>
                                         </label>
                                     </div>
 
                                     <div className="mb-4 col-span-2">
-                                        <label className="flex items-center">
+                                        <label className="d-flex align-items-center">
                                             <input
                                                 type="checkbox"
-                                                className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                className="rounded border-secondary text-primary shadow-sm-sm focus:border-indigo-300 focus:ring focus: focus:"
                                                 checked={formData.requires_hr_approval}
                                                 onChange={(e) => setFormData({...formData, requires_hr_approval: e.target.checked})}
                                             />
-                                            <span className="ml-2 text-sm font-medium text-gray-700">İK Onayı Gerekiyor</span>
+                                            <span className="ml-2 fs-sm fw-medium text-dark">İK Onayı Gerekiyor</span>
                                         </label>
                                     </div>
 
                                     <div className="mb-4 col-span-2">
-                                        <label className="block text-gray-700 text-sm font-medium mb-1">Açıklama</label>
-                                        <textarea
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Açıklama</label>
+                                        <textarea className="form-control"
                                             value={formData.reason}
                                             onChange={(e) => setFormData({...formData, reason: e.target.value})}
                                             rows="3"
@@ -389,17 +362,17 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end space-x-2 mt-6">
+                                <div className="d-flex justify-content-end space-x-2 mt-6">
                                     <button
                                         type="button"
                                         onClick={resetForm}
-                                        className="px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        className="px-4 py-2 bg-gray-500 border border-transparent rounded fw-semibold fs-xs text-white text-uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus: focus:  -out"
                                     >
                                         İptal
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        className="btn btn-primary btn-sm"
                                     >
                                         {editingId ? 'Güncelle' : 'Oluştur'}
                                     </button>
@@ -411,11 +384,11 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
 
                 {/* Approve Modal */}
                 {showApproveModal && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-                        <div className="relative p-5 bg-white rounded-lg shadow-xl w-full max-w-md">
-                            <h3 className="text-lg font-bold mb-4">İzin Talebini Onayla</h3>
+                    <div className="position-fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-100 w-100 d-flex align-items-center justify-content-center">
+                        <div className="position-relative p-5 bg-white rounded-3 shadow-sm-xl w-100 mw-100">
+                            <h5 className="fw-medium">İzin Talebini Onayla</h5>
 
-                            <p className="mb-4 text-gray-700">
+                            <p className="mb-4 text-dark">
                                 <strong>{getEmployeeName(selectedRequest?.employee_id)}</strong> çalışanının{' '}
                                 <strong>{getLeaveTypeName(selectedRequest?.leave_type_id)}</strong> iznine {' '}
                                 <strong>{new Date(selectedRequest?.start_date).toLocaleDateString('tr-TR')}</strong> - {' '}
@@ -423,28 +396,27 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                             </p>
 
                             <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-medium mb-1">Yorum (İsteğe Bağlı)</label>
-                                <textarea
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                <label className="d-block text-dark fs-sm fw-medium mb-1">Yorum (İsteğe Bağlı)</label>
+                                <textarea className="form-control"
                                     value={approverComment}
                                     onChange={(e) => setApproverComment(e.target.value)}
                                     rows="3"
                                 />
                             </div>
 
-                            <div className="flex justify-end space-x-2 mt-6">
+                            <div className="d-flex justify-content-end space-x-2 mt-6">
                                 <button
                                     onClick={() => {
                                         setShowApproveModal(false);
                                         setSelectedRequest(null);
                                     }}
-                                    className="px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    className="px-4 py-2 bg-gray-500 border border-transparent rounded fw-semibold fs-xs text-white text-uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus: focus:  -out"
                                 >
                                     İptal
                                 </button>
                                 <button
                                     onClick={confirmApprove}
-                                    className="px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                    className="btn btn-success btn-sm"
                                 >
                                     Onayla
                                 </button>
@@ -460,11 +432,11 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
 LeaveRequests.layout = page =>
     <AuthenticatedLayout
         children={page}
-        header={<div className="flex justify-between items-center">
-            <h2 className="text-lg font-medium text-gray-900">İzin Talepleri</h2>
+        header={<div className="d-flex justify-content-between align-items-center">
+            <h5 className="fw-medium text-dark">İzin Talepleri</h5>
             <button
                 onClick={() => document.dispatchEvent(new CustomEvent('openLeaveRequestModal'))}
-                className="ml-3 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                className="btn btn-primary btn-sm ms-auto"
             >
                 Yeni İzin Talebi
             </button>

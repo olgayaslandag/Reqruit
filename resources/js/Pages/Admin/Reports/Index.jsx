@@ -50,14 +50,14 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Bordro Raporları
-                    </h2>
-                    <div className="flex gap-2">
+                    </h5>
+                    <div className="d-flex gap-2">
                         <button
                             onClick={() => downloadReport(selectedReport, 'excel')}
-                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center gap-2 text-sm"
+                            className="btn btn-success btn-sm d-flex align-items-center gap-2"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -66,7 +66,7 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                         </button>
                         <button
                             onClick={() => downloadReport(selectedReport, 'pdf')}
-                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-2 text-sm"
+                            className="btn btn-danger btn-sm d-flex align-items-center gap-2"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -80,28 +80,28 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
             <Head title="Bordro Raporları" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="mw-100 mx-auto">
+                    <div className="d-grid d-grid-cols-1 gap-4">
                         {/* Sol Panel - Rapor Seçimi */}
-                        <div className="lg:col-span-1 space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">Raporlar</h3>
+                        <div className="space-y-4">
+                            <h5 className="fw-semibold">Raporlar</h5>
                             {reportTypes.map((report) => (
                                 <button
                                     key={report.id}
                                     onClick={() => setSelectedReport(report.id)}
-                                    className={`w-full p-4 rounded-lg border-2 text-left transition ${
+                                    className={`w-100 p-4 rounded border-2 text-left  ${
                                         selectedReport === report.id
                                             ? 'border-indigo-500 bg-indigo-50'
-                                            : 'border-gray-200 hover:border-gray-300'
+                                            : 'border-secondary hover:border-secondary'
                                     }`}
                                 >
-                                    <div className="flex items-start gap-3">
-                                        <svg className={`w-6 h-6 ${selectedReport === report.id ? 'text-indigo-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="d-flex align-items-start gap-2">
+                                        <svg className={`w-6 h-6 ${selectedReport === report.id ? 'text-primary' : 'text-muted'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={report.icon} />
                                         </svg>
                                         <div>
-                                            <div className="font-medium text-gray-900">{report.name}</div>
-                                            <div className="text-xs text-gray-500">{report.description}</div>
+                                            <div className="fw-medium text-dark">{report.name}</div>
+                                            <div className="fs-xs text-muted">{report.description}</div>
                                         </div>
                                     </div>
                                 </button>
@@ -109,53 +109,53 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                         </div>
 
                         {/* Sağ Panel - Rapor İçeriği */}
-                        <div className="lg:col-span-3">
+                        <div className="">
                             {/* Genel Özet */}
                             {selectedReport === 'summary' && summary && (
-                                <div className="space-y-6">
+                                <div className="mb-3">
                                     {/* İstatistikler */}
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                        <div className="bg-white rounded-lg shadow p-4">
-                                            <div className="text-sm text-gray-500">Toplam Dönem</div>
-                                            <div className="text-2xl font-bold text-gray-900">{summary.total_periods}</div>
+                                    <div className="d-grid d-grid-cols-1 gap-3">
+                                        <div className="bg-white rounded-3 shadow-sm p-4">
+                                            <div className="fs-sm text-muted">Toplam Dönem</div>
+                                            <div className="fs-2 fw-bold text-dark">{summary.total_periods}</div>
                                         </div>
-                                        <div className="bg-white rounded-lg shadow p-4">
-                                            <div className="text-sm text-gray-500">Toplam Çalışan</div>
-                                            <div className="text-2xl font-bold text-gray-900">{summary.total_employees}</div>
+                                        <div className="bg-white rounded-3 shadow-sm p-4">
+                                            <div className="fs-sm text-muted">Toplam Çalışan</div>
+                                            <div className="fs-2 fw-bold text-dark">{summary.total_employees}</div>
                                         </div>
-                                        <div className="bg-white rounded-lg shadow p-4">
-                                            <div className="text-sm text-gray-500">Toplam Brüt</div>
-                                            <div className="text-2xl font-bold text-indigo-600">{formatCurrency(summary.total_gross)}</div>
+                                        <div className="bg-white rounded-3 shadow-sm p-4">
+                                            <div className="fs-sm text-muted">Toplam Brüt</div>
+                                            <div className="fs-2 fw-bold text-primary">{formatCurrency(summary.total_gross)}</div>
                                         </div>
-                                        <div className="bg-white rounded-lg shadow p-4">
-                                            <div className="text-sm text-gray-500">Toplam Net</div>
-                                            <div className="text-2xl font-bold text-green-600">{formatCurrency(summary.total_net)}</div>
+                                        <div className="bg-white rounded-3 shadow-sm p-4">
+                                            <div className="fs-sm text-muted">Toplam Net</div>
+                                            <div className="fs-2 fw-bold text-success">{formatCurrency(summary.total_net)}</div>
                                         </div>
                                     </div>
 
                                     {/* Son Dönemler */}
-                                    <div className="bg-white rounded-lg shadow">
-                                        <div className="p-4 border-b border-gray-200">
-                                            <h3 className="text-lg font-semibold text-gray-800">Son Bordro Dönemleri</h3>
+                                    <div className="bg-white rounded-3 shadow-sm">
+                                        <div className="p-4 border-b border-secondary">
+                                            <h5 className="fw-semibold">Son Bordro Dönemleri</h5>
                                         </div>
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
+                                        <table className="w-100 divide-y divide-gray-200">
+                                            <thead className="table-light">
                                                 <tr>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dönem</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Çalışan</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Brüt</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kesinti</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Net</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Dönem</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Çalışan</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Brüt</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Kesinti</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Net</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
                                                 {summary.recent_periods?.map((period) => (
-                                                    <tr key={period.id} className="hover:bg-gray-50">
-                                                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{period.name}</td>
-                                                        <td className="px-4 py-3 text-sm text-gray-900">{period.employee_count}</td>
-                                                        <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(period.total_gross)}</td>
-                                                        <td className="px-4 py-3 text-sm text-red-600">{formatCurrency(period.total_deductions)}</td>
-                                                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{formatCurrency(period.total_net)}</td>
+                                                    <tr key={period.id} className="hover:table-light">
+                                                        <td className="px-4 py-3 fs-sm fw-medium text-dark">{period.name}</td>
+                                                        <td className="px-4 py-3 fs-sm text-dark">{period.employee_count}</td>
+                                                        <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(period.total_gross)}</td>
+                                                        <td className="px-4 py-3 fs-sm text-danger">{formatCurrency(period.total_deductions)}</td>
+                                                        <td className="px-4 py-3 fs-sm fw-medium text-dark">{formatCurrency(period.total_net)}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -166,35 +166,35 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
 
                             {/* Aylık Rapor */}
                             {selectedReport === 'monthly' && monthlyData && (
-                                <div className="space-y-6">
-                                    <div className="bg-white rounded-lg shadow">
-                                        <div className="p-4 border-b border-gray-200">
-                                            <h3 className="text-lg font-semibold text-gray-800">Aylık Maliyet Analizi</h3>
+                                <div className="mb-3">
+                                    <div className="bg-white rounded-3 shadow-sm">
+                                        <div className="p-4 border-b border-secondary">
+                                            <h5 className="fw-semibold">Aylık Maliyet Analizi</h5>
                                         </div>
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
+                                        <table className="w-100 divide-y divide-gray-200">
+                                            <thead className="table-light">
                                                 <tr>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ay</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Çalışan</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Toplam Brüt</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">SGK Kesintisi</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vergi</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Toplam Net</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Ay</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Çalışan</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Toplam Brüt</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">SGK Kesintisi</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Vergi</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Toplam Net</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
                                                 {monthlyData.map((month, index) => (
-                                                    <tr key={index} className="hover:bg-gray-50">
-                                                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{month.period}</td>
-                                                        <td className="px-4 py-3 text-sm text-gray-900">{month.employee_count}</td>
-                                                        <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(month.total_gross)}</td>
-                                                        <td className="px-4 py-3 text-sm text-red-600">{formatCurrency(month.total_ssk)}</td>
-                                                        <td className="px-4 py-3 text-sm text-red-600">{formatCurrency(month.total_tax)}</td>
-                                                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{formatCurrency(month.total_net)}</td>
+                                                    <tr key={index} className="hover:table-light">
+                                                        <td className="px-4 py-3 fs-sm fw-medium text-dark">{month.period}</td>
+                                                        <td className="px-4 py-3 fs-sm text-dark">{month.employee_count}</td>
+                                                        <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(month.total_gross)}</td>
+                                                        <td className="px-4 py-3 fs-sm text-danger">{formatCurrency(month.total_ssk)}</td>
+                                                        <td className="px-4 py-3 fs-sm text-danger">{formatCurrency(month.total_tax)}</td>
+                                                        <td className="px-4 py-3 fs-sm fw-medium text-dark">{formatCurrency(month.total_net)}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
-                                            <tfoot className="bg-gray-50 font-medium">
+                                            <tfoot className="table-light fw-medium">
                                                 <tr>
                                                     <td className="px-4 py-3">TOPLAM</td>
                                                     <td className="px-4 py-3">-</td>
@@ -208,9 +208,9 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                     </div>
 
                                     {/* Grafik Alanı (ileride eklenebilir) */}
-                                    <div className="bg-white rounded-lg shadow p-6">
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Maliyet Trendi</h3>
-                                        <div className="h-64 flex items-center justify-center text-gray-400">
+                                    <div className="bg-white rounded-3 shadow-sm p-4">
+                                        <h5 className="fw-semibold">Maliyet Trendi</h5>
+                                        <div className="h-64 d-flex align-items-center justify-content-center text-muted">
                                             <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                                             </svg>
@@ -221,28 +221,28 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
 
                             {/* Departman Maliyetleri */}
                             {selectedReport === 'departments' && departmentCosts && (
-                                <div className="bg-white rounded-lg shadow">
-                                    <div className="p-4 border-b border-gray-200">
-                                        <h3 className="text-lg font-semibold text-gray-800">Departman Bazlı Maliyetler</h3>
+                                <div className="bg-white rounded-3 shadow-sm">
+                                    <div className="p-4 border-b border-secondary">
+                                        <h5 className="fw-semibold">Departman Bazlı Maliyetler</h5>
                                     </div>
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
+                                    <table className="w-100 divide-y divide-gray-200">
+                                        <thead className="table-light">
                                             <tr>
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departman</th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Çalışan</th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ortalama Maaş</th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Toplam Maliyet</th>
-                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">%</th>
+                                                <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Departman</th>
+                                                <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Çalışan</th>
+                                                <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Ortalama Maaş</th>
+                                                <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Toplam Maliyet</th>
+                                                <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">%</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
                                             {departmentCosts.map((dept, index) => (
-                                                <tr key={index} className="hover:bg-gray-50">
-                                                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{dept.name}</td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900">{dept.employee_count}</td>
-                                                    <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(dept.avg_salary)}</td>
-                                                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{formatCurrency(dept.total_cost)}</td>
-                                                    <td className="px-4 py-3 text-sm text-gray-500">{dept.percentage}%</td>
+                                                <tr key={index} className="hover:table-light">
+                                                    <td className="px-4 py-3 fs-sm fw-medium text-dark">{dept.name}</td>
+                                                    <td className="px-4 py-3 fs-sm text-dark">{dept.employee_count}</td>
+                                                    <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(dept.avg_salary)}</td>
+                                                    <td className="px-4 py-3 fs-sm fw-medium text-dark">{formatCurrency(dept.total_cost)}</td>
+                                                    <td className="px-4 py-3 fs-sm text-muted">{dept.percentage}%</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -252,61 +252,61 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
 
                             {/* Çalışan Raporu */}
                             {selectedReport === 'employees' && topEmployees && (
-                                <div className="space-y-6">
-                                    <div className="bg-white rounded-lg shadow">
-                                        <div className="p-4 border-b border-gray-200">
-                                            <h3 className="text-lg font-semibold text-gray-800">En Yüksek Maaşlı Çalışanlar</h3>
+                                <div className="mb-3">
+                                    <div className="bg-white rounded-3 shadow-sm">
+                                        <div className="p-4 border-b border-secondary">
+                                            <h5 className="fw-semibold">En Yüksek Maaşlı Çalışanlar</h5>
                                         </div>
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
+                                        <table className="w-100 divide-y divide-gray-200">
+                                            <thead className="table-light">
                                                 <tr>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sıra</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Çalışan</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departman</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pozisyon</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Brüt Maaş</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Net Maaş</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Sıra</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Çalışan</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Departman</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Pozisyon</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Brüt Maaş</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Net Maaş</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
                                                 {topEmployees.map((emp, index) => (
-                                                    <tr key={index} className="hover:bg-gray-50">
-                                                        <td className="px-4 py-3 text-sm text-gray-500">{index + 1}</td>
-                                                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{emp.name}</td>
-                                                        <td className="px-4 py-3 text-sm text-gray-900">{emp.department}</td>
-                                                        <td className="px-4 py-3 text-sm text-gray-900">{emp.position}</td>
-                                                        <td className="px-4 py-3 text-sm text-gray-900">{formatCurrency(emp.gross_salary)}</td>
-                                                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{formatCurrency(emp.net_salary)}</td>
+                                                    <tr key={index} className="hover:table-light">
+                                                        <td className="px-4 py-3 fs-sm text-muted">{index + 1}</td>
+                                                        <td className="px-4 py-3 fs-sm fw-medium text-dark">{emp.name}</td>
+                                                        <td className="px-4 py-3 fs-sm text-dark">{emp.department}</td>
+                                                        <td className="px-4 py-3 fs-sm text-dark">{emp.position}</td>
+                                                        <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(emp.gross_salary)}</td>
+                                                        <td className="px-4 py-3 fs-sm fw-medium text-dark">{formatCurrency(emp.net_salary)}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
                                         </table>
                                     </div>
 
-                                    <div className="bg-white rounded-lg shadow p-6">
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-4">İstatistikler</h3>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div className="bg-white rounded-3 shadow-sm p-4">
+                                        <h5 className="fw-semibold">İstatistikler</h5>
+                                        <div className="d-grid d-grid-cols-2 gap-3">
                                             <div>
-                                                <div className="text-sm text-gray-500">Ortalama Maaş</div>
-                                                <div className="text-xl font-bold text-gray-900">
+                                                <div className="fs-sm text-muted">Ortalama Maaş</div>
+                                                <div className="fs-4 fw-bold text-dark">
                                                     {formatCurrency(topEmployees.reduce((sum, e) => sum + e.gross_salary, 0) / (topEmployees.length || 1))}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-sm text-gray-500">Medyan Maaş</div>
-                                                <div className="text-xl font-bold text-gray-900">
+                                                <div className="fs-sm text-muted">Medyan Maaş</div>
+                                                <div className="fs-4 fw-bold text-dark">
                                                     {formatCurrency(topEmployees[Math.floor(topEmployees.length / 2)]?.gross_salary || 0)}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-sm text-gray-500">En Düşük</div>
-                                                <div className="text-xl font-bold text-gray-900">
+                                                <div className="fs-sm text-muted">En Düşük</div>
+                                                <div className="fs-4 fw-bold text-dark">
                                                     {formatCurrency(Math.min(...topEmployees.map(e => e.gross_salary)))}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="text-sm text-gray-500">En Yüksek</div>
-                                                <div className="text-xl font-bold text-gray-900">
+                                                <div className="fs-sm text-muted">En Yüksek</div>
+                                                <div className="fs-4 fw-bold text-dark">
                                                     {formatCurrency(Math.max(...topEmployees.map(e => e.gross_salary)))}
                                                 </div>
                                             </div>

@@ -93,51 +93,45 @@ export default function Index({ departments }) {
     const collectDepartmentRows = (department, level = 0) => {
         const indent = level * 24;
         const isParent = department.children && department.children.length > 0;
-        
+
         const rows = [
             <tr key={department.id}>
-                <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="flex items-center" style={{ paddingLeft: indent }}>
+                <td className="px-4 py-3 text-nowrap">
+                    <div className="d-flex align-items-center" style={{ paddingLeft: indent }}>
                         {isParent && (
-                            <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <i className="bi bi-chevron-down me-1 text-muted"></i>
                         )}
                         {!isParent && level > 0 && (
-                            <span className="w-4 h-4 mr-1 text-gray-300">└</span>
+                            <span className="me-1 text-muted">└</span>
                         )}
-                        <span className={level > 0 ? 'text-gray-600' : 'font-medium text-gray-900'}>
+                        <span className={level > 0 ? 'text-muted' : 'fw-medium text-dark'}>
                             {department.title}
                         </span>
                     </div>
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap">{department.slug}</td>
+                <td className="px-4 py-3 text-nowrap">{department.slug}</td>
                 <td className="px-4 py-3">
                     {department.emails?.map((email, i) => (
-                        <span key={i} className="inline-block bg-gray-100 rounded px-2 py-1 text-xs mr-1">
+                        <span key={i} className="badge bg-light text-dark me-1">
                             {email}
                         </span>
                     ))}
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end gap-2">
+                <td className="px-4 py-3 text-nowrap text-end">
+                    <div className="d-flex align-items-center justify-content-end gap-1">
                         <button
                             onClick={() => openModal(department)}
-                            className="p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-md transition"
+                            className="btn btn-link btn-sm text-primary"
                             title="Düzenle"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
+                            <i className="bi bi-pencil"></i>
                         </button>
                         <button
                             onClick={() => handleDelete(department.id)}
-                            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition"
+                            className="btn btn-link btn-sm text-danger"
                             title="Sil"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <i className="bi bi-trash"></i>
                         </button>
                     </div>
                 </td>
@@ -158,17 +152,15 @@ export default function Index({ departments }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold mb-0">
                         Departmanlar
-                    </h2>
+                    </h5>
                     <button
                         onClick={() => openModal()}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
+                        <i className="bi bi-plus-lg"></i>
                         Yeni Departman
                     </button>
                 </div>
@@ -176,51 +168,49 @@ export default function Index({ departments }) {
         >
             <Head title="Departmanlar" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-200 table table-sm">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Başlık</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">E-postalar</th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {allRows}
-                            </tbody>
-                        </table>
+            <div className="py-4">
+                <div className="container-fluid px-0">
+                    <div className="card shadow-sm">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th className="px-4 py-3">Başlık</th>
+                                        <th className="px-4 py-3">Slug</th>
+                                        <th className="px-4 py-3">E-postalar</th>
+                                        <th className="px-4 py-3 text-end">İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {allRows}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 overflow-y-auto">
-                    <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                            <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={closeModal}></div>
-                        </div>
-
-                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                <div className="modal fade show d-block" tabIndex="-1" onClick={closeModal}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                             <form onSubmit={handleSubmit}>
-                                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                    <h3 className="text-lg font-medium text-gray-900 mb-4">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">
                                         {editingDepartment ? 'Departman Düzenle' : 'Yeni Departman'}
-                                    </h3>
-                                    
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Üst Departman</label>
-                                        <select
-                                            value={data.parent_id}
+                                    </h5>
+                                    <button type="button" className="btn-close" onClick={closeModal}></button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="mb-3">
+                                        <label className="form-label fw-medium">Üst Departman</label>
+                                        <select className="form-select" value={data.parent_id}
                                             onChange={(e) => setData('parent_id', e.target.value || '')}
-                                            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         >
                                             <option value="">Yok (Ana Departman)</option>
                                             {flatDepartments.map((dept) => (
-                                                <option 
-                                                    key={dept.id} 
+                                                <option
+                                                    key={dept.id}
                                                     value={dept.id}
                                                     disabled={editingDepartment?.id === dept.id}
                                                 >
@@ -229,60 +219,55 @@ export default function Index({ departments }) {
                                             ))}
                                         </select>
                                     </div>
-                                    
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Başlık</label>
-                                        <input
-                                            type="text"
+
+                                    <div className="mb-3">
+                                        <label className="form-label fw-medium">Başlık</label>
+                                        <input className="form-control" type="text"
                                             value={data.title}
                                             onChange={(e) => setData('title', e.target.value)}
-                                            className="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                             required
                                         />
                                     </div>
 
-                                    <div className="mb-4">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">E-postalar</label>
+                                    <div className="mb-0">
+                                        <label className="form-label fw-medium">E-postalar</label>
                                         {data.emails.map((email, index) => (
-                                            <div key={index} className="flex gap-2 mb-2">
-                                                <input
-                                                    type="email"
+                                            <div key={index} className="input-group mb-2">
+                                                <input className="form-control" type="email"
                                                     value={email}
                                                     onChange={(e) => handleEmailChange(index, e.target.value)}
                                                     placeholder="email@example.com"
-                                                    className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() => removeEmailField(index)}
-                                                    className="p-2 text-red-600 hover:text-red-900"
+                                                    className="btn btn-outline-danger"
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    <i className="bi bi-x-lg"></i>
                                                 </button>
                                             </div>
                                         ))}
                                         <button
                                             type="button"
                                             onClick={addEmailField}
-                                            className="text-indigo-600 hover:text-indigo-900 text-sm"
+                                            className="btn btn-link text-primary p-0"
                                         >
-                                            + E-posta ekle
+                                            <i className="bi bi-plus-lg me-1"></i>
+                                            E-posta ekle
                                         </button>
                                     </div>
                                 </div>
-                                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <div className="modal-footer d-flex flex-column gap-2">
                                     <button
                                         type="submit"
-                                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm"
+                                        className="btn btn-primary w-100"
                                     >
                                         {editingDepartment ? 'Güncelle' : 'Oluştur'}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={closeModal}
-                                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                        className="btn btn-secondary w-100"
                                     >
                                         İptal
                                     </button>

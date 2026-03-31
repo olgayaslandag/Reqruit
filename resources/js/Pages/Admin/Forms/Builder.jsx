@@ -192,30 +192,26 @@ export default function Builder({ departments, form }) {
             <Head title={form ? 'Form Düzenle' : 'Yeni Form'} />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     <form onSubmit={handleSubmit}>
-                        <div className="grid grid-cols-3 gap-6">
+                        <div className="d-grid d-grid-cols-3 gap-4">
                             {/* Form Settings */}
-                            <div className="col-span-1 bg-white p-6 rounded-lg shadow">
-                                <h2 className="text-lg font-semibold mb-4">Form Ayarları</h2>
+                            <div className="col-span-1 bg-white p-4 rounded-3 shadow-sm">
+                                <h5 className="fw-semibold mb-3">Form Ayarları</h5>
                                 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Form Adı</label>
-                                    <input
-                                        type="text"
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Form Adı</label>
+                                    <input className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" type="text"
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
-                                        className="w-full border-gray-300 rounded-md shadow-sm"
                                         required
                                     />
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Departman</label>
-                                    <select
-                                        value={data.department_id}
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Departman</label>
+                                    <select className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" value={data.department_id}
                                         onChange={(e) => setData('department_id', e.target.value)}
-                                        className="w-full border-gray-300 rounded-md shadow-sm"
                                         required
                                     >
                                         <option value="">Seçiniz</option>
@@ -228,22 +224,19 @@ export default function Builder({ departments, form }) {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
-                                    <textarea
-                                        value={data.description}
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Açıklama</label>
+                                    <textarea className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
-                                        className="w-full border-gray-300 rounded-md shadow-sm"
                                         rows={3}
                                     />
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Bildirim E-postaları</label>
-                                    <p className="text-xs text-gray-500 mb-2">Bu formdan başvuru geldiğinde bildirim gönderilecek e-postalar (departmandan bağımsız)</p>
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Bildirim E-postaları</label>
+                                    <p className="fs-xs text-muted mb-2">Bu formdan başvuru geldiğinde bildirim gönderilecek e-postalar (departmandan bağımsız)</p>
                                     {(data.notification_emails || []).map((email, index) => (
-                                        <div key={index} className="flex gap-2 mb-2">
-                                            <input
-                                                type="email"
+                                        <div key={index} className="d-flex gap-2 mb-2">
+                                            <input className="form-control d-flex-1 border-secondary rounded-3 shadow-sm-sm" type="email"
                                                 value={email || ''}
                                                 onChange={(e) => {
                                                     const newEmails = [...(data.notification_emails || [])];
@@ -251,7 +244,6 @@ export default function Builder({ departments, form }) {
                                                     setData('notification_emails', newEmails);
                                                 }}
                                                 placeholder="email@example.com"
-                                                className="flex-1 border-gray-300 rounded-md shadow-sm"
                                             />
                                             {(data.notification_emails || []).length > 1 && (
                                                 <button
@@ -260,7 +252,7 @@ export default function Builder({ departments, form }) {
                                                         const newEmails = (data.notification_emails || []).filter((_, i) => i !== index);
                                                         setData('notification_emails', newEmails);
                                                     }}
-                                                    className="p-2 text-red-600 hover:text-red-900"
+                                                    className="p-2 text-danger hover:text-red-900"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -272,7 +264,7 @@ export default function Builder({ departments, form }) {
                                     <button
                                         type="button"
                                         onClick={() => setData('notification_emails', [...(data.notification_emails || []), ''])}
-                                        className="text-indigo-600 hover:text-indigo-900 text-sm"
+                                        className="text-primary hover:text-indigo-900 fs-sm"
                                     >
                                         + E-posta ekle
                                     </button>
@@ -280,7 +272,7 @@ export default function Builder({ departments, form }) {
 
                                 <button
                                     type="submit"
-                                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                    className="btn btn-primary btn-sm w-100"
                                 >
                                     {form ? 'Güncelle' : 'Oluştur'}
                                 </button>
@@ -288,27 +280,27 @@ export default function Builder({ departments, form }) {
 
                             {/* Fields */}
                             <div className="col-span-2">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-lg font-semibold">Form Alanları</h2>
-                                    <div className="flex gap-2">
+                                <div className="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 className="fw-semibold">Form Alanları</h5>
+                                    <div className="d-flex gap-2">
                                         <button
                                             type="button"
                                             onClick={() => addField('name')}
-                                            className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200"
+                                            className="px-3 py-1.5 bg-light text-dark fs-sm rounded hover:bg-gray-200"
                                         >
                                             + Ad Soyad
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => addField('email')}
-                                            className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200"
+                                            className="px-3 py-1.5 bg-light text-dark fs-sm rounded hover:bg-gray-200"
                                         >
                                             + E-posta
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => addField('default')}
-                                            className="px-4 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700"
+                                            className="btn btn-success btn-sm"
                                         >
                                             + Alan Ekle
                                         </button>
@@ -323,40 +315,36 @@ export default function Builder({ departments, form }) {
                                             onDragStart={() => handleDragStart(index)}
                                             onDragOver={(e) => handleDragOver(e, index)}
                                             onDragEnd={handleDragEnd}
-                                            className={`bg-white p-4 rounded-lg shadow cursor-move ${
+                                            className={`bg-white p-4 rounded-3 shadow-sm cursor-move ${
                                                 draggedIndex === index ? 'opacity-50' : ''
                                             }`}
                                         >
-                                            <div className="flex justify-between items-start mb-3">
-                                                <span className="text-gray-400">☰</span>
+                                            <div className="d-flex justify-content-between align-items-start mb-3">
+                                                <span className="text-muted">☰</span>
                                                 {field.name !== 'name' && field.name !== 'email' && (
                                                     <button
                                                         type="button"
                                                         onClick={() => removeField(index)}
-                                                        className="text-red-600 hover:text-red-900"
+                                                        className="text-danger hover:text-red-900"
                                                     >
                                                         Sil
                                                     </button>
                                                 )}
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-4">
+                                            <div className="d-grid d-grid-cols-2 gap-3">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Etiket</label>
-                                                    <input
-                                                        type="text"
+                                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Etiket</label>
+                                                    <input className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" type="text"
                                                         value={field.label}
                                                         onChange={(e) => updateField(index, 'label', e.target.value)}
-                                                        className="w-full border-gray-300 rounded-md shadow-sm"
                                                     />
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Tür</label>
-                                                    <select
-                                                        value={field.type}
+                                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Tür</label>
+                                                    <select className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" value={field.type}
                                                         onChange={(e) => updateField(index, 'type', e.target.value)}
-                                                        className="w-full border-gray-300 rounded-md shadow-sm"
                                                     >
                                                         {FIELD_TYPES.map((type) => (
                                                             <option key={type.value} value={type.value}>
@@ -366,33 +354,31 @@ export default function Builder({ departments, form }) {
                                                     </select>
                                                 </div>
 
-                                                <div className="flex items-center">
+                                                <div className="d-flex align-items-center">
                                                     <input
                                                         type="checkbox"
                                                         checked={field.required}
                                                         onChange={(e) => updateField(index, 'required', e.target.checked)}
-                                                        className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                                        className="h-4 w-4 text-primary border-secondary rounded"
                                                     />
-                                                    <label className="ml-2 text-sm text-gray-700">Zorunlu</label>
+                                                    <label className="ml-2 fs-sm text-dark">Zorunlu</label>
                                                 </div>
                                             </div>
 
                                             {/* Options for select/checkbox/radio */}
                                             {['select', 'checkbox', 'radio'].includes(field.type) && (
                                                 <div className="mt-4">
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Seçenekler</label>
+                                                    <label className="d-block fs-sm fw-medium text-dark mb-2">Seçenekler</label>
                                                     {(field.options || []).map((option, optionIndex) => (
-                                                        <div key={optionIndex} className="flex gap-2 mb-2">
-                                                            <input
-                                                                type="text"
+                                                        <div key={optionIndex} className="d-flex gap-2 mb-2">
+                                                            <input className="form-control d-flex-1 border-secondary rounded-3 shadow-sm-sm fs-sm" type="text"
                                                                 value={option}
                                                                 onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
-                                                                className="flex-1 border-gray-300 rounded-md shadow-sm text-sm"
                                                             />
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeOption(index, optionIndex)}
-                                                                className="text-red-600 hover:text-red-900 text-sm"
+                                                                className="text-danger hover:text-red-900 fs-sm"
                                                             >
                                                                 Sil
                                                             </button>
@@ -401,7 +387,7 @@ export default function Builder({ departments, form }) {
                                                     <button
                                                         type="button"
                                                         onClick={() => addOption(index)}
-                                                        className="text-indigo-600 hover:text-indigo-900 text-sm"
+                                                        className="text-primary hover:text-indigo-900 fs-sm"
                                                     >
                                                         + Seçenek ekle
                                                     </button>
@@ -411,7 +397,7 @@ export default function Builder({ departments, form }) {
                                     ))}
 
                                     {data.fields.length === 0 && (
-                                        <div className="bg-gray-50 p-8 rounded-lg text-center text-gray-500">
+                                        <div className="table-light p-8 rounded text-center text-muted">
                                             Henüz alan eklenmedi. "Alan Ekle" butonuna tıklayarak başlayabilirsiniz.
                                         </div>
                                     )}

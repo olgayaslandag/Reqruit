@@ -46,38 +46,34 @@ export default function DeleteUserForm({ className = '' }) {
     };
 
     return (
-        <section className={`space-y-6 ${className}`}>
+        <section className={`mb-4 ${className}`}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
+                <h5 className="h5 text-dark mb-2">
                     Hesabı Sil
-                </h2>
+                </h5>
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Hesabınız silindiğinde, tüm kaynaklar ve veriler kalıcı olarak silinir. 
+                <p className="small text-muted">
+                    Hesabınız silindiğinde, tüm kaynaklar ve veriler kalıcı olarak silinir.
                     Silmeden önce saklamak istediğiniz verileri indirin.
                 </p>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>
+            <DangerButton onClick={confirmUserDeletion} className="mt-3">
                 Hesabı Sil
             </DangerButton>
 
-            <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={deleteUser} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
+            <Modal show={confirmingUserDeletion} onClose={closeModal} title="Hesabı Sil">
+                <form onSubmit={deleteUser} className="p-3">
+                    <p className="text-muted">
                         Hesabınızı silmek istediğinizden emin misiniz?
-                    </h2>
-
-                    <p className="mt-1 text-sm text-gray-600">
-                        Hesabınız silindiğinde tüm kaynaklar ve veriler kalıcı olarak silinir. 
+                        Hesabınız silindiğinde tüm kaynaklar ve veriler kalıcı olarak silinir.
                         Kalıcı olarak silmek istediğinizi onaylamak için şifrenizi girin.
                     </p>
 
-                    <div className="mt-6">
+                    <div className="mt-4">
                         <InputLabel
                             htmlFor="password"
                             value="Şifre"
-                            className="sr-only"
                         />
 
                         <TextInput
@@ -89,18 +85,17 @@ export default function DeleteUserForm({ className = '' }) {
                             onChange={(e) =>
                                 setData('password', e.target.value)
                             }
-                            className="mt-1 block w-3/4"
+                            className="form-control"
                             isFocused
                             placeholder="Şifre"
                         />
 
                         <InputError
                             message={errors.password}
-                            className="mt-2"
                         />
                     </div>
 
-                    <div className="mt-6 flex justify-end">
+                    <div className="mt-4 d-flex justify-content-end">
                         <SecondaryButton onClick={closeModal}>
                             İptal
                         </SecondaryButton>

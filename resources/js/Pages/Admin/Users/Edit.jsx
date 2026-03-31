@@ -19,73 +19,65 @@ export default function Edit({ user, errors: propErrors }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h5 className="fw-semibold">
                     Kullanıcı Düzenle
-                </h2>
+                </h5>
             }
         >
             <Head title="Kullanıcı Düzenle" />
 
             <div className="py-12">
-                <div className="max-w-2xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div className="mw-100 mx-auto">
+                    <div className="bg-white overflow-hidden shadow-sm-sm p-4">
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Ad Soyad
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus:border-indigo-500 focus:" type="text"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 />
                                 {errors.name && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                                    <p className="mt-1 fs-sm text-danger">{errors.name}</p>
                                 )}
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     E-posta
                                 </label>
-                                <input
-                                    type="email"
+                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus:border-indigo-500 focus:" type="email"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     required
                                 />
                                 {errors.email && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                                    <p className="mt-1 fs-sm text-danger">{errors.email}</p>
                                 )}
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Yeni Şifre (değiştirmek istemiyorsanız boş bırakın)
                                 </label>
-                                <input
-                                    type="password"
+                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus:border-indigo-500 focus:" type="password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     minLength="8"
                                 />
                                 {errors.password && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                                    <p className="mt-1 fs-sm text-danger">{errors.password}</p>
                                 )}
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Rol
                                 </label>
-                                <select
-                                    value={data.rank_id}
+                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus:border-indigo-500 focus:" value={data.rank_id}
                                     onChange={(e) => setData('rank_id', parseInt(e.target.value))}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 >
                                     <option value={1}>Yönetici</option>
                                     <option value={2}>İK Yöneticisi</option>
@@ -96,13 +88,11 @@ export default function Edit({ user, errors: propErrors }) {
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Durum
                                 </label>
-                                <select
-                                    value={data.status_id}
+                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus:border-indigo-500 focus:" value={data.status_id}
                                     onChange={(e) => setData('status_id', parseInt(e.target.value))}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 >
                                     <option value={1}>Aktif</option>
                                     <option value={2}>Pasif</option>
@@ -110,17 +100,17 @@ export default function Edit({ user, errors: propErrors }) {
                                 </select>
                             </div>
 
-                            <div className="flex justify-end gap-2">
+                            <div className="d-flex justify-content-end">
                                 <a
                                     href="/admin/users"
-                                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                                    className="px-4 py-2 bg-gray-300 text-dark rounded hover:bg-gray-400"
                                 >
                                     İptal
                                 </a>
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                                    className="btn btn-primary btn-sm disabled:opacity-50"
                                 >
                                     Güncelle
                                 </button>

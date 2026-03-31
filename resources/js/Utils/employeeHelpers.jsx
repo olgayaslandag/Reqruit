@@ -15,13 +15,13 @@ export const getStatusBadge = (employee) => {
     const isActive = !employee.termination_date;
     if (isActive) {
         return (
-            <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+            <span className="badge bg-success">
                 Aktif
             </span>
         );
     }
     return (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+        <span className="badge bg-danger">
             Çıktı
         </span>
     );
@@ -34,13 +34,13 @@ export const getStatusBadgeLarge = (employee) => {
     const isActive = !employee.termination_date;
     if (isActive) {
         return (
-            <span className="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800">
+            <span className="badge bg-success">
                 Aktif
             </span>
         );
     }
     return (
-        <span className="px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-800">
+        <span className="badge bg-danger">
             Çıktı ({employee.termination_date})
         </span>
     );

@@ -21,32 +21,30 @@ export default function ForgotPassword({ status }) {
 
             {status ? (
                 <div className="text-center">
-                    <div className="mb-6 flex justify-center">
-                        <div className="rounded-full bg-green-100 p-4">
-                            <svg className="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
+                    <div className="mb-4 d-flex justify-content-center">
+                        <div className="rounded-circle bg-success bg-opacity-10 p-4">
+                            <i className="fas fa-check-circle fa-3x text-success"></i>
                         </div>
                     </div>
-                    <h2 className="mb-2 text-xl font-semibold text-gray-900">
+                    <h5 className="mb-3 h5 text-dark">
                         Şifre Sıfırlama Bağlantısı Gönderildi!
-                    </h2>
-                    <p className="mb-6 text-sm text-gray-600">
+                    </h5>
+                    <p className="mb-4 small text-muted">
                         {status || 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.'}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="small text-muted">
                         E-posta kutunuzu kontrol edin. Gelen kutunuzda göremiyorsanız spam klasörünü de kontrol edin.
                     </p>
                     <a
                         href="/forgot-password"
-                        className="mt-6 inline-block text-sm text-indigo-600 hover:text-indigo-500"
+                        className="mt-3 d-inline-d-block small text-primary"
                     >
                         Farklı bir e-posta adresi denemek için tıklayın
                     </a>
                 </div>
             ) : (
                 <>
-                    <div className="mb-6 text-sm text-gray-600">
+                    <div className="mb-4 small text-muted">
                         Şifrenizi mi unuttunuz? Sorun değil. E-posta adresinizi girin,
                         size yeni bir şifre belirleyebileceğiniz bağlantı gönderelim.
                     </div>
@@ -58,19 +56,19 @@ export default function ForgotPassword({ status }) {
                                 type="email"
                                 name="email"
                                 value={data.email}
-                                className="mt-1 block w-full"
+                                className="form-control"
                                 isFocused={true}
                                 onChange={(e) => setData('email', e.target.value)}
                                 placeholder="E-posta adresiniz"
                             />
 
-                            <InputError message={errors.email} className="mt-2" />
+                            <InputError message={errors.email} />
                         </div>
 
-                        <div className="mt-4 flex items-center justify-between">
+                        <div className="mt-4 d-flex justify-content-between align-items-center">
                             <Link
                                 href="/login"
-                                className="text-sm text-indigo-600 hover:text-indigo-500"
+                                className="small text-primary"
                             >
                                 Giriş yap
                             </Link>

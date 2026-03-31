@@ -26,17 +26,17 @@ export default function Show({ period, employees, salaryComponents }) {
     // Durum badge
     const getStatusBadge = (status) => {
         const statusConfig = {
-            draft: { label: 'Taslak', class: 'bg-gray-100 text-gray-800' },
-            pending: { label: 'Beklemede', class: 'bg-yellow-100 text-yellow-800' },
-            approved: { label: 'Onaylandı', class: 'bg-green-100 text-green-800' },
-            paid: { label: 'Ödendi', class: 'bg-blue-100 text-blue-800' },
-            locked: { label: 'Kilitli', class: 'bg-red-100 text-red-800' },
+            draft: { label: 'Taslak', class: 'bg-light text-dark' },
+            pending: { label: 'Beklemede', class: 'bg-warning bg-opacity-10 text-warning' },
+            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
+            paid: { label: 'Ödendi', class: 'bg-primary bg-opacity-10 text-info' },
+            locked: { label: 'Kilitli', class: 'bg-danger bg-opacity-10 text-danger' },
         };
         
-        const config = statusConfig[status] || { label: status, class: 'bg-gray-100 text-gray-800' };
+        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
         
         return (
-            <span className={`px-3 py-1 text-sm font-medium rounded-full ${config.class}`}>
+            <span className={`px-3 py-1 fs-sm fw-medium rounded-pill ${config.class}`}>
                 {config.label}
             </span>
         );
@@ -109,11 +109,11 @@ export default function Show({ period, employees, salaryComponents }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
+                <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center gap-3">
                         <Link
                             href={route('admin.payrolls.index')}
-                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition"
+                            className="p-2 text-muted hover:text-dark hover:bg-light rounded"
                             title="Geri"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,21 +121,21 @@ export default function Show({ period, employees, salaryComponents }) {
                             </svg>
                         </Link>
                         <div>
-                            <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                            <h5 className="fw-semibold">
                                 {period.name}
-                            </h2>
-                            <p className="text-sm text-gray-500">
+                            </h5>
+                            <p className="fs-sm text-muted">
                                 {formatDate(period.start_date)} - {formatDate(period.end_date)}
                             </p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="d-flex align-items-center gap-2">
                         {getStatusBadge(period.status)}
                         
                         {period.status === 'draft' && (
                             <Link
                                 href={route('admin.payrolls.edit', period.id)}
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
+                                className="btn btn-primary btn-sm"
                             >
                                 Düzenle
                             </Link>
@@ -144,7 +144,7 @@ export default function Show({ period, employees, salaryComponents }) {
                         {period.status === 'pending' && (
                             <button
                                 onClick={handleApprove}
-                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                                className="btn btn-success btn-sm"
                             >
                                 Onayla
                             </button>
@@ -153,7 +153,7 @@ export default function Show({ period, employees, salaryComponents }) {
                         {period.status === 'approved' && (
                             <button
                                 onClick={handleMarkAsPaid}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 fs-sm"
                             >
                                 Ödendi İşaretle
                             </button>
@@ -161,7 +161,7 @@ export default function Show({ period, employees, salaryComponents }) {
                         
                         <Link
                             href={route('admin.payrolls.export', period.id)}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                         >
                             Dışa Aktar
                         </Link>
@@ -172,39 +172,39 @@ export default function Show({ period, employees, salaryComponents }) {
             <Head title={`Bordro: ${period.name}`} />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Özet Kartları */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Çalışan Sayısı</div>
-                            <div className="text-2xl font-bold text-gray-900">{employees.length}</div>
+                    <div className="d-grid d-grid-cols-1 gap-3 mb-5">
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Çalışan Sayısı</div>
+                            <div className="fs-2 fw-bold text-dark">{employees.length}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Toplam Brüt</div>
-                            <div className="text-2xl font-bold text-gray-900">{formatCurrency(totals.gross)}</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Toplam Brüt</div>
+                            <div className="fs-2 fw-bold text-dark">{formatCurrency(totals.gross)}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Toplam Kesinti</div>
-                            <div className="text-2xl font-bold text-red-600">{formatCurrency(totals.ssk + totals.tax)}</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Toplam Kesinti</div>
+                            <div className="fs-2 fw-bold text-danger">{formatCurrency(totals.ssk + totals.tax)}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Toplam Net</div>
-                            <div className="text-2xl font-bold text-green-600">{formatCurrency(totals.net)}</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Toplam Net</div>
+                            <div className="fs-2 fw-bold text-success">{formatCurrency(totals.net)}</div>
                         </div>
                     </div>
 
                     {/* Tabs */}
-                    <div className="bg-white rounded-lg shadow mb-6">
-                        <div className="border-b border-gray-200">
-                            <nav className="flex -mb-px">
+                    <div className="bg-white rounded-3 shadow-sm mb-5">
+                        <div className="border-b border-secondary">
+                            <nav className="d-flex -mb-px">
                                 {TABS.map((tab) => (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`w-1/3 py-4 px-1 text-center border-b-2 font-medium text-sm ${
+                                        className={`w-1/3 py-4 px-1 text-center border-b-2 fw-medium fs-sm ${
                                             activeTab === tab.id
-                                                ? 'border-indigo-500 text-indigo-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                ? 'border-indigo-500 text-primary'
+                                                : 'border-transparent text-muted hover:text-dark hover:border-secondary'
                                         }`}
                                     >
                                         <svg className="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,25 +216,23 @@ export default function Show({ period, employees, salaryComponents }) {
                             </nav>
                         </div>
 
-                        <div className="p-6">
+                        <div className="p-4">
                             {/* Çalışanlar Tab */}
                             {activeTab === 'employees' && (
                                 <div>
                                     {/* Arama ve İşlemler */}
-                                    <div className="flex justify-between items-center mb-4">
-                                        <div className="flex-1 max-w-md">
-                                            <input
-                                                type="text"
+                                    <div className="d-flex justify-content-between align-items-center mb-4">
+                                        <div className="d-flex-1 mw-100">
+                                            <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                                 placeholder="Çalışan ara..."
-                                                className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                             />
                                         </div>
-                                        <div className="flex gap-2">
+                                        <div className="d-flex gap-2">
                                             <button
                                                 onClick={toggleSelectAll}
-                                                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
+                                                className="px-3 py-2 fs-sm text-muted hover:text-dark"
                                             >
                                                 {selectAll ? 'Tümünü Kaldır' : 'Tümünü Seç'}
                                             </button>
@@ -242,37 +240,37 @@ export default function Show({ period, employees, salaryComponents }) {
                                     </div>
 
                                     {/* Tablo */}
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
+                                    <div className="overflow-auto">
+                                        <table className="w-100 divide-y divide-gray-200">
+                                            <thead className="table-light">
                                                 <tr>
                                                     <th className="px-4 py-3 text-left">
                                                         <input
                                                             type="checkbox"
                                                             checked={selectAll}
                                                             onChange={toggleSelectAll}
-                                                            className="rounded border-gray-300"
+                                                            className="rounded border-secondary"
                                                         />
                                                     </th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                         Çalışan
                                                     </th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                         Brüt
                                                     </th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                         Ek Ödemeler
                                                     </th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                         SGK
                                                     </th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                         Vergi
                                                     </th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                                         Net
                                                     </th>
-                                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
                                                         İşlemler
                                                     </th>
                                                 </tr>
@@ -281,42 +279,42 @@ export default function Show({ period, employees, salaryComponents }) {
                                                 {filteredEmployees.map((employee) => {
                                                     const calc = calculateEmployeePayroll(employee);
                                                     return (
-                                                        <tr key={employee.id} className="hover:bg-gray-50">
+                                                        <tr key={employee.id} className="hover:table-light">
                                                             <td className="px-4 py-3">
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={selectedEmployees.includes(employee.id)}
                                                                     onChange={() => toggleEmployee(employee.id)}
-                                                                    className="rounded border-gray-300"
+                                                                    className="rounded border-secondary"
                                                                 />
                                                             </td>
                                                             <td className="px-4 py-3">
-                                                                <div className="text-sm font-medium text-gray-900">
+                                                                <div className="fs-sm fw-medium text-dark">
                                                                     {employee.name}
                                                                 </div>
-                                                                <div className="text-xs text-gray-500">
+                                                                <div className="fs-xs text-muted">
                                                                     {employee.identity_no}
                                                                 </div>
                                                             </td>
-                                                            <td className="px-4 py-3 text-sm text-gray-900">
+                                                            <td className="px-4 py-3 fs-sm text-dark">
                                                                 {formatCurrency(calc.gross)}
                                                             </td>
-                                                            <td className="px-4 py-3 text-sm text-green-600">
+                                                            <td className="px-4 py-3 fs-sm text-success">
                                                                 +{formatCurrency(calc.allowances.total)}
                                                             </td>
-                                                            <td className="px-4 py-3 text-sm text-red-600">
+                                                            <td className="px-4 py-3 fs-sm text-danger">
                                                                 -{formatCurrency(calc.deductions.ssk)}
                                                             </td>
-                                                            <td className="px-4 py-3 text-sm text-red-600">
+                                                            <td className="px-4 py-3 fs-sm text-danger">
                                                                 -{formatCurrency(calc.deductions.tax)}
                                                             </td>
-                                                            <td className="px-4 py-3 text-sm font-bold text-gray-900">
+                                                            <td className="px-4 py-3 fs-sm fw-bold text-dark">
                                                                 {formatCurrency(calc.net)}
                                                             </td>
                                                             <td className="px-4 py-3 text-right">
                                                                 <Link
                                                                     href={route('admin.payrolls.employeeShow', { payroll: period.id, employee: employee.id })}
-                                                                    className="text-indigo-600 hover:text-indigo-900 text-sm"
+                                                                    className="text-primary hover:text-indigo-900 fs-sm"
                                                                 >
                                                                     Detay
                                                                 </Link>
@@ -325,13 +323,13 @@ export default function Show({ period, employees, salaryComponents }) {
                                                     );
                                                 })}
                                             </tbody>
-                                            <tfoot className="bg-gray-50 font-medium">
+                                            <tfoot className="table-light fw-medium">
                                                 <tr>
                                                     <td colSpan="2" className="px-4 py-3 text-right">TOPLAM</td>
                                                     <td className="px-4 py-3">{formatCurrency(totals.gross)}</td>
-                                                    <td className="px-4 py-3 text-green-600">+{formatCurrency(totals.allowances)}</td>
-                                                    <td className="px-4 py-3 text-red-600">-{formatCurrency(totals.ssk)}</td>
-                                                    <td className="px-4 py-3 text-red-600">-{formatCurrency(totals.tax)}</td>
+                                                    <td className="px-4 py-3 text-success">+{formatCurrency(totals.allowances)}</td>
+                                                    <td className="px-4 py-3 text-danger">-{formatCurrency(totals.ssk)}</td>
+                                                    <td className="px-4 py-3 text-danger">-{formatCurrency(totals.tax)}</td>
                                                     <td className="px-4 py-3">{formatCurrency(totals.net)}</td>
                                                     <td></td>
                                                 </tr>
@@ -343,55 +341,55 @@ export default function Show({ period, employees, salaryComponents }) {
 
                             {/* Özet Tab */}
                             {activeTab === 'summary' && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Dönem Bilgileri</h3>
+                                <div className="d-grid d-grid-cols-1 gap-4">
+                                    <div className="table-light rounded p-4">
+                                        <h5 className="fw-semibold">Dönem Bilgileri</h5>
                                         <div className="space-y-3">
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Dönem Adı</span>
-                                                <span className="font-medium">{period.name}</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Dönem Adı</span>
+                                                <span className="fw-medium">{period.name}</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Başlangıç</span>
-                                                <span className="font-medium">{formatDate(period.start_date)}</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Başlangıç</span>
+                                                <span className="fw-medium">{formatDate(period.start_date)}</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Bitiş</span>
-                                                <span className="font-medium">{formatDate(period.end_date)}</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Bitiş</span>
+                                                <span className="fw-medium">{formatDate(period.end_date)}</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Çalışma Günü</span>
-                                                <span className="font-medium">{period.work_days} gün</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Çalışma Günü</span>
+                                                <span className="fw-medium">{period.work_days} gün</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Çalışan Sayısı</span>
-                                                <span className="font-medium">{employees.length}</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Çalışan Sayısı</span>
+                                                <span className="fw-medium">{employees.length}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Mali Özet</h3>
+                                    <div className="table-light rounded p-4">
+                                        <h5 className="fw-semibold">Mali Özet</h5>
                                         <div className="space-y-3">
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Toplam Brüt Maaş</span>
-                                                <span className="font-medium">{formatCurrency(totals.gross)}</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Toplam Brüt Maaş</span>
+                                                <span className="fw-medium">{formatCurrency(totals.gross)}</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Toplam Ek Ödemeler</span>
-                                                <span className="font-medium text-green-600">{formatCurrency(totals.allowances)}</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Toplam Ek Ödemeler</span>
+                                                <span className="fw-medium text-success">{formatCurrency(totals.allowances)}</span>
                                             </div>
-                                            <div className="flex justify-between border-t pt-3">
-                                                <span className="text-gray-500">Toplam SGK Kesintisi</span>
-                                                <span className="font-medium text-red-600">{formatCurrency(totals.ssk)}</span>
+                                            <div className="d-flex justify-content-between border-t pt-3">
+                                                <span className="text-muted">Toplam SGK Kesintisi</span>
+                                                <span className="fw-medium text-danger">{formatCurrency(totals.ssk)}</span>
                                             </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-500">Toplam Vergi</span>
-                                                <span className="font-medium text-red-600">{formatCurrency(totals.tax)}</span>
+                                            <div className="d-flex justify-content-between">
+                                                <span className="text-muted">Toplam Vergi</span>
+                                                <span className="fw-medium text-danger">{formatCurrency(totals.tax)}</span>
                                             </div>
-                                            <div className="flex justify-between border-t pt-3">
-                                                <span className="text-gray-500 font-semibold">Toplam Net</span>
-                                                <span className="font-bold text-green-600 text-lg">{formatCurrency(totals.net)}</span>
+                                            <div className="d-flex justify-content-between border-t pt-3">
+                                                <span className="text-muted fw-semibold">Toplam Net</span>
+                                                <span className="fw-bold text-success fs-3">{formatCurrency(totals.net)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -400,11 +398,11 @@ export default function Show({ period, employees, salaryComponents }) {
 
                             {/* Detaylar Tab */}
                             {activeTab === 'details' && (
-                                <div className="space-y-6">
+                                <div className="mb-3">
                                     <div>
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Bordro Detayları</h3>
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                            <pre className="text-sm text-gray-600 whitespace-pre-wrap">
+                                        <h5 className="fw-semibold">Bordro Detayları</h5>
+                                        <div className="table-light rounded p-4">
+                                            <pre className="fs-sm text-muted whitespace-pre-wrap">
                                                 {JSON.stringify(period, null, 2)}
                                             </pre>
                                         </div>

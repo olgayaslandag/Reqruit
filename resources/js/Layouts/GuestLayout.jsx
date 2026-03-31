@@ -1,8 +1,10 @@
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
-                {children}
+        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+            <div className="card shadow" style={{ width: '100%', maxWidth: '400px' }}>
+                <div className="card-body">
+                    {children}
+                </div>
             </div>
         </div>
     );

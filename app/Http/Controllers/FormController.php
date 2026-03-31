@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateFormRequest;
 use App\Models\Form;
 use App\Services\DepartmentService;
 use App\Services\FormService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class FormController extends Controller
@@ -18,14 +19,27 @@ class FormController extends Controller
         $this->authorizeResource(Form::class, 'form');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $forms = $this->formService->getAll();
+        $query = Form::query()->with('department');
+
+        // Arama
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('slug', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $forms = $query->orderBy('created_at', 'desc')->paginate(10);
         $departments = $this->departmentService->getAll();
 
         return Inertia::render('Admin/Forms/Index', [
             'forms' => $forms,
             'departments' => $departments,
+            'filters' => [
+                'search' => $request->search,
+            ],
         ]);
     }
 

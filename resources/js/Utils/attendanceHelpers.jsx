@@ -4,56 +4,56 @@ import moment from 'moment';
 export const getAttendanceStatusBadge = (status, clock_in = null, clock_out = null) => {
     let colorClass = '';
     let label = '';
-    
+
     switch (status) {
         case 'present':
-            colorClass = 'bg-green-100 text-green-800';
+            colorClass = 'bg-success text-white';
             label = 'Devrede';
             break;
         case 'absent':
-            colorClass = 'bg-red-100 text-red-800';
+            colorClass = 'bg-danger text-white';
             label = 'Devre Dışı';
             break;
         case 'late':
-            colorClass = 'bg-yellow-100 text-yellow-800';
+            colorClass = 'bg-warning text-dark';
             label = 'Geç Giriş';
             break;
         case 'early_departure':
-            colorClass = 'bg-orange-100 text-orange-800';
+            colorClass = 'bg-orange text-white';
             label = 'Erken Çıkış';
             break;
         case 'on_leave':
-            colorClass = 'bg-blue-100 text-blue-800';
+            colorClass = 'bg-info text-white';
             label = 'İzinli';
             break;
         default:
-            colorClass = 'bg-gray-100 text-gray-800';
+            colorClass = 'bg-secondary text-white';
             label = status?.charAt(0)?.toUpperCase() + status?.slice(1) || '';
     }
-    
+
     // Geç kalma/erken çıkma kontrollerini manuel yapalım
     if (clock_in && status === 'present') {
         const clockInTime = moment(clock_in, 'YYYY-MM-DD HH:mm:ss');
         const shiftStartTime = moment().set({ hour: 9, minute: 0, second: 0 }); // varsayılan 9:00
-        
+
         if (clockInTime.isAfter(shiftStartTime)) {
-            colorClass = 'bg-yellow-100 text-yellow-800';
+            colorClass = 'bg-warning text-dark';
             label = 'Geç Giriş';
         }
     }
-    
+
     if (clock_out && status === 'present') {
         const clockOutTime = moment(clock_out, 'YYYY-MM-DD HH:mm:ss');
         const shiftEndTime = moment().set({ hour: 18, minute: 0, second: 0 }); // varsayılan 18:00
-        
+
         if (clockOutTime.isBefore(shiftEndTime)) {
-            colorClass = 'bg-orange-100 text-orange-800';
+            colorClass = 'bg-orange text-white';
             label = 'Erken Çıkış';
         }
     }
-    
+
     return (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
+        <span className={`badge ${colorClass}`}>
             {label}
         </span>
     );

@@ -1,0 +1,20 @@
+<svg width="810"
+     height="810"
+     viewBox="0 0 48 56"
+     xmlns="http://www.w3.org/2000/svg">
+
+  <g transform="translate(0,8)">
+
+    <!-- Outer diamond -->
+    <polygon points="24,0 48,24 24,48 0,24"
+             fill="none"
+             stroke="#0A6DD9"
+             stroke-width="3"/>
+
+    <!-- Inner diamond -->
+    <polygon points="24,10 38,24 24,38 10,24"
+             fill="#0A6DD9"/>
+
+  </g>
+
+</svg>

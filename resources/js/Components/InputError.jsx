@@ -1,11 +1,11 @@
 export default function InputError({ message, className = '', ...props }) {
     return message ? (
-        <p
+        <div
             {...props}
-            className={'text-sm text-red-600 ' + className}
+            className={`invalid-feedback d-block ${className}`}
         >
             {message}
-        </p>
+        </div>
     ) : null;
 }
 

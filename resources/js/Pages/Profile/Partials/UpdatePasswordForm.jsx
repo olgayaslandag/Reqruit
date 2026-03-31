@@ -2,13 +2,13 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 export default function UpdatePasswordForm({ className = '' }) {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
 
     const {
         data,
@@ -17,7 +17,6 @@ export default function UpdatePasswordForm({ className = '' }) {
         put,
         reset,
         processing,
-        recentlySuccessful,
     } = useForm({
         current_password: '',
         password: '',
@@ -29,7 +28,11 @@ export default function UpdatePasswordForm({ className = '' }) {
 
         put(route('password.update'), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                setRecentlySuccessful(true);
+                setTimeout(() => setRecentlySuccessful(false), 2000);
+            },
             onError: (errors) => {
                 if (errors.password) {
                     reset('password', 'password_confirmation');
@@ -47,17 +50,17 @@ export default function UpdatePasswordForm({ className = '' }) {
     return (
         <section className={className}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
+                <h5 className="h5 text-dark mb-2">
                     Şifre Güncelle
-                </h2>
+                </h5>
 
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="small text-muted">
                     Hesabınızın güvende kalması için uzun, rastgele bir şifre kullandığınızdan emin olun.
                 </p>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
+            <form onSubmit={updatePassword} className="mt-4">
+                <div className="mb-3">
                     <InputLabel
                         htmlFor="current_password"
                         value="Mevcut Şifre"
@@ -71,17 +74,16 @@ export default function UpdatePasswordForm({ className = '' }) {
                             setData('current_password', e.target.value)
                         }
                         type="password"
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="current-password"
                     />
 
                     <InputError
                         message={errors.current_password}
-                        className="mt-2"
                     />
                 </div>
 
-                <div>
+                <div className="mb-3">
                     <InputLabel htmlFor="password" value="Yeni Şifre" />
 
                     <TextInput
@@ -90,14 +92,14 @@ export default function UpdatePasswordForm({ className = '' }) {
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         type="password"
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="new-password"
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} />
                 </div>
 
-                <div>
+                <div className="mb-3">
                     <InputLabel
                         htmlFor="password_confirmation"
                         value="Şifre Tekrar"
@@ -110,30 +112,23 @@ export default function UpdatePasswordForm({ className = '' }) {
                             setData('password_confirmation', e.target.value)
                         }
                         type="password"
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="new-password"
                     />
 
                     <InputError
                         message={errors.password_confirmation}
-                        className="mt-2"
                     />
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="d-flex align-items-center gap-2">
                     <PrimaryButton disabled={processing}>Kaydet</PrimaryButton>
 
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">
+                    {recentlySuccessful && (
+                        <p className="small text-muted mb-0">
                             Kaydedildi.
                         </p>
-                    </Transition>
+                    )}
                 </div>
             </form>
         </section>

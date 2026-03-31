@@ -5,20 +5,20 @@ export default function Show({ component }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold text-dark">
                         Maaş Kalemı Detayı
-                    </h2>
-                    <div className="flex gap-2">
+                    </h5>
+                    <div className="d-flex gap-2">
                         <Link
                             href={route('admin.salary-components.edit', component.id)}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm"
+                            className="btn btn-primary btn-sm"
                         >
                             Düzenle
                         </Link>
                         <Link
                             href={route('admin.salary-components.index')}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                         >
                             Geri Dön
                         </Link>
@@ -29,31 +29,31 @@ export default function Show({ component }) {
             <Head title={`Maaş Kalemı - ${component.name}`} />
 
             <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="mw-100 mx-auto">
+                    <div className="bg-white overflow-hidden shadow-sm-sm">
+                        <div className="p-4 text-dark">
+                            <div className="d-grid d-grid-cols-1 gap-4">
                                 <div>
-                                    <h3 className="text-lg font-medium text-gray-900 mb-4">Genel Bilgiler</h3>
+                                    <h5 className="fw-medium">Genel Bilgiler</h5>
                                     
                                     <div className="space-y-4">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Ad</dt>
-                                            <dd className="mt-1 text-sm text-gray-900">{component.name}</dd>
+                                            <dt className="fs-sm fw-medium text-muted">Ad</dt>
+                                            <dd className="mt-1 fs-sm text-dark">{component.name}</dd>
                                         </div>
                                         
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Kod</dt>
-                                            <dd className="mt-1 text-sm text-gray-900">{component.code}</dd>
+                                            <dt className="fs-sm fw-medium text-muted">Kod</dt>
+                                            <dd className="mt-1 fs-sm text-dark">{component.code}</dd>
                                         </div>
                                         
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Tip</dt>
-                                            <dd className="mt-1 text-sm">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            <dt className="fs-sm fw-medium text-muted">Tip</dt>
+                                            <dd className="mt-1 fs-sm">
+                                                <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                     component.type === 'earning' 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-red-100 text-red-800'
+                                                        ? 'bg-success bg-opacity-10 text-success' 
+                                                        : 'bg-danger bg-opacity-10 text-danger'
                                                 }`}>
                                                     {component.type === 'earning' ? 'Kazanç' : 'Kesinti'}
                                                 </span>
@@ -61,43 +61,43 @@ export default function Show({ component }) {
                                         </div>
                                         
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Kategori</dt>
-                                            <dd className="mt-1 text-sm">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                    component.category === 'fixed' 
-                                                        ? 'bg-blue-100 text-blue-800' 
-                                                        : 'bg-yellow-100 text-yellow-800'
+                                            <dt className="fs-sm fw-medium text-muted">Kategori</dt>
+                                            <dd className="mt-1 fs-sm">
+                                                <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
+                                                    component.category === 'position-fixed' 
+                                                        ? 'bg-primary bg-opacity-10 text-info' 
+                                                        : 'bg-warning bg-opacity-10 text-warning'
                                                 }`}>
-                                                    {component.category === 'fixed' ? 'Sabit' : 'Değişken'}
+                                                    {component.category === 'position-fixed' ? 'Sabit' : 'Değişken'}
                                                 </span>
                                             </dd>
                                         </div>
                                         
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Varsayılan Tutar</dt>
-                                            <dd className="mt-1 text-sm text-gray-900">
+                                            <dt className="fs-sm fw-medium text-muted">Varsayılan Tutar</dt>
+                                            <dd className="mt-1 fs-sm text-dark">
                                                 {component.default_amount ? `${component.default_amount.toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₺` : '-'}
                                             </dd>
                                         </div>
 
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Sıralama</dt>
-                                            <dd className="mt-1 text-sm text-gray-900">{component.sort_order}</dd>
+                                            <dt className="fs-sm fw-medium text-muted">Sıralama</dt>
+                                            <dd className="mt-1 fs-sm text-dark">{component.sort_order}</dd>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-lg font-medium text-gray-900 mb-4">Ayarlar</h3>
+                                    <h5 className="fw-medium">Ayarlar</h5>
                                     
                                     <div className="space-y-4">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Durum</dt>
-                                            <dd className="mt-1 text-sm">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            <dt className="fs-sm fw-medium text-muted">Durum</dt>
+                                            <dd className="mt-1 fs-sm">
+                                                <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                     component.is_active 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-success bg-opacity-10 text-success' 
+                                                        : 'bg-light text-dark'
                                                 }`}>
                                                     {component.is_active ? 'Aktif' : 'Pasif'}
                                                 </span>
@@ -105,12 +105,12 @@ export default function Show({ component }) {
                                         </div>
                                         
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Vergiye Tabi</dt>
-                                            <dd className="mt-1 text-sm">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            <dt className="fs-sm fw-medium text-muted">Vergiye Tabi</dt>
+                                            <dd className="mt-1 fs-sm">
+                                                <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                     component.is_taxable 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-success bg-opacity-10 text-success' 
+                                                        : 'bg-light text-dark'
                                                 }`}>
                                                     {component.is_taxable ? 'Evet' : 'Hayır'}
                                                 </span>
@@ -118,12 +118,12 @@ export default function Show({ component }) {
                                         </div>
                                         
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">SGK Uygulanır</dt>
-                                            <dd className="mt-1 text-sm">
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            <dt className="fs-sm fw-medium text-muted">SGK Uygulanır</dt>
+                                            <dd className="mt-1 fs-sm">
+                                                <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                     component.is_sgk_applicable 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-gray-100 text-gray-800'
+                                                        ? 'bg-success bg-opacity-10 text-success' 
+                                                        : 'bg-light text-dark'
                                                 }`}>
                                                     {component.is_sgk_applicable ? 'Evet' : 'Hayır'}
                                                 </span>
@@ -131,8 +131,8 @@ export default function Show({ component }) {
                                         </div>
                                         
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Açıklama</dt>
-                                            <dd className="mt-1 text-sm text-gray-900">
+                                            <dt className="fs-sm fw-medium text-muted">Açıklama</dt>
+                                            <dd className="mt-1 fs-sm text-dark">
                                                 {component.description || '-'}
                                             </dd>
                                         </div>

@@ -1,594 +1,221 @@
-import { useState, useEffect, useRef } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import Flash from '@/Components/Flash';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 
-import { PageActionProvider } from '@/Context/PageActionContext';
-
-export default function AuthenticatedLayout({ header, children, pageActions = {} }) {
+export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
-    const flash = usePage().props.flash;
+    const appName = usePage().props.appName || 'Reqruit';
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const currentRoute = usePage().url;
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
-    const [payrollDropdownOpen, setPayrollDropdownOpen] = useState(false);
-    const [attendanceDropdownOpen, setAttendanceDropdownOpen] = useState(false);
-    const [leaveDropdownOpen, setLeaveDropdownOpen] = useState(false);
+    const isActive = (href) => currentRoute === href || currentRoute.startsWith(href + '?');
 
-    // Click outside reference for desktop dropdowns
-    const payrollDropdownRef = useRef(null);
-    const attendanceDropdownRef = useRef(null);
-
-    // Close payroll dropdown when clicking outside
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (payrollDropdownRef.current && !payrollDropdownRef.current.contains(event.target)) {
-                setPayrollDropdownOpen(false);
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    // Close attendance dropdown when clicking outside
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (attendanceDropdownRef.current && !attendanceDropdownRef.current.contains(event.target)) {
-                setAttendanceDropdownOpen(false);
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    // Close mobile menu when route changes
-    useEffect(() => {
-        setShowingNavigationDropdown(false);
-    }, [usePage().url]);
-
-    // Helper: Check if any payroll route is active
-    const isPayrollActive = () => {
-        return route().current('admin.payrolls.*') ||
-               route().current('admin.salaryComponents.*') ||
-               route().current('admin.advances.*') ||
-               route().current('admin.payroll-reports.*');
-    };
-
-    // Helper: Check if any attendance route is active
-    const isAttendanceActive = () => {
-        return route().current('admin.attendance.*') ||
-               route().current('admin.attendance-reports.*') ||
-               route().current('admin.shifts.*') ||
-               route().current('admin.work-calendars.*') ||
-               route().current('admin.holidays.*') ||
-               route().current('admin.adjustments.*');
-    };
-
-    // Helper: Check if any leave route is active
-    const isLeaveActive = () => {
-        return route().current('admin.leave.*');
-    };
+    const menuGroups = [
+        {
+            title: 'Ana Sayfa',
+            items: [
+            { title: 'Dashboard', icon: 'ti ti-dashboard', href: route('dashboard') },
+            ],
+        },
+        {
+            title: 'İnsan Kaynakları',
+            items: [
+            { title: 'Başvurular', icon: 'ti ti-clipboard-list', href: route('admin.submissions.index') },
+            { title: 'Formlar', icon: 'ti ti-file-text', href: route('admin.forms.index') },
+            { title: 'Departmanlar', icon: 'ti ti-building', href: route('admin.departments.index') },
+            { title: 'Çalışanlar', icon: 'ti ti-users', href: route('admin.employees.index') },
+            { title: 'Kullanıcılar', icon: 'ti ti-user-cog', href: route('admin.users.index') },
+            ],
+        },
+        {
+            title: 'Zaman Yönetimi',
+            items: [
+            { title: 'Devam Takibi', icon: 'ti ti-clock-check', href: route('admin.attendance.index') },
+            { title: 'QR Giriş/Çıkış', icon: 'ti ti-qrcode', href: route('admin.attendance.scan') },
+            { title: 'Vardiyalar', icon: 'ti ti-clock-hour-3', href: route('admin.shifts.index') },
+            { title: 'Vardiya Takvimi', icon: 'ti ti-calendar-week', href: route('admin.shifts.schedules') },
+            { title: 'Düzeltme Talepleri', icon: 'ti ti-edit', href: route('admin.adjustments.index') },
+            { title: 'Çalışma Takvimleri', icon: 'ti ti-calendar-event', href: route('admin.work-calendars.index') },
+            { title: 'Resmi Tatiller', icon: 'ti ti-confetti', href: route('admin.holidays.index') },
+            ],
+        },
+        {
+            title: 'İzin Yönetimi',
+            items: [
+            { title: 'İzin Talepleri', icon: 'ti ti-calendar-check', href: route('admin.leave.requests.index') },
+            { title: 'İzin Türleri', icon: 'ti ti-tags', href: route('admin.leave.types.index') },
+            { title: 'İzin Hakları', icon: 'ti ti-list-check', href: route('admin.leave.entitlements.index') },
+            ],
+        },
+        {
+            title: 'Bordro ve Maaş',
+            items: [
+            { title: 'Bordrolar', icon: 'ti ti-cash-banknote', href: route('admin.payrolls.index') },
+            { title: 'Maaş Bileşenleri', icon: 'ti ti-calculator', href: route('admin.salary-components.index') },
+            { title: 'Avans Talepleri', icon: 'ti ti-hand-click', href: route('admin.advances.index') },
+            ],
+        },
+        {
+            title: 'Raporlar',
+            items: [
+            { title: 'Bordro Raporları', icon: 'ti ti-chart-bar', href: route('admin.payroll-reports.index') },
+            { title: 'Yıllık Özet', icon: 'ti ti-chart-dots', href: route('admin.payroll-reports.annual') },
+            { title: 'Karşılaştırma', icon: 'ti ti-arrows-diff', href: route('admin.payroll-reports.compare') },
+            { title: 'Devam Raporları', icon: 'ti ti-file-analytics', href: route('admin.attendance-reports.index') },
+            { title: 'Günlük Rapor', icon: 'ti ti-journal', href: route('admin.attendance-reports.daily') },
+            { title: 'Aylık Rapor', icon: 'ti ti-calendar-stats', href: route('admin.attendance-reports.monthly') },
+            { title: 'Fazla Mesai', icon: 'ti ti-hourglass', href: route('admin.attendance-reports.overtime') },
+            ],
+        },
+        ];
 
     return (
-        <PageActionProvider actions={pageActions}>
-            <div className="min-h-screen bg-gray-100">
-                <Flash flash={flash} />
+        <>
+            <nav className={`pc-sidebar ${sidebarOpen ? '' : 'pc-sidebar-hide'}`}>
+                <div className="navbar-wrapper">
+                    <div className="m-header">
+                        <Link href={route('dashboard')}>
+                            <span style={{ fontSize: "1.3rem", fontWeight: "bold", textTransform: "uppercase" }}>
+                                {appName}
+                            </span>
+                        </Link>
+                    </div>
 
-                <nav className="border-b border-gray-100 bg-white">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="flex h-16 justify-between">
-
-                            {/* Left Side: Logo + Navigation */}
-                            <div className="flex">
-                                {/* Logo */}
-                                <div className="flex shrink-0 items-center">
-                                    <Link href={route('dashboard')}>
-                                        <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                    </Link>
-                                </div>
-
-                                {/* Desktop Navigation - FLEX EKLENDİ */}
-                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:items-center">
-                                    <NavLink
-                                        href={route('dashboard')}
-                                        active={route().current('dashboard')}
-                                         style={{ display: 'none' }}
-                                    >
-                                        Ana Ekran
-                                    </NavLink>
-
-                                    <NavLink
-                                        href={route('admin.submissions.index')}
-                                        active={route().current('admin.submissions.*')}
-                                    >
-                                        Başvurular
-                                    </NavLink>
-
-                                    <NavLink
-                                        href={route('admin.forms.index')}
-                                        active={route().current('admin.forms.*')}
-                                    >
-                                        Formlar
-                                    </NavLink>
-
-                                    <NavLink
-                                        href={route('admin.departments.index')}
-                                        active={route().current('admin.departments.*')}
-                                    >
-                                        Departmanlar
-                                    </NavLink>
-
-                                    <NavLink
-                                        href={route('admin.users.index')}
-                                        active={route().current('admin.users.*')}
-                                    >
-                                        Kullanıcılar
-                                    </NavLink>
-
-                                    <NavLink
-                                        href={route('admin.employees.index')}
-                                        active={route().current('admin.employees.*')}
-                                    >
-                                        Çalışanlar
-                                    </NavLink>
-
-                                    {/* Bordro Dropdown - Desktop */}
-                                    <div className="relative">
-                                        <Dropdown>
-                                            <Dropdown.Trigger>
-                                                <span className="inline-flex rounded-md">
-                                                    <button
-                                                        type="button"
-                                                        className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none ${
-                                                            isPayrollActive()
-                                                                ? 'text-gray-900 bg-gray-100'
-                                                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                                        }`}
-                                                        style={{ marginTop: 3 }}
-                                                    >
-                                                        Bordro
-                                                        <svg
-                                                            className="-me-0.5 ms-2 h-4 w-4 transition-transform"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                        >
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                                clipRule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </button>
-                                                </span>
-                                            </Dropdown.Trigger>
-
-                                            <Dropdown.Content align="left">
-                                                <Dropdown.Link href={route('admin.payrolls.index')}>
-                                                    Dönemler
-                                                </Dropdown.Link>
-                                                <Dropdown.Link href={route('admin.salary-components.index')}>
-                                                    Maaş Kalemleri
-                                                </Dropdown.Link>
-                                                <Dropdown.Link href={route('admin.advances.index')}>
-                                                    Avans Talepleri
-                                                </Dropdown.Link>
-                                                <Dropdown.Link href={route('admin.payroll-reports.index')}>
-                                                    Raporlar
-                                                </Dropdown.Link>
-                                            </Dropdown.Content>
-                                        </Dropdown>
-                                    </div>
-
-                                     {/* Devam Kontrolü Dropdown - Desktop */}
-                                     <div className="relative">
-                                         <Dropdown>
-                                             <Dropdown.Trigger>
-                                                 <span className="inline-flex rounded-md">
-                                                     <button
-                                                         type="button"
-                                                         className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none ${
-                                                             isAttendanceActive()
-                                                                 ? 'text-gray-900 bg-gray-100'
-                                                                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                                         }`}
-                                                         style={{ marginTop: 3 }}
-                                                     >
-                                                         Devam
-                                                         <svg
-                                                             className="-me-0.5 ms-2 h-4 w-4 transition-transform"
-                                                             xmlns="http://www.w3.org/2000/svg"
-                                                             viewBox="0 0 20 20"
-                                                             fill="currentColor"
-                                                         >
-                                                             <path
-                                                                 fillRule="evenodd"
-                                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                                 clipRule="evenodd"
-                                                             />
-                                                         </svg>
-                                                     </button>
-                                                 </span>
-                                             </Dropdown.Trigger>
-
-                                             <Dropdown.Content align="left">
-                                                 <Dropdown.Link href={route('admin.attendance.index')}>
-                                                     Devam Kayıtları
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.attendance.scan')}>
-                                                     QR Tarayıcı
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.attendance-reports.index')}>
-                                                     Raporlar
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.shifts.index')}>
-                                                     Vardiyalar
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.work-calendars.index')}>
-                                                     Takvimler
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.holidays.index')}>
-                                                     Tatiller
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.adjustments.index')}>
-                                                     Düzeltmeler
-                                                 </Dropdown.Link>
-                                             </Dropdown.Content>
-                                         </Dropdown>
-                                     </div>
-                                     
-                                     {/* Corrected leave dropdown menus to remove problematic code */}
-                                     <div className="relative">
-                                         <Dropdown>
-                                             <Dropdown.Trigger>
-                                                 <span className="inline-flex rounded-md">
-                                                     <button
-                                                         type="button"
-                                                         className={`inline-flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none ${
-                                                             isLeaveActive()
-                                                                 ? 'text-gray-900 bg-gray-100'
-                                                                 : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                                         }`}
-                                                         style={{ marginTop: 3 }}
-                                                     >
-                                                         İzinler & Tatiller
-                                                         <svg
-                                                             className="-me-0.5 ms-2 h-4 w-4 transition-transform"
-                                                             xmlns="http://www.w3.org/2000/svg"
-                                                             viewBox="0 0 20 20"
-                                                             fill="currentColor"
-                                                         >
-                                                             <path
-                                                                 fillRule="evenodd"
-                                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                                 clipRule="evenodd"
-                                                             />
-                                                         </svg>
-                                                     </button>
-                                                 </span>
-                                             </Dropdown.Trigger>
-
-                                             <Dropdown.Content align="left">
-                                                 <Dropdown.Link href={route('admin.leave.types.index')}>
-                                                     İzin Türleri
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.leave.entitlements.index')}>
-                                                     İzin Hakları
-                                                 </Dropdown.Link>
-                                                 <Dropdown.Link href={route('admin.leave.requests.index')}>
-                                                     İzin Talepleri
-                                                 </Dropdown.Link>
-                                             </Dropdown.Content>
-                                         </Dropdown>
-                                     </div>
-                                </div>
-                            </div>
-
-                            {/* Right Side: User Dropdown */}
-                            <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                                <div className="relative ms-3">
-                                    <Dropdown>
-                                        <Dropdown.Trigger>
-                                            <span className="inline-flex rounded-md">
-                                                <button
-                                                    type="button"
-                                                    className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                                >
-                                                    {user.name}
-                                                    <svg
-                                                        className="-me-0.5 ms-2 h-4 w-4"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 20 20"
-                                                        fill="currentColor"
-                                                    >
-                                                        <path
-                                                            fillRule="evenodd"
-                                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                            clipRule="evenodd"
-                                                        />
-                                                    </svg>
-                                                </button>
-                                            </span>
-                                        </Dropdown.Trigger>
-
-                                        <Dropdown.Content>
-                                            <Dropdown.Link href={route('profile.edit')}>
-                                                Profil
-                                            </Dropdown.Link>
-                                            <Dropdown.Link
-                                                href={route('logout')}
-                                                method="post"
-                                                as="button"
+                    <div className="navbar-content">
+                        <ul className='pc-navbar'>
+                            {menuGroups.map((group, groupIndex) => (
+                                <React.Fragment key={groupIndex}>
+                                    <li className="pc-item pc-caption">
+                                        {sidebarOpen && (
+                                            <label>{group.title}</label>
+                                        )}
+                                    </li>
+                                    {group.items.map((item, itemIndex) => (
+                                        <li key={itemIndex} className="pc-item">
+                                            <Link
+                                                href={item.href}
+                                                className={`pc-link${isActive(item.href) ? ' active' : ''}`}
                                             >
-                                                Çıkış Yap
-                                            </Dropdown.Link>
-                                        </Dropdown.Content>
-                                    </Dropdown>
-                                </div>
-                            </div>
+                                                <span className='pc-micon'>
+                                                    <i className={`bi ${item.icon}`}></i>
+                                                </span>
+                                                {sidebarOpen && <span className='pc-mtext'>{item.title}</span>}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </React.Fragment>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </nav>
 
-                            {/* Mobile Hamburger Button */}
-                            <div className="-me-2 flex items-center sm:hidden">
-                                <button
-                                    onClick={() => setShowingNavigationDropdown((prev) => !prev)}
-                                    className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
-                                >
-                                    <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path
-                                            className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M4 6h16M4 12h16M4 18h16"
-                                        />
-                                        <path
-                                            className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M6 18L18 6M6 6l12 12"
-                                        />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+            <header className='pc-header'>
+                <div className="header-wrapper">
+                    <div className="me-auto pc-mob-drp">
+                        <ul className="list-unstyled">
+                            <li className="pc-h-item pc-sidebar-collapse">
+                                <a href="#" className="pc-head-link ms-0" id="sidebar-hide" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                                    <i className="ti ti-menu-2"></i>
+                                </a>
+                            </li>
+                            <li className="pc-h-item pc-sidebar-popup">
+                                <a href="#" className="pc-head-link ms-0" id="mobile-collapse">
+                                    <i className="ti ti-menu-2"></i>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
 
-                    {/* Mobile Navigation Menu */}
-                    <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
-                        <div className="space-y-1 pb-3 pt-2">
-                            <ResponsiveNavLink
-                                href={route('dashboard')}
-                                active={route().current('dashboard')}
-                            >
-                                Ana Ekran
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route('admin.submissions.index')}
-                                active={route().current('admin.submissions.*')}
-                            >
-                                Başvurular
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route('admin.forms.index')}
-                                active={route().current('admin.forms.*')}
-                            >
-                                Formlar
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route('admin.departments.index')}
-                                active={route().current('admin.departments.*')}
-                            >
-                                Departmanlar
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route('admin.users.index')}
-                                active={route().current('admin.users.*')}
-                            >
-                                Kullanıcılar
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route('admin.employees.index')}
-                                active={route().current('admin.employees.*')}
-                            >
-                                Çalışanlar
-                            </ResponsiveNavLink>
 
-                            {/* Mobile Bordro Submenu - Toggle ile */}
-                            <div className="border-t border-gray-200 pt-4 pb-2">
-                                <button
-                                    onClick={() => setPayrollDropdownOpen(!payrollDropdownOpen)}
-                                    className="w-full flex items-center justify-between px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none"
-                                >
-                                    <span>Bordro</span>
-                                    <svg
-                                        className={`h-4 w-4 transition-transform ${payrollDropdownOpen ? 'rotate-180' : ''}`}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
+                    <div className="ms-auto">
+                        <ul className="list-unstyled">
+                            {/* Bildirimler */}
+                            <li className="dropdown pc-h-item">
 
-                                {payrollDropdownOpen && (
-                                    <div className="pl-4 space-y-1 bg-gray-50">
-                                        <ResponsiveNavLink
-                                            href={route('admin.payrolls.index')}
-                                            active={route().current('admin.payrolls.*')}
-                                        >
-                                            Dönemler
-                                        </ResponsiveNavLink>
-                                        <ResponsiveNavLink
-                                            href={route('admin.salary-components.index')}
-                                            active={route().current('admin.salary-components.*')}
-                                        >
-                                            Maaş Kalemleri
-                                        </ResponsiveNavLink>
-                                        <ResponsiveNavLink
-                                            href={route('admin.advances.index')}
-                                            active={route().current('admin.advances.*')}
-                                        >
-                                            Avans Talepleri
-                                        </ResponsiveNavLink>
-                                        <ResponsiveNavLink
-                                            href={route('admin.payroll-reports.index')}
-                                            active={route().current('admin.payroll-reports.*')}
-                                        >
-                                            Raporlar
-                                        </ResponsiveNavLink>
+                                <a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown">
+                                    <i className='ti ti-bell'></i>
+                                    <span className="badge-dot"></span>
+                                </a>
+                                <div className="dropdown-menu dropdown-notification dropdown-menu-end">
+                                    <div className="dropdown-header d-flex align-items-center justify-content-between">
+                                        <h5 className="m-0">Bildirimler</h5>
+                                        <a href="#" className="text-primary">Tümünü Gör</a>
                                     </div>
-                                 )}
-                             </div>
-                             
-                             {/* Mobile İşe Devam Submenu - Toggle ile */}
-                             <div className="border-t border-gray-200 pt-2 pb-2">
-                                 <button
-                                     onClick={() => setAttendanceDropdownOpen(!attendanceDropdownOpen)}
-                                     className="w-full flex items-center justify-between px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none"
-                                 >
-                                     <span>İşe Devam</span>
-                                     <svg
-                                         className={`h-4 w-4 transition-transform ${attendanceDropdownOpen ? 'rotate-180' : ''}`}
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24"
-                                     >
-                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                     </svg>
-                                 </button>
+                                    <div className="dropdown-divider"></div>
+                                    <div className="p-3 text-center text-muted">
+                                        Yeni bildirim yok
+                                    </div>
+                                </div>
+                            </li>
 
-                                 {attendanceDropdownOpen && (
-                                     <div className="pl-4 space-y-1 bg-gray-50">
-                                         <ResponsiveNavLink
-                                             href={route('admin.attendance.index')}
-                                             active={route().current('admin.attendance.*')}
-                                         >
-                                             Devam Kayıtları
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.attendance.scan')}
-                                             active={route().current('admin.attendance.scan')}
-                                         >
-                                             QR Tarayıcı
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.attendance-reports.index')}
-                                             active={route().current('admin.attendance-reports.*')}
-                                         >
-                                             Raporlar
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.shifts.index')}
-                                             active={route().current('admin.shifts.*')}
-                                         >
-                                             Vardiyalar
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.work-calendars.index')}
-                                             active={route().current('admin.work-calendars.*')}
-                                         >
-                                             Takvimler
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.holidays.index')}
-                                             active={route().current('admin.holidays.*')}
-                                         >
-                                             Tatiller
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.adjustments.index')}
-                                             active={route().current('admin.adjustments.*')}
-                                         >
-                                             Düzeltmeler
-                                         </ResponsiveNavLink>
-                                     </div>
-                                 )}
-                             </div>
-                             
-                             {/* Mobile İzin & Tatil Submenu - Toggle ile */}
-                             <div className="border-t border-gray-200 pt-2 pb-2">
-                                 <button
-                                     onClick={() => setLeaveDropdownOpen(!leaveDropdownOpen)}
-                                     className="w-full flex items-center justify-between px-4 py-2 text-base font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-50 focus:outline-none"
-                                 >
-                                     <span>İzinler & Tatiller</span>
-                                     <svg
-                                         className={`h-4 w-4 transition-transform ${leaveDropdownOpen ? 'rotate-180' : ''}`}
-                                         fill="none"
-                                         stroke="currentColor"
-                                         viewBox="0 0 24 24"
-                                     >
-                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                     </svg>
-                                 </button>
-
-                                 {leaveDropdownOpen && (
-                                     <div className="pl-4 space-y-1 bg-gray-50">
-                                         <ResponsiveNavLink
-                                             href={route('admin.leave.types.index')}
-                                             active={route().current('admin.leave.types.*')}
-                                         >
-                                             İzin Türleri
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.leave.entitlements.index')}
-                                             active={route().current('admin.leave.entitlements.*')}
-                                         >
-                                             İzin Hakları
-                                         </ResponsiveNavLink>
-                                         <ResponsiveNavLink
-                                             href={route('admin.leave.requests.index')}
-                                             active={route().current('admin.leave.requests.*')}
-                                         >
-                                             İzin Talepleri
-                                         </ResponsiveNavLink>
-                                     </div>
-                                 )}
-                             </div>
-                        </div>
-
-                        {/* Mobile User Section */}
-                        <div className="border-t border-gray-200 pb-1 pt-4">
-                            <div className="px-4">
-                                <div className="text-base font-medium text-gray-800">{user.name}</div>
-                                <div className="text-sm font-medium text-gray-500">{user.email}</div>
-                            </div>
-
-                            <div className="mt-3 space-y-1">
-                                <ResponsiveNavLink href={route('profile.edit')}>
-                                    Profil
-                                </ResponsiveNavLink>
-                                <ResponsiveNavLink
-                                    method="post"
-                                    href={route('logout')}
-                                    as="button"
-                                >
-                                    Çıkış Yap
-                                </ResponsiveNavLink>
-                            </div>
-                        </div>
+                            {/* Kullanıcı Profili */}
+                            <li className="pc-h-item header-user-profile">
+                                <a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown">
+                                    <div className="user-avatar-sm">
+                                        {user?.name?.charAt(0) || 'U'}
+                                    </div>
+                                    <span>{user?.name || 'User'}</span>
+                                </a>
+                                <div className="dropdown-menu dropdown-user-profile dropdown-menu-end">
+                                    <div className="dropdown-header">
+                                        <div className="d-flex">
+                                            <div className="flex-shrink-0">
+                                                <div className="user-avtar wid-35">
+                                                    {user?.name?.charAt(0) || 'U'}
+                                                </div>
+                                            </div>
+                                            <div className="flex-grow-1 ms-3">
+                                                <h6 className="mb-1">{user?.name || 'User'}</h6>
+                                                <span className="text-muted">Kullanıcı</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <ul className="nav drp-tabs nav-fill nav-tabs">
+                                        <li className="nav-item">
+                                            <button className="nav-link active" data-bs-toggle="tab">
+                                                <i className="bi bi-person"></i> Hesap
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <div className="tab-content">
+                                        <div className="tab-pane fade show active">
+                                            <Link href={route('profile.edit')} className="dropdown-item">
+                                                <i className="bi bi-person"></i>
+                                                <span>Profil</span>
+                                            </Link>
+                                            <Link href={route('logout')} method="post" className="dropdown-item">
+                                                <i className="bi bi-box-arrow-right"></i>
+                                                <span>Çıkış Yap</span>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                </nav>
+                </div>
+            </header>
 
-                {/* Page Header */}
-                {header && (
-                    <header className="bg-white shadow">
-                        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                            {header}
+            <div className="pc-container">
+                <div className="pc-content">
+                    {header && (
+                        <div className="page-header mb-4">
+                            <h4 className="page-title mb-1">{header}</h4>
                         </div>
-                    </header>
-                )}
+                    )}
 
-                {/* Page Content */}
-                <main>{children}</main>
+                    {children}
+                </div>
             </div>
-        </PageActionProvider>
+
+            {/* Footer */}
+            <footer className="footer">
+                <div className="container-fluid text-center">
+                    <p className="mb-0 text-muted small">
+                        Copyright © {new Date().getFullYear()} {appName}. Tüm hakları saklıdır.
+                    </p>
+                </div>
+            </footer>
+        </>
     );
 }

@@ -54,13 +54,13 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Devam Kayıtları
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.attendance.scan')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -73,33 +73,29 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
             <Head title="Devam Kayıtları" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Arama ve Filtreler */}
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <form onSubmit={handleSearch} className="flex flex-wrap gap-4 items-end">
+                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
+                        <form onSubmit={handleSearch} className="d-flex d-flex-wrap gap-3 align-items-end">
                             {/* Arama */}
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="d-flex-1 min-w-[200px]">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Arama
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control" type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Çalışan Adı, Tc Numarası..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
 
                             {/* Personel Seçimi */}
                             <div className="w-48">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Personel
                                 </label>
-                                <select
-                                    value={localFilters.employee_id}
+                                <select className="form-control" value={localFilters.employee_id}
                                     onChange={(e) => handleFilterChange('employee_id', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     {employees?.map((emp) => (
@@ -111,40 +107,34 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                             </div>
 
                             {/* Tarih Aralığı */}
-                            <div className="flex gap-2">
+                            <div className="d-flex gap-2">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Başlangıç
                                     </label>
-                                    <input
-                                        type="date"
+                                    <input className="form-control" type="date"
                                         value={localFilters.date_from}
                                         onChange={(e) => handleFilterChange('date_from', e.target.value)}
-                                        className="rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Bitiş
                                     </label>
-                                    <input
-                                        type="date"
+                                    <input className="form-control" type="date"
                                         value={localFilters.date_to}
                                         onChange={(e) => handleFilterChange('date_to', e.target.value)}
-                                        className="rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                     />
                                 </div>
                             </div>
 
                             {/* Statü Filtresi */}
                             <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Statü
                                 </label>
-                                <select
-                                    value={localFilters.status}
+                                <select className="form-control" value={localFilters.status}
                                     onChange={(e) => handleFilterChange('status', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     <option value="present">Devrede</option>
@@ -158,7 +148,7 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                             {/* Ara Butonu */}
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                className="btn btn-primary btn-sm"
                             >
                                 Ara
                             </button>
@@ -166,32 +156,32 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                     </div>
 
                     {/* Tablo */}
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
+                        <table className="w-100 divide-y divide-gray-200">
+                            <thead className="table-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Personel
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Tarih
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Giriş Saati
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Çıkış Saati
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Toplam Saat
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Fazla Mesai
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Statü
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
                                         İşlemler
                                     </th>
                                 </tr>
@@ -199,52 +189,52 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {attendances?.data && attendances.data.length > 0 ? (
                                     attendances.data.map((attendance) => (
-                                        <tr key={attendance.id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">
+                                        <tr key={attendance.id} className="hover:table-light">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <div className="fs-sm fw-medium text-dark">
                                                     {attendance.employee?.first_name} {attendance.employee?.last_name}
                                                 </div>
-                                                <div className="text-sm text-gray-500">
+                                                <div className="fs-sm text-muted">
                                                     {attendance.employee?.identity_no}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {formatDate(attendance.date)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {formatTime(attendance.clock_in)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {formatTime(attendance.clock_out)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {calculateWorkingHours(attendance.clock_in, attendance.clock_out)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {getOvertimeHours(attendance.clock_in, attendance.clock_out)} saat
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
+                                            <td className="px-4 py-3 text-nowrap">
                                                 {getAttendanceStatusBadge(
                                                     attendance.status,
                                                     attendance.clock_in,
                                                     attendance.clock_out
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                            <td className="px-4 py-3 text-nowrap text-right">
+                                                <div className="d-flex align-items-center justify-content-end">
                                                     <Link
                                                         href={route('admin.attendance.edit', attendance.id)}
-                                                        className="p-1 text-gray-500 hover:text-indigo-600"
+                                                        className="p-1 text-muted hover:text-primary"
                                                         title="Düzenle"
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,7 +243,7 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                                                     </Link>
                                                     <button
                                                         onClick={() => handleDelete(attendance.id)}
-                                                        className="p-1 text-gray-500 hover:text-red-600"
+                                                        className="p-1 text-muted hover:text-danger"
                                                         title="Sil"
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,7 +256,7 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="8" className="px-4 py-8 text-center text-sm text-gray-500">
+                                        <td colSpan="8" className="px-4 py-8 text-center fs-sm text-muted">
                                             Devam kaydı bulunamadı.
                                         </td>
                                     </tr>
@@ -277,16 +267,16 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
 
                     {/* Pagination */}
                     {attendances?.meta && attendances.meta.last_page > 1 && (
-                        <div className="mt-4 flex justify-center">
-                            <div className="flex gap-1">
+                        <div className="mt-4 d-flex justify-content-center">
+                            <div className="d-flex gap-1">
                                 {attendances.meta.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 border rounded-md ${
+                                        className={`px-4 py-2 border rounded ${
                                             link.active
                                                 ? 'bg-indigo-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-50'
+                                                : 'bg-white text-dark hover:table-light'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={!link.url}
                                     >

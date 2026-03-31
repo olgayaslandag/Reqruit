@@ -10,10 +10,6 @@ export const confirmDelete = (message = 'Bu kaydı silmek istediğinize emin mis
         cancelButtonColor: '#6b7280',
         confirmButtonText: 'Evet, Sil',
         cancelButtonText: 'İptal',
-        customClass: {
-            confirmButton: 'px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700',
-            cancelButton: 'px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 ml-2',
-        }
     }).then((result) => {
         if (result.isConfirmed && onSuccess) {
             onSuccess();

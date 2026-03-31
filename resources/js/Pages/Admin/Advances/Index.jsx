@@ -44,17 +44,17 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
     // Durum badge
     const getStatusBadge = (status) => {
         const statusConfig = {
-            pending: { label: 'Beklemede', class: 'bg-yellow-100 text-yellow-800' },
-            approved: { label: 'Onaylandı', class: 'bg-green-100 text-green-800' },
-            rejected: { label: 'Reddedildi', class: 'bg-red-100 text-red-800' },
-            cancelled: { label: 'İptal', class: 'bg-gray-100 text-gray-800' },
-            paid: { label: 'Ödendi', class: 'bg-blue-100 text-blue-800' },
+            pending: { label: 'Beklemede', class: 'bg-warning bg-opacity-10 text-warning' },
+            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
+            rejected: { label: 'Reddedildi', class: 'bg-danger bg-opacity-10 text-danger' },
+            cancelled: { label: 'İptal', class: 'bg-light text-dark' },
+            paid: { label: 'Ödendi', class: 'bg-primary bg-opacity-10 text-info' },
         };
         
-        const config = statusConfig[status] || { label: status, class: 'bg-gray-100 text-gray-800' };
+        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
         
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.class}`}>
+            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
                 {config.label}
             </span>
         );
@@ -102,13 +102,13 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Avans Talepleri
-                    </h2>
+                    </h5>
                         <Link
                             href={route('admin.advances.create')}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                            className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                         >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -121,54 +121,50 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
             <Head title="Avans Talepleri" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* İstatistikler */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Bekleyen</div>
-                            <div className="text-2xl font-bold text-yellow-600">{pendingCount || 0}</div>
+                    <div className="d-grid d-grid-cols-1 gap-3 mb-5">
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Bekleyen</div>
+                            <div className="fs-2 fw-bold text-warning">{pendingCount || 0}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Onaylanan</div>
-                            <div className="text-2xl font-bold text-green-600">{approvedCount || 0}</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Onaylanan</div>
+                            <div className="fs-2 fw-bold text-success">{approvedCount || 0}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Reddedilen</div>
-                            <div className="text-2xl font-bold text-red-600">{rejectedCount || 0}</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Reddedilen</div>
+                            <div className="fs-2 fw-bold text-danger">{rejectedCount || 0}</div>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <div className="text-sm text-gray-500">Ödenen</div>
-                            <div className="text-2xl font-bold text-blue-600">{advances?.data?.filter(a => a.status === 'paid').reduce((sum, a) => sum + parseFloat(a.amount), 0) || 0} TL</div>
+                        <div className="bg-white rounded-3 shadow-sm p-4">
+                            <div className="fs-sm text-muted">Ödenen</div>
+                            <div className="fs-2 fw-bold text-info">{advances?.data?.filter(a => a.status === 'paid').reduce((sum, a) => sum + parseFloat(a.amount), 0) || 0} TL</div>
                         </div>
                     </div>
 
                     {/* Arama ve Filtre */}
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <form onSubmit={handleSearch} className="flex flex-wrap gap-4 items-end">
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
+                        <form onSubmit={handleSearch} className="d-flex d-flex-wrap gap-3 align-items-end">
+                            <div className="d-flex-1 min-w-[200px]">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Ara
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control" type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Çalışan adı, TC Kimlik No..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
 
                             <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Durum
                                 </label>
-                                <select
-                                    value={statusFilter}
+                                <select className="form-control" value={statusFilter}
                                     onChange={(e) => {
                                         setStatusFilter(e.target.value);
                                         handleFilterChange('status', e.target.value);
                                     }}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     <option value="pending">Beklemede</option>
@@ -181,7 +177,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
 
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                className="btn btn-primary btn-sm"
                             >
                                 Ara
                             </button>
@@ -189,29 +185,29 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                     </div>
 
                     {/* Tablo */}
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
+                        <table className="w-100 divide-y divide-gray-200">
+                            <thead className="table-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Çalışan
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Tür
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Tutar
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Taksit
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Talep Tarihi
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Durum
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
                                         İşlemler
                                     </th>
                                 </tr>
@@ -219,43 +215,43 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {advances?.data?.length > 0 ? (
                                     advances.data.map((advance) => (
-                                        <tr key={advance.id} className="hover:bg-gray-50">
+                                        <tr key={advance.id} className="hover:table-light">
                                             <td className="px-4 py-3">
-                                                <div className="text-sm font-medium text-gray-900">
+                                                <div className="fs-sm fw-medium text-dark">
                                                     {advance.employee_name}
                                                 </div>
-                                                <div className="text-xs text-gray-500">
+                                                <div className="fs-xs text-muted">
                                                     {advance.employee_identity_no}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3">
-                                                <span className="text-sm text-gray-900">
+                                                <span className="fs-sm text-dark">
                                                     {getTypeLabel(advance.type)}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3">
-                                                <span className="text-sm font-bold text-gray-900">
+                                                <span className="fs-sm fw-bold text-dark">
                                                     {formatCurrency(advance.amount)}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3">
-                                                <span className="text-sm text-gray-900">
+                                                <span className="fs-sm text-dark">
                                                     {advance.installments || 1} taksit
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {formatDate(advance.request_date)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
+                                            <td className="px-4 py-3 text-nowrap">
                                                 {getStatusBadge(advance.status)}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                                <div className="d-flex align-items-center justify-content-end">
                                                     <Link
                                                         href={route('admin.advances.show', advance.id)}
-                                                        className="p-1 text-gray-500 hover:text-indigo-600"
+                                                        className="p-1 text-muted hover:text-primary"
                                                         title="Görüntüle"
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,7 +264,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                         <>
                                                             <button
                                                                 onClick={() => handleApprove(advance.id)}
-                                                                className="p-1 text-green-600 hover:text-green-800"
+                                                                className="p-1 text-success hover:text-success"
                                                                 title="Onayla"
                                                             >
                                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,7 +273,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                             </button>
                                                             <button
                                                                 onClick={() => handleReject(advance.id)}
-                                                                className="p-1 text-red-600 hover:text-red-800"
+                                                                className="p-1 text-danger hover:text-danger"
                                                                 title="Reddet"
                                                             >
                                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,7 +286,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                     {advance.status === 'approved' && (
                                                         <button
                                                             onClick={() => handleMarkAsPaid(advance.id)}
-                                                            className="p-1 text-blue-600 hover:text-blue-800"
+                                                            className="p-1 text-info hover:text-info"
                                                             title="Ödendi"
                                                         >
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +298,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                     {advance.status === 'pending' && (
                                                         <button
                                                             onClick={() => handleCancel(advance.id)}
-                                                            className="p-1 text-gray-500 hover:text-red-600"
+                                                            className="p-1 text-muted hover:text-danger"
                                                             title="İptal"
                                                         >
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,7 +312,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="px-4 py-8 text-center text-sm text-gray-500">
+                                        <td colSpan="7" className="px-4 py-8 text-center fs-sm text-muted">
                                             Avans talebi bulunamadı.
                                         </td>
                                     </tr>
@@ -327,16 +323,16 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
 
                     {/* Pagination */}
                     {advances?.meta && advances.meta.last_page > 1 && (
-                        <div className="mt-4 flex justify-center">
-                            <div className="flex gap-1">
+                        <div className="mt-4 d-flex justify-content-center">
+                            <div className="d-flex gap-1">
                                 {advances.meta.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 border rounded-md ${
+                                        className={`px-4 py-2 border rounded ${
                                             link.active
                                                 ? 'bg-indigo-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-50'
+                                                : 'bg-white text-dark hover:table-light'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={!link.url}
                                     >

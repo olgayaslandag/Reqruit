@@ -26,24 +26,24 @@ export default function Register() {
             <Head title="Kayıt Ol" />
 
             <form onSubmit={submit}>
-                <div>
+                <div className="mb-3">
                     <InputLabel htmlFor="name" value="Ad Soyad" />
 
                     <TextInput
                         id="name"
                         name="name"
                         value={data.name}
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="name"
                         isFocused={true}
                         onChange={(e) => setData('name', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
+                    <InputError message={errors.name} />
                 </div>
 
-                <div className="mt-4">
+                <div className="mb-3">
                     <InputLabel htmlFor="email" value="E-posta" />
 
                     <TextInput
@@ -51,16 +51,16 @@ export default function Register() {
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email} />
                 </div>
 
-                <div className="mt-4">
+                <div className="mb-3">
                     <InputLabel htmlFor="password" value="Şifre" />
 
                     <TextInput
@@ -68,16 +68,16 @@ export default function Register() {
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="new-password"
                         onChange={(e) => setData('password', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} />
                 </div>
 
-                <div className="mt-4">
+                <div className="mb-3">
                     <InputLabel
                         htmlFor="password_confirmation"
                         value="Şifre Tekrar"
@@ -88,7 +88,7 @@ export default function Register() {
                         type="password"
                         name="password_confirmation"
                         value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="new-password"
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
@@ -98,19 +98,18 @@ export default function Register() {
 
                     <InputError
                         message={errors.password_confirmation}
-                        className="mt-2"
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
+                <div className="d-flex justify-content-end">
                     <Link
                         href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="small text-muted-link"
                     >
                         Zaten hesabın var mı?
                     </Link>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton className="ms-3" disabled={processing}>
                         Kayıt Ol
                     </PrimaryButton>
                 </div>

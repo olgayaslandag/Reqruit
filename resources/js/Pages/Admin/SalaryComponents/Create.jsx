@@ -13,7 +13,7 @@ export default function Create() {
         name: '',
         code: '',
         type: 'earning',
-        category: 'fixed',
+        category: 'position-fixed',
         description: '',
         is_active: true,
         is_taxable: true,
@@ -30,13 +30,13 @@ export default function Create() {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold text-dark">
                         Yeni Maaş Kalemı Oluştur
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.salary-components.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                     >
                         Geri Dön
                     </Link>
@@ -46,18 +46,18 @@ export default function Create() {
             <Head title="Yeni Maaş Kalemı" />
 
             <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="mw-100 mx-auto">
+                    <div className="bg-white overflow-hidden shadow-sm-sm">
+                        <div className="p-4 text-dark">
+                            <form onSubmit={handleSubmit} className="mb-3">
+                                <div className="d-grid d-grid-cols-1 gap-4">
                                     {/* Kalem Adı */}
-                                    <div className="md:col-span-2">
+                                    <div className="">
                                         <InputLabel htmlFor="name" value="Kalem Adı" />
                                         <TextInput
                                             id="name"
                                             type="text"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                             required
@@ -72,7 +72,7 @@ export default function Create() {
                                         <TextInput
                                             id="code"
                                             type="text"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.code}
                                             onChange={(e) => setData('code', e.target.value)}
                                             required
@@ -85,7 +85,7 @@ export default function Create() {
                                         <InputLabel htmlFor="type" value="Tip" />
                                         <Select
                                             id="type"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.type}
                                             onChange={(e) => setData('type', e.target.value)}
                                         >
@@ -100,11 +100,11 @@ export default function Create() {
                                         <InputLabel htmlFor="category" value="Kategori" />
                                         <Select
                                             id="category"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.category}
                                             onChange={(e) => setData('category', e.target.value)}
                                         >
-                                            <option value="fixed">Sabit</option>
+                                            <option value="position-fixed">Sabit</option>
                                             <option value="variable">Değişken</option>
                                         </Select>
                                         <InputError message={errors.category} className="mt-2" />
@@ -117,7 +117,7 @@ export default function Create() {
                                             id="default_amount"
                                             type="number"
                                             step="0.01"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.default_amount}
                                             onChange={(e) => setData('default_amount', e.target.value)}
                                             min="0"
@@ -131,7 +131,7 @@ export default function Create() {
                                         <TextInput
                                             id="sort_order"
                                             type="number"
-                                            className="mt-1 block w-full"
+                                            className="mt-1 d-block w-100"
                                             value={data.sort_order}
                                             onChange={(e) => setData('sort_order', parseInt(e.target.value))}
                                             min="0"
@@ -143,10 +143,9 @@ export default function Create() {
                                 {/* Açıklama */}
                                 <div>
                                     <InputLabel htmlFor="description" value="Açıklama" />
-                                    <textarea
-                                        id="description"
+                                    <textarea className="form-control mt-1 d-block w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" id="description"
                                         rows="3"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                     />
@@ -154,55 +153,55 @@ export default function Create() {
                                 </div>
 
                                 {/* Seçenekler */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="d-grid d-grid-cols-1 gap-3">
                                     <div>
-                                        <label className="flex items-start">
+                                        <label className="d-flex align-items-start">
                                             <Checkbox
                                                 name="is_active"
                                                 checked={data.is_active}
                                                 onChange={(e) => setData('is_active', e.target.checked)}
                                             />
-                                            <span className="ml-2 text-sm text-gray-600">Aktif</span>
+                                            <span className="ml-2 fs-sm text-muted">Aktif</span>
                                         </label>
                                     </div>
                                     <div>
-                                        <label className="flex items-start">
+                                        <label className="d-flex align-items-start">
                                             <Checkbox
                                                 name="is_taxable"
                                                 checked={data.is_taxable}
                                                 onChange={(e) => setData('is_taxable', e.target.checked)}
                                             />
-                                            <span className="ml-2 text-sm text-gray-600">Vergilendirilir</span>
+                                            <span className="ml-2 fs-sm text-muted">Vergilendirilir</span>
                                         </label>
                                     </div>
                                     <div>
-                                        <label className="flex items-start">
+                                        <label className="d-flex align-items-start">
                                             <Checkbox
                                                 name="is_sgk_applicable"
                                                 checked={data.is_sgk_applicable}
                                                 onChange={(e) => setData('is_sgk_applicable', e.target.checked)}
                                             />
-                                            <span className="ml-2 text-sm text-gray-600">SGK Uygulanır</span>
+                                            <span className="ml-2 fs-sm text-muted">SGK Uygulanır</span>
                                         </label>
                                     </div>
                                 </div>
 
                                 {/* Butonlar */}
-                                <div className="flex items-center gap-4">
+                                <div className="d-flex align-items-center gap-3">
                                     <PrimaryButton disabled={processing}>
                                         Kaydet
                                     </PrimaryButton>
 
                                     <Link
                                         href={route('admin.salary-components.index')}
-                                        className="ml-4 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                                        className="ml-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                                     >
                                         İptal
                                     </Link>
                                 </div>
 
                                 {recentlySuccessful && (
-                                    <p className="text-sm text-gray-600">Kaydedildi.</p>
+                                    <p className="fs-sm text-muted">Kaydedildi.</p>
                                 )}
                             </form>
                         </div>

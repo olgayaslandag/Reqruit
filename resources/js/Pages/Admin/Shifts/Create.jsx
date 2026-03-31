@@ -83,13 +83,13 @@ export default function Create({ departments, shifts }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Yeni Vardiya Tanımla
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.shifts.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                     >
                         Geri
                     </Link>
@@ -99,54 +99,48 @@ export default function Create({ departments, shifts }) {
             <Head title="Yeni Vardiya" />
 
             <div className="py-6">
-                <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200">
-                            <h3 className="text-lg font-medium text-gray-900">Vardiya Bilgileri</h3>
-                            <p className="mt-1 text-sm text-gray-600">Yeni bir vardiyayı buradan tanımlayabilirsiniz</p>
+                <div className="mw-100 mx-auto px-4">
+                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
+                        <div className="px-6 py-4 border-b border-secondary">
+                            <h5 className="fw-medium">Vardiya Bilgileri</h5>
+                            <p className="mt-1 fs-sm text-muted">Yeni bir vardiyayı buradan tanımlayabilirsiniz</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-6">
-                            <div className="space-y-6">
+                        <form onSubmit={handleSubmit} className="p-4">
+                            <div className="mb-3">
                                 {/* Temel Bilgiler */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Vardiya Adı *
                                     </label>
-                                    <input
-                                        type="text"
+                                    <input className={`form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500 ${
+                                            errors.name ? 'border-red-300 focus: focus:border-red-500' : ''
+                                        }`} type="text"
                                         value={formData.name}
                                         onChange={(e) => handleChange('name', e.target.value)}
-                                        className={`w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
-                                            errors.name ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                                        }`}
                                         placeholder="Sabah Vardiyası, Part-Time vs."
                                     />
-                                    {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                                    {errors.name && <p className="mt-1 fs-sm text-danger">{errors.name}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Açıklama
                                     </label>
-                                    <textarea
-                                        value={formData.description}
+                                    <textarea className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={formData.description}
                                         onChange={(e) => handleChange('description', e.target.value)}
                                         rows={3}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         placeholder="Vardiya hakkında detaylı bilgi..."
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="d-grid d-grid-cols-1 gap-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Departman
                                         </label>
-                                        <select
-                                            value={formData.department_id}
+                                        <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={formData.department_id}
                                             onChange={(e) => handleChange('department_id', e.target.value)}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         >
                                             <option value="">Tüm Departmanlar</option>
                                             {departments?.map((dept) => (
@@ -158,13 +152,11 @@ export default function Create({ departments, shifts }) {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Status
                                         </label>
-                                        <select
-                                            value={formData.status}
+                                        <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={formData.status}
                                             onChange={(e) => handleChange('status', e.target.value)}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         >
                                             <option value="active">Aktif</option>
                                             <option value="inactive">Pasif</option>
@@ -173,68 +165,62 @@ export default function Create({ departments, shifts }) {
                                 </div>
 
                                 {/* Saat Tanımları */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="d-grid d-grid-cols-1 gap-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Başlangıç Saati *
                                         </label>
-                                        <select
-                                            value={formData.start_time}
+                                        <select className={`form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500 ${
+                                                errors.start_time ? 'border-red-300 focus: focus:border-red-500' : ''
+                                            }`} value={formData.start_time}
                                             onChange={(e) => handleChange('start_time', e.target.value)}
-                                            className={`w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
-                                                errors.start_time ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                                            }`}
                                         >
                                             {timeSlots.map(time => (
                                                 <option key={time} value={time}>{time}</option>
                                             ))}
                                         </select>
-                                        {errors.start_time && <p className="mt-1 text-sm text-red-600">{errors.start_time}</p>}
+                                        {errors.start_time && <p className="mt-1 fs-sm text-danger">{errors.start_time}</p>}
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Bitiş Saati *
                                         </label>
-                                        <select
-                                            value={formData.end_time}
+                                        <select className={`form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500 ${
+                                                errors.end_time ? 'border-red-300 focus: focus:border-red-500' : ''
+                                            }`} value={formData.end_time}
                                             onChange={(e) => handleChange('end_time', e.target.value)}
-                                            className={`w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
-                                                errors.end_time ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                                            }`}
                                         >
                                             {timeSlots.map(time => (
                                                 <option key={time} value={time}>{time}</option>
                                             ))}
                                         </select>
-                                        {errors.end_time && <p className="mt-1 text-sm text-red-600">{errors.end_time}</p>}
+                                        {errors.end_time && <p className="mt-1 fs-sm text-danger">{errors.end_time}</p>}
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Mola Süresi
                                         </label>
-                                        <select
-                                            value={formData.break_duration}
+                                        <select className={`form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500 ${
+                                                errors.break_duration ? 'border-red-300 focus: focus:border-red-500' : ''
+                                            }`} value={formData.break_duration}
                                             onChange={(e) => handleChange('break_duration', e.target.value)}
-                                            className={`w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
-                                                errors.break_duration ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : ''
-                                            }`}
                                         >
                                             {timeSlots.slice(0, 4).map(time => (
                                                 <option key={time} value={time}>{time} saat</option>
                                             ))}
                                         </select>
-                                        {errors.break_duration && <p className="mt-1 text-sm text-red-600">{errors.break_duration}</p>}
+                                        {errors.break_duration && <p className="mt-1 fs-sm text-danger">{errors.break_duration}</p>}
                                     </div>
                                 </div>
 
                                 {/* Çalışma Günleri */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                                    <label className="d-block fs-sm fw-medium text-dark mb-3">
                                         Çalışma Günleri
                                     </label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <div className="d-grid d-grid-cols-2 gap-2">
                                         {[
                                             { key: 'mon', label: 'Pazartesi' },
                                             { key: 'tue', label: 'Salı' },
@@ -244,15 +230,15 @@ export default function Create({ departments, shifts }) {
                                             { key: 'sat', label: 'Cumartesi' },
                                             { key: 'sun', label: 'Pazar' }
                                         ].map(day => (
-                                            <div key={day.key} className="flex items-center">
+                                            <div key={day.key} className="d-flex align-items-center">
                                                 <input
                                                     type="checkbox"
                                                     id={day.key}
                                                     checked={formData.days[day.key]}
                                                     onChange={() => handleDayToggle(day.key)}
-                                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                                    className="h-4 w-4 text-primary focus: border-secondary rounded"
                                                 />
-                                                <label htmlFor={day.key} className="ml-2 block text-sm text-gray-700">
+                                                <label htmlFor={day.key} className="ml-2 d-block fs-sm text-dark">
                                                     {day.label}
                                                 </label>
                                             </div>
@@ -261,8 +247,8 @@ export default function Create({ departments, shifts }) {
                                 </div>
 
                                 {/* Hesaplanan Bilgiler */}
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <h4 className="text-sm font-medium text-blue-800 mb-2">Vardiya Bilgileri</h4>
+                                <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                                    <h5 className="fw-medium text-info mb-2">Vardiya Bilgileri</h5>
                                     
                                     {/* Toplam gün sayısını hesaplayalım */}
                                     {(() => {
@@ -279,18 +265,18 @@ export default function Create({ departments, shifts }) {
                                         const hoursDifference = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
                                         
                                         return (
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                            <div className="d-grid d-grid-cols-1 gap-3 fs-sm">
                                                 <div>
-                                                    <span className="text-gray-600">Toplam Günlük Satış</span><br />
-                                                    <span className="font-semibold">{workDaysCount} gün</span>
+                                                    <span className="text-muted">Toplam Günlük Satış</span><br />
+                                                    <span className="fw-semibold">{workDaysCount} gün</span>
                                                 </div>
                                                 <div>
-                                                    <span className="text-gray-600">Günlük Süre</span><br />
-                                                    <span className="font-semibold">{hoursDifference.toFixed(1)} saat</span>
+                                                    <span className="text-muted">Günlük Süre</span><br />
+                                                    <span className="fw-semibold">{hoursDifference.toFixed(1)} saat</span>
                                                 </div>
                                                 <div>
-                                                    <span className="text-gray-600">Toplam Haftalık Süre</span><br />
-                                                    <span className="font-semibold">{(hoursDifference * workDaysCount).toFixed(1)} saat</span>
+                                                    <span className="text-muted">Toplam Haftalık Süre</span><br />
+                                                    <span className="fw-semibold">{(hoursDifference * workDaysCount).toFixed(1)} saat</span>
                                                 </div>
                                             </div>
                                         );
@@ -300,17 +286,17 @@ export default function Create({ departments, shifts }) {
                             </div>
 
                             {/* Submit Butonu */}
-                            <div className="mt-8 flex justify-end gap-3">
+                            <div className="mt-8 d-flex justify-content-end">
                                 <Link
                                     href={route('admin.shifts.index')}
-                                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                                 >
                                     İptal
                                 </Link>
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                                    className="btn btn-primary disabled:opacity-50"
                                 >
                                     {loading ? 'Kaydediliyor...' : 'Vardiya Oluştur'}
                                 </button>
@@ -320,24 +306,24 @@ export default function Create({ departments, shifts }) {
 
                     {/* Benzer Vardiyalar */}
                     {shifts && shifts.length > 0 && (
-                        <div className="mt-6 bg-white rounded-lg shadow-md overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200">
-                                <h3 className="text-lg font-medium text-gray-900">Mevcut Vardiyalar</h3>
+                        <div className="mt-6 bg-white rounded-3 shadow-sm-md overflow-hidden">
+                            <div className="px-6 py-4 border-b border-secondary">
+                                <h5 className="fw-medium">Mevcut Vardiyalar</h5>
                             </div>
-                            <div className="p-6">
+                            <div className="p-4">
                                 <div className="space-y-3">
                                     {shifts.slice(0, 5).map(shift => (
-                                        <div key={shift.id} className="flex items-center justify-between border-b pb-3">
+                                        <div key={shift.id} className="d-flex align-items-center justify-content-between border-b pb-3">
                                             <div>
-                                                <span className="font-medium">{shift.name}</span>
-                                                <span className="text-sm text-gray-500 ml-2">
+                                                <span className="fw-medium">{shift.name}</span>
+                                                <span className="fs-sm text-muted ml-2">
                                                     {shift.start_time} - {shift.end_time}
                                                 </span>
                                             </div>
-                                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                            <span className={`px-2 py-1 rounded fs-xs fw-medium ${
                                                 shift.status === 'active' 
-                                                    ? 'bg-green-100 text-green-800' 
-                                                    : 'bg-red-100 text-red-800'
+                                                    ? 'bg-success bg-opacity-10 text-success' 
+                                                    : 'bg-danger bg-opacity-10 text-danger'
                                             }`}>
                                                 {shift.status === 'active' ? 'Aktif' : 'Pasif'}
                                             </span>

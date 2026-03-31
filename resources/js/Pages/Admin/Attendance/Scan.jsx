@@ -55,36 +55,36 @@ export default function Scan() {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         QR Tarayıcı & Manuel Kayıt
-                    </h2>
+                    </h5>
                 </div>
             }
         >
             <Head title="Devam Kaydı" />
 
             <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <div className="p-6">
-                            <div className="flex gap-4 mb-6 border-b pb-4">
+                <div className="mw-100 mx-auto">
+                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
+                        <div className="p-4">
+                            <div className="d-flex gap-3 mb-5 border-b pb-4">
                                 <button
                                     onClick={() => handleModeChange('clock_in')}
-                                    className={`px-6 py-3 rounded-lg font-medium ${
+                                    className={`px-6 py-3 rounded fw-medium ${
                                         mode === 'clock_in'
                                             ? 'bg-green-600 text-white'
-                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                            : 'bg-gray-200 text-dark hover:bg-gray-300'
                                     }`}
                                 >
                                     Giriş
                                 </button>
                                 <button
                                     onClick={() => handleModeChange('clock_out')}
-                                    className={`px-6 py-3 rounded-lg font-medium ${
+                                    className={`px-6 py-3 rounded fw-medium ${
                                         mode === 'clock_out'
                                             ? 'bg-red-600 text-white'
-                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                            : 'bg-gray-200 text-dark hover:bg-gray-300'
                                     }`}
                                 >
                                     Çıkış
@@ -92,18 +92,16 @@ export default function Scan() {
                             </div>
 
                             {/* Manual Entry Section */}
-                            <div className="mb-6">
-                                <h3 className="text-lg font-medium text-gray-900 mb-4">Manuel Kayıt</h3>
+                            <div className="mb-5">
+                                <h5 className="fw-medium">Manuel Kayıt</h5>
                                 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="d-grid d-grid-cols-1 gap-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Personel
                                         </label>
-                                        <select
-                                            value={selectedEmployee}
+                                        <select className="form-control" value={selectedEmployee}
                                             onChange={(e) => setSelectedEmployee(e.target.value)}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         >
                                             <option value="">Personel Seçin</option>
                                             {props.employees?.map((emp) => (
@@ -115,14 +113,12 @@ export default function Scan() {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Zaman
                                         </label>
-                                        <input
-                                            type="datetime-local"
+                                        <input className="form-control" type="datetime-local"
                                             value={manualClockTime}
                                             onChange={(e) => setManualClockTime(e.target.value)}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                         />
                                     </div>
                                 </div>
@@ -131,12 +127,12 @@ export default function Scan() {
                                     <button
                                         onClick={handleClock}
                                         disabled={!selectedEmployee}
-                                        className={`px-6 py-3 rounded-md text-white font-medium ${
+                                        className={`btn fw-medium ${
                                             selectedEmployee
                                                 ? mode === 'clock_in'
-                                                    ? 'bg-green-600 hover:bg-green-700'
-                                                    : 'bg-red-600 hover:bg-red-700'
-                                                : 'bg-gray-400 cursor-not-allowed'
+                                                    ? 'btn-success'
+                                                    : 'btn-danger'
+                                                : 'btn-secondary disabled'
                                         }`}
                                     >
                                         {mode === 'clock_in' ? 'Giriş Yap' : 'Çıkış Yap'} - {new Date(manualClockTime).toLocaleTimeString('tr-TR')}
@@ -146,18 +142,18 @@ export default function Scan() {
 
                             {/* QR Scanner Section */}
                             <div className="border-t pt-6">
-                                <h3 className="text-lg font-medium text-gray-900 mb-4">QR Kod ile Kayıt</h3>
+                                <h5 className="fw-medium">QR Kod ile Kayıt</h5>
                                 
-                                <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                                    <div className="flex flex-col items-center">
-                                        <svg className="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="bg-light border-2 border-dashed border-secondary rounded p-8 text-center">
+                                    <div className="d-flex d-flex-column align-items-center">
+                                        <svg className="w-16 h-16 text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                                         </svg>
-                                        <h4 className="text-lg font-medium text-gray-900 mb-2">QR Tarayıcı Kamerayı Aç</h4>
-                                        <p className="text-sm text-gray-500 mb-4">
+                                        <h5 className="fw-medium text-dark mb-2">QR Tarayıcı Kamerayı Aç</h5>
+                                        <p className="fs-sm text-muted mb-4">
                                             Çalışan kimlik kartındaki QR kodunu tarayın
                                         </p>
-                                        <button className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                        <button className="btn btn-primary btn-sm">
                                             Kamera Aç
                                         </button>
                                     </div>
@@ -166,39 +162,39 @@ export default function Scan() {
 
                             {/* Recent Attendance Records */}
                             <div className="border-t pt-6 mt-8">
-                                <h3 className="text-lg font-medium text-gray-900 mb-4">Son Kayıtlar</h3>
+                                <h5 className="fw-medium">Son Kayıtlar</h5>
                                 
                                 {props.recentAttendances && props.recentAttendances.length > 0 ? (
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
+                                    <div className="overflow-auto">
+                                        <table className="w-100 divide-y divide-gray-200">
+                                            <thead className="table-light">
                                                 <tr>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Personel</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zaman</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tip</th>
-                                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Durum</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Personel</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Zaman</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Tip</th>
+                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Durum</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
                                                 {props.recentAttendances.map((record, index) => (
-                                                    <tr key={index} className="hover:bg-gray-50">
-                                                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                    <tr key={index} className="hover:table-light">
+                                                        <td className="px-4 py-3 text-nowrap fs-sm fw-medium text-dark">
                                                             {record.employee.first_name} {record.employee.last_name}
                                                         </td>
-                                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                                                        <td className="px-4 py-3 text-nowrap fs-sm text-dark">
                                                             {formatDateTime(record.timestamp)}
                                                         </td>
-                                                        <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                        <td className="px-4 py-3 text-nowrap fs-sm">
+                                                            <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
                                                                 record.type === 'clock_in' 
-                                                                    ? 'bg-green-100 text-green-800' 
-                                                                    : 'bg-red-100 text-red-800'
+                                                                    ? 'bg-success bg-opacity-10 text-success' 
+                                                                    : 'bg-danger bg-opacity-10 text-danger'
                                                             }`}>
                                                                 {record.type === 'clock_in' ? 'Giriş' : 'Çıkış'}
                                                             </span>
                                                         </td>
-                                                        <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <td className="px-4 py-3 text-nowrap fs-sm">
+                                                            <span className="d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium bg-success bg-opacity-10 text-success">
                                                                 Kaydedildi
                                                             </span>
                                                         </td>
@@ -208,7 +204,7 @@ export default function Scan() {
                                         </table>
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-gray-500 text-center py-4">
+                                    <p className="fs-sm text-muted text-center py-4">
                                         Son kayıt bulunamadı.
                                     </p>
                                 )}

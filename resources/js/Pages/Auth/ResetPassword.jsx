@@ -25,12 +25,12 @@ export default function ResetPassword({ token, email }) {
         <GuestLayout>
             <Head title="Şifre Sıfırlama" />
 
-            <div className="mb-6 text-sm text-gray-600">
+            <div className="mb-4 small text-muted">
                 Yeni şifrenizi belirleyin. Güvenli bir şifre seçtiğinizden emin olun.
             </div>
 
             <form onSubmit={submit}>
-                <div>
+                <div className="mb-3">
                     <InputLabel htmlFor="email" value="E-posta" />
 
                     <TextInput
@@ -38,15 +38,15 @@ export default function ResetPassword({ token, email }) {
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
+                    <InputError message={errors.email} />
                 </div>
 
-                <div className="mt-4">
+                <div className="mb-3">
                     <InputLabel htmlFor="password" value="Yeni Şifre" />
 
                     <TextInput
@@ -54,17 +54,17 @@ export default function ResetPassword({ token, email }) {
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="new-password"
                         isFocused={true}
                         onChange={(e) => setData('password', e.target.value)}
                         placeholder="Yeni şifreniz"
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
+                    <InputError message={errors.password} />
                 </div>
 
-                <div className="mt-4">
+                <div className="mb-3">
                     <InputLabel
                         htmlFor="password_confirmation"
                         value="Şifre Tekrar"
@@ -75,7 +75,7 @@ export default function ResetPassword({ token, email }) {
                         id="password_confirmation"
                         name="password_confirmation"
                         value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        className="form-control"
                         autoComplete="new-password"
                         onChange={(e) =>
                             setData('password_confirmation', e.target.value)
@@ -85,12 +85,11 @@ export default function ResetPassword({ token, email }) {
 
                     <InputError
                         message={errors.password_confirmation}
-                        className="mt-2"
                     />
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                <div className="d-flex justify-content-end">
+                    <PrimaryButton className="ms-3" disabled={processing}>
                         {processing ? 'Kaydediliyor...' : 'Şifremi Sıfırla'}
                     </PrimaryButton>
                 </div>

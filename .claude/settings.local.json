@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(node:*)",
+      "Bash(php artisan:*)",
+      "Bash(find /projects/reqruit/resources/js/Pages -name \"*.jsx\" -exec sed -i 's/<h4 className=\"\"\"\"fs-sm fw-medium text-info mb-3\"\"\"\">/<h5 className=\"\"\"\"fw-medium text-info mb-3\"\"\"\">/g' {})",
+      "Bash(find /projects/reqruit/resources/js/Pages -name \"*.jsx\" -exec sed -i 's/<h2 className=\"\"\"\"h5 text-dark mb-2\"\"\"\">/<h5 className=\"\"\"\"h5 text-dark mb-2\"\"\"\">/g' {})",
+      "Bash(find /projects/reqruit/resources/js/Pages -name \"*.jsx\" -exec sed -i 's/<h2 className=\"\"\"\"h5 title-dark mb-2\"\"\"\">/<h5 className=\"\"\"\"h5 title-dark mb-2\"\"\"\">/g' {})",
+      "WebFetch(domain:github.com)",
+      "Bash(find /tmp/mantis -name NavItem* -type f)",
+      "Bash(grep -l \"paginate\\\\|\\\\.map\\(\" /projects/reqruit/resources/js/Pages/Admin/*/Index.jsx)",
+      "Bash(done)"
+    ]
+  }
+}

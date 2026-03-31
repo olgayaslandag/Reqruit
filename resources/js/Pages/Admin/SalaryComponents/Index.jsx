@@ -44,14 +44,14 @@ export default function Index({ components, filters }) {
     // Tip badge
     const getTypeBadge = (type) => {
         const typeConfig = {
-            allowance: { label: 'Ek Ödeme', class: 'bg-green-100 text-green-800' },
-            deduction: { label: 'Kesinti', class: 'bg-red-100 text-red-800' },
+            allowance: { label: 'Ek Ödeme', class: 'bg-success bg-opacity-10 text-success' },
+            deduction: { label: 'Kesinti', class: 'bg-danger bg-opacity-10 text-danger' },
         };
         
-        const config = typeConfig[type] || { label: type, class: 'bg-gray-100 text-gray-800' };
+        const config = typeConfig[type] || { label: type, class: 'bg-light text-dark' };
         
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.class}`}>
+            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
                 {config.label}
             </span>
         );
@@ -60,14 +60,14 @@ export default function Index({ components, filters }) {
     // Durum badge
     const getStatusBadge = (status) => {
         const statusConfig = {
-            active: { label: 'Aktif', class: 'bg-green-100 text-green-800' },
-            inactive: { label: 'Pasif', class: 'bg-gray-100 text-gray-800' },
+            active: { label: 'Aktif', class: 'bg-success bg-opacity-10 text-success' },
+            inactive: { label: 'Pasif', class: 'bg-light text-dark' },
         };
         
-        const config = statusConfig[status] || { label: status, class: 'bg-gray-100 text-gray-800' };
+        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
         
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.class}`}>
+            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
                 {config.label}
             </span>
         );
@@ -80,13 +80,13 @@ export default function Index({ components, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Maaş Kalemleri
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.salary-components.create')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -99,34 +99,30 @@ export default function Index({ components, filters }) {
             <Head title="Maaş Kalemleri" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Arama ve Filtre */}
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <form onSubmit={handleSearch} className="flex flex-wrap gap-4 items-end">
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
+                        <form onSubmit={handleSearch} className="d-flex d-flex-wrap gap-3 align-items-end">
+                            <div className="d-flex-1 min-w-[200px]">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Kalem Ara
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Kalem adı..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
 
                             <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Tip
                                 </label>
-                                <select
-                                    value={typeFilter}
+                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={typeFilter}
                                     onChange={(e) => {
                                         setTypeFilter(e.target.value);
                                         handleFilterChange('type', e.target.value);
                                     }}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     <option value="allowance">Ek Ödeme</option>
@@ -136,7 +132,7 @@ export default function Index({ components, filters }) {
 
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                className="btn btn-primary btn-sm"
                             >
                                 Ara
                             </button>
@@ -144,50 +140,50 @@ export default function Index({ components, filters }) {
                     </div>
 
                     {/* Ek Ödemeler */}
-                    <div className="bg-white rounded-lg shadow mb-6">
-                        <div className="p-4 border-b border-gray-200 bg-green-50">
-                            <h3 className="text-lg font-semibold text-green-800 flex items-center gap-2">
+                    <div className="bg-white rounded-3 shadow-sm mb-5">
+                        <div className="p-4 border-b border-secondary bg-green-50">
+                            <h5 className="fw-semibold">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                                 Ek Ödemeler ({allowances.length})
-                            </h3>
+                            </h5>
                         </div>
                         
                         {allowances.length > 0 ? (
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                            <table className="w-100 divide-y divide-gray-200">
+                                <thead className="table-light">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Kalem Adı
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Tip
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Tutar/Oran
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Vergi
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             SGK
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Durum
                                         </th>
-                                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
                                             İşlemler
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {allowances.map((component) => (
-                                        <tr key={component.id} className="hover:bg-gray-50">
+                                        <tr key={component.id} className="hover:table-light">
                                             <td className="px-4 py-3">
                                                 <Link
                                                     href={route('admin.salary-components.edit', component.id)}
-                                                    className="text-sm font-medium text-indigo-600 hover:text-indigo-900"
+                                                    className="fs-sm fw-medium text-primary hover:text-indigo-900"
                                                 >
                                                     {component.name}
                                                 </Link>
@@ -195,7 +191,7 @@ export default function Index({ components, filters }) {
                                             <td className="px-4 py-3">
                                                 {getTypeBadge(component.type)}
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-gray-900">
+                                            <td className="px-4 py-3 fs-sm text-dark">
                                                 {component.is_percentage 
                                                     ? formatPercentage(component.percentage)
                                                     : formatCurrency(component.amount)
@@ -203,26 +199,26 @@ export default function Index({ components, filters }) {
                                             </td>
                                             <td className="px-4 py-3">
                                                 {component.taxable ? (
-                                                    <span className="text-green-600 text-sm">Vergilendirilir</span>
+                                                    <span className="text-success fs-sm">Vergilendirilir</span>
                                                 ) : (
-                                                    <span className="text-gray-500 text-sm">Vergisiz</span>
+                                                    <span className="text-muted fs-sm">Vergisiz</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
                                                 {component.sgk_applicable ? (
-                                                    <span className="text-green-600 text-sm">Dahil</span>
+                                                    <span className="text-success fs-sm">Dahil</span>
                                                 ) : (
-                                                    <span className="text-gray-500 text-sm">Dışı</span>
+                                                    <span className="text-muted fs-sm">Dışı</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
                                                 {getStatusBadge(component.status)}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                                <div className="d-flex align-items-center justify-content-end">
                                                     <Link
                                                                     href={route('admin.salary-components.edit', component.id)}
-                                                                    className="p-1 text-gray-500 hover:text-indigo-600"
+                                                                    className="p-1 text-muted hover:text-primary"
                                                                     title="Düzenle"
                                                                 >
                                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,54 +232,54 @@ export default function Index({ components, filters }) {
                                 </tbody>
                             </table>
                         ) : (
-                            <div className="p-8 text-center text-gray-500">
+                            <div className="p-8 text-center text-muted">
                                 Ek ödeme kalemi bulunmuyor.
                             </div>
                         )}
                     </div>
 
                     {/* Kesintiler */}
-                    <div className="bg-white rounded-lg shadow">
-                        <div className="p-4 border-b border-gray-200 bg-red-50">
-                            <h3 className="text-lg font-semibold text-red-800 flex items-center gap-2">
+                    <div className="bg-white rounded-3 shadow-sm">
+                        <div className="p-4 border-b border-secondary bg-red-50">
+                            <h5 className="fw-semibold">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                                 </svg>
                                 Kesintiler ({deductions.length})
-                            </h3>
+                            </h5>
                         </div>
                         
                         {deductions.length > 0 ? (
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                            <table className="w-100 divide-y divide-gray-200">
+                                <thead className="table-light">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Kalem Adı
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Tip
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Tutar/Oran
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Zorunlu
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                             Durum
                                         </th>
-                                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                        <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
                                             İşlemler
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {deductions.map((component) => (
-                                        <tr key={component.id} className="hover:bg-gray-50">
+                                        <tr key={component.id} className="hover:table-light">
                                             <td className="px-4 py-3">
                                                 <Link
                                                     href={route('admin.salary-components.edit', component.id)}
-                                                    className="text-sm font-medium text-indigo-600 hover:text-indigo-900"
+                                                    className="fs-sm fw-medium text-primary hover:text-indigo-900"
                                                 >
                                                     {component.name}
                                                 </Link>
@@ -291,7 +287,7 @@ export default function Index({ components, filters }) {
                                             <td className="px-4 py-3">
                                                 {getTypeBadge(component.type)}
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-gray-900">
+                                            <td className="px-4 py-3 fs-sm text-dark">
                                                 {component.is_percentage 
                                                     ? formatPercentage(component.percentage)
                                                     : formatCurrency(component.amount)
@@ -299,19 +295,19 @@ export default function Index({ components, filters }) {
                                             </td>
                                             <td className="px-4 py-3">
                                                 {component.is_mandatory ? (
-                                                    <span className="text-red-600 text-sm">Zorunlu</span>
+                                                    <span className="text-danger fs-sm">Zorunlu</span>
                                                 ) : (
-                                                    <span className="text-gray-500 text-sm">Opsiyonel</span>
+                                                    <span className="text-muted fs-sm">Opsiyonel</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
                                                 {getStatusBadge(component.status)}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                                <div className="d-flex align-items-center justify-content-end">
                                                     <button
                                                         onClick={() => toggleStatus(component.id, component.status)}
-                                                        className={`p-1 ${component.status === 'active' ? 'text-green-600' : 'text-gray-400'}`}
+                                                        className={`p-1 ${component.status === 'active' ? 'text-success' : 'text-muted'}`}
                                                         title={component.status === 'active' ? 'Pasif Yap' : 'Aktif Yap'}
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,7 +316,7 @@ export default function Index({ components, filters }) {
                                                     </button>
                                                                 <Link
                                                                     href={route('admin.salary-components.edit', component.id)}
-                                                                    className="p-1 text-gray-500 hover:text-indigo-600"
+                                                                    className="p-1 text-muted hover:text-primary"
                                                                     title="Düzenle"
                                                                 >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,7 +325,7 @@ export default function Index({ components, filters }) {
                                                     </Link>
                                                     <button
                                                         onClick={() => handleDelete(component.id)}
-                                                        className="p-1 text-gray-500 hover:text-red-600"
+                                                        className="p-1 text-muted hover:text-danger"
                                                         title="Sil"
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,7 +339,7 @@ export default function Index({ components, filters }) {
                                 </tbody>
                             </table>
                         ) : (
-                            <div className="p-8 text-center text-gray-500">
+                            <div className="p-8 text-center text-muted">
                                 Kesinti kalemi bulunmuyor.
                             </div>
                         )}
@@ -351,16 +347,16 @@ export default function Index({ components, filters }) {
 
                     {/* Pagination */}
                     {components?.meta && components.meta.last_page > 1 && (
-                        <div className="mt-4 flex justify-center">
-                            <div className="flex gap-1">
+                        <div className="mt-4 d-flex justify-content-center">
+                            <div className="d-flex gap-1">
                                 {components.meta.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 border rounded-md ${
+                                        className={`px-4 py-2 border rounded ${
                                             link.active
                                                 ? 'bg-indigo-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-50'
+                                                : 'bg-white text-dark hover:table-light'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={!link.url}
                                     >

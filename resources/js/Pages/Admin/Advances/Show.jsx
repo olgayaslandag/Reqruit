@@ -45,17 +45,17 @@ export default function Show({ advance }) {
     // Durum badge ayarları
     const getStatusBadge = (status) => {
         const statusConfig = {
-            pending: { label: 'Bekliyor', class: 'bg-yellow-100 text-yellow-800' },
-            approved: { label: 'Onaylandı', class: 'bg-green-100 text-green-800' },
-            rejected: { label: 'Reddedildi', class: 'bg-red-100 text-red-800' },
-            paid: { label: 'Ödendi', class: 'bg-blue-100 text-blue-800' },
-            cancelled: { label: 'İptal Edildi', class: 'bg-gray-100 text-gray-800' },
+            pending: { label: 'Bekliyor', class: 'bg-warning bg-opacity-10 text-warning' },
+            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
+            rejected: { label: 'Reddedildi', class: 'bg-danger bg-opacity-10 text-danger' },
+            paid: { label: 'Ödendi', class: 'bg-primary bg-opacity-10 text-info' },
+            cancelled: { label: 'İptal Edildi', class: 'bg-light text-dark' },
         };
 
-        const config = statusConfig[status] || { label: status, class: 'bg-gray-100 text-gray-800' };
+        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
 
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.class}`}>
+            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
                 {config.label}
             </span>
         );
@@ -64,14 +64,14 @@ export default function Show({ advance }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold text-dark">
                         Avans Talebi Detayı #{advance.id}
-                    </h2>
-                    <div className="flex gap-2">
+                    </h5>
+                    <div className="d-flex gap-2">
                         <Link
                             href={route('admin.advances.index')}
-                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                         >
                             Geri Dön
                         </Link>
@@ -82,68 +82,68 @@ export default function Show({ advance }) {
             <Head title={`Avans Talebi #${advance.id}`} />
 
             <div className="py-12">
-                <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
+                <div className="mw-100 mx-auto">
+                    <div className="bg-white overflow-hidden shadow-sm-sm">
+                        <div className="p-4 text-dark">
                             {/* Genel Bilgiler */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border-b pb-6">
+                            <div className="d-grid d-grid-cols-1 gap-4 mb-8 border-b pb-6">
                                 <div>
-                                    <h3 className="text-lg font-medium text-gray-900 mb-4">Talep Bilgileri</h3>
+                                    <h5 className="fw-medium">Talep Bilgileri</h5>
                                     
                                     <div className="space-y-3">
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Talep Numarası</span>
-                                            <span className="text-sm text-gray-900">#{advance.id}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Talep Numarası</span>
+                                            <span className="fs-sm text-dark">#{advance.id}</span>
                                         </div>
                                         
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Durumu</span>
-                                            <span className="text-sm">
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Durumu</span>
+                                            <span className="fs-sm">
                                                 {getStatusBadge(advance.status)}
                                             </span>
                                         </div>
                                         
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Miktarı</span>
-                                            <span className="text-sm text-gray-900 font-medium">{formatCurrency(advance.amount)}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Miktarı</span>
+                                            <span className="fs-sm text-dark fw-medium">{formatCurrency(advance.amount)}</span>
                                         </div>
                                         
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Talep Tarihi</span>
-                                            <span className="text-sm text-gray-900">{formatDate(advance.requested_date)}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Talep Tarihi</span>
+                                            <span className="fs-sm text-dark">{formatDate(advance.requested_date)}</span>
                                         </div>
                                         
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Talep Nedeni</span>
-                                            <span className="text-sm text-gray-900">{advance.reason || '-'}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Talep Nedeni</span>
+                                            <span className="fs-sm text-dark">{advance.reason || '-'}</span>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div>
-                                    <h3 className="text-lg font-medium text-gray-900 mb-4">Çalişan Bilgileri</h3>
+                                    <h5 className="fw-medium">Çalişan Bilgileri</h5>
                                     
                                     <div className="space-y-3">
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Ad Soyad</span>
-                                            <span className="text-sm text-gray-900">
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Ad Soyad</span>
+                                            <span className="fs-sm text-dark">
                                                 {advance.employee.first_name} {advance.employee.last_name}
                                             </span>
                                         </div>
                                         
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">E-Posta</span>
-                                            <span className="text-sm text-gray-900">{advance.employee.email}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">E-Posta</span>
+                                            <span className="fs-sm text-dark">{advance.employee.email}</span>
                                         </div>
                                         
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Telefon</span>
-                                            <span className="text-sm text-gray-900">{advance.employee.phone}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Telefon</span>
+                                            <span className="fs-sm text-dark">{advance.employee.phone}</span>
                                         </div>
                                         
-                                        <div className="flex justify-between">
-                                            <span className="text-sm font-medium text-gray-500">Pozisyon</span>
-                                            <span className="text-sm text-gray-900">{advance.employee.position_title}</span>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="fs-sm fw-medium text-muted">Pozisyon</span>
+                                            <span className="fs-sm text-dark">{advance.employee.position_title}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -152,23 +152,23 @@ export default function Show({ advance }) {
                             {/* Ek Bilgiler */}
                             <div className="mb-8">
                                 {advance.notes && (
-                                    <div className="mb-6">
-                                        <h3 className="text-lg font-medium text-gray-900 mb-2">Notlar</h3>
-                                        <p className="text-sm text-gray-600">{advance.notes}</p>
+                                    <div className="mb-5">
+                                        <h5 className="fw-medium">Notlar</h5>
+                                        <p className="fs-sm text-muted">{advance.notes}</p>
                                     </div>
                                 )}
                                 
                                 {advance.rejection_reason && advance.status === 'rejected' && (
-                                    <div className="bg-red-50 p-4 rounded-lg mb-6">
-                                        <h3 className="text-lg font-medium text-red-800 mb-2">Reddetme Nedeni</h3>
-                                        <p className="text-sm text-red-700">{advance.rejection_reason}</p>
+                                    <div className="bg-red-50 p-4 rounded mb-5">
+                                        <h5 className="fw-medium">Reddetme Nedeni</h5>
+                                        <p className="fs-sm text-danger">{advance.rejection_reason}</p>
                                     </div>
                                 )}
                                 
                                 {advance.payment_date && (
-                                    <div className="bg-blue-50 p-4 rounded-lg">
-                                        <h3 className="text-lg font-medium text-blue-800 mb-2">Ödeme Bilgileri</h3>
-                                        <div className="flex justify-between text-sm text-blue-700">
+                                    <div className="bg-blue-50 p-4 rounded">
+                                        <h5 className="fw-medium">Ödeme Bilgileri</h5>
+                                        <div className="d-flex justify-content-between fs-sm text-info">
                                             <span>Ödeme Tarihi:</span>
                                             <span>{formatDate(advance.payment_date)}</span>
                                         </div>
@@ -178,24 +178,24 @@ export default function Show({ advance }) {
 
                             {/* İşlem Butonları */}
                             {advance.status === 'pending' && (
-                                <div className="flex gap-4 justify-end mt-8 pt-6 border-t">
+                                <div className="d-flex gap-3 justify-content-end mt-8 pt-6 border-t">
                                     <button
                                         onClick={() => handleApprove()}
-                                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                                        className="btn btn-success btn-sm"
                                     >
                                         Onayla
                                     </button>
                                     
                                     <button
                                         onClick={() => handleReject()}
-                                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                                        className="btn btn-danger btn-sm"
                                     >
                                         Reddet
                                     </button>
                                     
                                     <button
                                         onClick={() => handleCancel()}
-                                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                                     >
                                         İptal Et
                                     </button>
@@ -203,17 +203,17 @@ export default function Show({ advance }) {
                             )}
                             
                             {advance.status === 'approved' && (
-                                <div className="flex gap-4 justify-end mt-8 pt-6 border-t">
+                                <div className="d-flex gap-3 justify-content-end mt-8 pt-6 border-t">
                                     <button
                                         onClick={() => handleMarkAsPaid()}
-                                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 fs-sm"
                                     >
                                         Ödendi Olarak İşaretle
                                     </button>
                                     
                                     <button
                                         onClick={() => handleCancel()}
-                                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                                     >
                                         İptal Et
                                     </button>
@@ -221,8 +221,8 @@ export default function Show({ advance }) {
                             )}
                             
                             {advance.status === 'approved' && (
-                                <div className="flex gap-4 justify-end mt-4">
-                                    <small className="text-sm text-gray-500">Not: Avansı ödemek için bankacılık işlemlerini gerçekleştirdikten sonra "Ödendi" butonuna tıklayınız.</small>
+                                <div className="d-flex gap-3 justify-content-end mt-4">
+                                    <small className="fs-sm text-muted">Not: Avansı ödemek için bankacılık işlemlerini gerçekleştirdikten sonra "Ödendi" butonuna tıklayınız.</small>
                                 </div>
                             )}
                         </div>

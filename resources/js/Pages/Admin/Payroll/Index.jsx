@@ -45,17 +45,17 @@ export default function Index({ payrollPeriods, filters }) {
     // Durum badge bileşeni
     const getStatusBadge = (status) => {
         const statusConfig = {
-            draft: { label: 'Taslak', class: 'bg-gray-100 text-gray-800' },
-            pending: { label: 'Beklemede', class: 'bg-yellow-100 text-yellow-800' },
-            approved: { label: 'Onaylandı', class: 'bg-green-100 text-green-800' },
-            paid: { label: 'Ödendi', class: 'bg-blue-100 text-blue-800' },
-            locked: { label: 'Kilitli', class: 'bg-red-100 text-red-800' },
+            draft: { label: 'Taslak', class: 'bg-light text-dark' },
+            pending: { label: 'Beklemede', class: 'bg-warning bg-opacity-10 text-warning' },
+            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
+            paid: { label: 'Ödendi', class: 'bg-primary bg-opacity-10 text-info' },
+            locked: { label: 'Kilitli', class: 'bg-danger bg-opacity-10 text-danger' },
         };
         
-        const config = statusConfig[status] || { label: status, class: 'bg-gray-100 text-gray-800' };
+        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
         
         return (
-            <span className={`px-2 py-1 text-xs font-medium rounded-full ${config.class}`}>
+            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
                 {config.label}
             </span>
         );
@@ -64,13 +64,13 @@ export default function Index({ payrollPeriods, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold">
                         Bordro Dönemleri
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.payrolls.create')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -83,36 +83,32 @@ export default function Index({ payrollPeriods, filters }) {
             <Head title="Bordro Dönemleri" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Arama ve Filtreler */}
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <form onSubmit={handleSearch} className="flex flex-wrap gap-4 items-end">
+                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
+                        <form onSubmit={handleSearch} className="d-flex d-flex-wrap gap-3 align-items-end">
                             {/* Arama */}
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="d-flex-1 min-w-[200px]">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Dönem Ara
                                 </label>
-                                <input
-                                    type="text"
+                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Dönem adı..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 />
                             </div>
 
                             {/* Durum Filtresi */}
                             <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Durum
                                 </label>
-                                <select
-                                    value={statusFilter}
+                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={statusFilter}
                                     onChange={(e) => {
                                         setStatusFilter(e.target.value);
                                         handleFilterChange('status', e.target.value);
                                     }}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Tümü</option>
                                     <option value="draft">Taslak</option>
@@ -126,7 +122,7 @@ export default function Index({ payrollPeriods, filters }) {
                             {/* Ara Butonu */}
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                className="btn btn-primary btn-sm"
                             >
                                 Ara
                             </button>
@@ -134,29 +130,29 @@ export default function Index({ payrollPeriods, filters }) {
                     </div>
 
                     {/* Tablo */}
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
+                        <table className="w-100 divide-y divide-gray-200">
+                            <thead className="table-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Dönem
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Tarih Aralığı
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Çalışma Günü
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Çalışan Sayısı
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Toplam Brüt
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
                                         Durum
                                     </th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
                                         İşlemler
                                     </th>
                                 </tr>
@@ -164,46 +160,46 @@ export default function Index({ payrollPeriods, filters }) {
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {payrollPeriods?.data?.length > 0 ? (
                                     payrollPeriods.data.map((period) => (
-                                        <tr key={period.id} className="hover:bg-gray-50">
+                                        <tr key={period.id} className="hover:table-light">
                                             <td className="px-4 py-3">
                                                 <Link
                                                     href={route('admin.payrolls.show', period.id)}
-                                                    className="text-sm font-medium text-indigo-600 hover:text-indigo-900 hover:underline"
+                                                    className="fs-sm fw-medium text-primary hover:text-indigo-900 hover:underline"
                                                 >
                                                     {period.name}
                                                 </Link>
-                                                <div className="text-xs text-gray-500">
+                                                <div className="fs-xs text-muted">
                                                     {formatMonthYear(period.start_date)}
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {formatDate(period.start_date)} - {formatDate(period.end_date)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {period.work_days || 0} gün
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-sm text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap">
+                                                <span className="fs-sm text-dark">
                                                     {period.employee_count || 0}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-right">
-                                                <span className="text-sm font-medium text-gray-900">
+                                            <td className="px-4 py-3 text-nowrap text-right">
+                                                <span className="fs-sm fw-medium text-dark">
                                                     {formatCurrency(period.total_gross)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
+                                            <td className="px-4 py-3 text-nowrap">
                                                 {getStatusBadge(period.status)}
                                             </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-right">
-                                                <div className="flex items-center justify-end gap-2">
+                                            <td className="px-4 py-3 text-nowrap text-right">
+                                                <div className="d-flex align-items-center justify-content-end">
                                                     <Link
                                                         href={route('admin.payrolls.show', period.id)}
-                                                        className="p-1 text-gray-500 hover:text-indigo-600"
+                                                        className="p-1 text-muted hover:text-primary"
                                                         title="Görüntüle"
                                                     >
                                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +211,7 @@ export default function Index({ payrollPeriods, filters }) {
                                                     {period.status === 'draft' && (
                                                         <Link
                                                             href={route('admin.payrolls.edit', period.id)}
-                                                            className="p-1 text-gray-500 hover:text-indigo-600"
+                                                            className="p-1 text-muted hover:text-primary"
                                                             title="Düzenle"
                                                         >
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +223,7 @@ export default function Index({ payrollPeriods, filters }) {
                                                     {period.status === 'draft' && (
                                                         <button
                                                             onClick={() => handleDelete(period.id)}
-                                                            className="p-1 text-gray-500 hover:text-red-600"
+                                                            className="p-1 text-muted hover:text-danger"
                                                             title="Sil"
                                                         >
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,7 +235,7 @@ export default function Index({ payrollPeriods, filters }) {
                                                     {['pending', 'approved'].includes(period.status) && (
                                                         <Link
                                                             href={route('admin.payrolls.approve', period.id)}
-                                                            className="p-1 text-gray-500 hover:text-green-600"
+                                                            className="p-1 text-muted hover:text-success"
                                                             title="Onayla"
                                                         >
                                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,7 +249,7 @@ export default function Index({ payrollPeriods, filters }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="px-4 py-8 text-center text-sm text-gray-500">
+                                        <td colSpan="7" className="px-4 py-8 text-center fs-sm text-muted">
                                             Bordro dönemi bulunamadı.
                                         </td>
                                     </tr>
@@ -264,16 +260,16 @@ export default function Index({ payrollPeriods, filters }) {
 
                     {/* Pagination */}
                     {payrollPeriods?.meta && payrollPeriods.meta.last_page > 1 && (
-                        <div className="mt-4 flex justify-center">
-                            <div className="flex gap-1">
+                        <div className="mt-4 d-flex justify-content-center">
+                            <div className="d-flex gap-1">
                                 {payrollPeriods.meta.links.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.url || '#'}
-                                        className={`px-4 py-2 border rounded-md ${
+                                        className={`px-4 py-2 border rounded ${
                                             link.active
                                                 ? 'bg-indigo-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-50'
+                                                : 'bg-white text-dark hover:table-light'
                                         } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={!link.url}
                                     >

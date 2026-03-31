@@ -84,49 +84,49 @@ export default function LeaveTypes({ leaveTypes: initialLeaveTypes }) {
 
     return (
         <div className="py-12">
-            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div className="bg-white rounded-lg shadow"> {/* No p-6 as required */}
+            <div className="mw-100 mx-auto">
+                <div className="bg-white rounded-3 shadow-sm"> {/* No p-4 as required */}
 
                     <div className="overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <table className="w-100 divide-y divide-gray-200">
+                            <thead className="table-light">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ad</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ücretli</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Belge Gerekiyor</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Maks. Gün</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Açıklama</th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Ad</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Ücretli</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Belge Gerekiyor</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Maks. Gün</th>
+                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Açıklama</th>
+                                    <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {(leaveTypes || []).map((leaveType) => (
-                                    <tr key={leaveType.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{leaveType.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                    <tr key={leaveType.id} className="hover:table-light">
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-dark">{leaveType.name}</td>
+                                        <td className="px-6 py-4 text-nowrap fs-sm">
                                             {leaveType.is_paid ? (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                <span className="px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill bg-success bg-opacity-10 text-success">
                                                     Evet
                                                 </span>
                                             ) : (
-                                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                <span className="px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill bg-danger bg-opacity-10 text-danger">
                                                     Hayır
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{leaveType.requires_document ? 'Evet' : 'Hayır'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{leaveType.max_duration_days || 'Sınırsız'}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">{leaveType.description}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-muted">{leaveType.requires_document ? 'Evet' : 'Hayır'}</td>
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-muted">{leaveType.max_duration_days || 'Sınırsız'}</td>
+                                        <td className="px-6 py-4 fs-sm text-muted">{leaveType.description}</td>
+                                        <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
                                             <button
                                                 onClick={() => handleEdit(leaveType)}
-                                                className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                className="text-primary hover:text-indigo-900 mr-4"
                                             >
                                                 Güncelle
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(leaveType.id)}
-                                                className="text-red-600 hover:text-red-900"
+                                                className="text-danger hover:text-red-900"
                                             >
                                                 Sil
                                             </button>
@@ -140,16 +140,14 @@ export default function LeaveTypes({ leaveTypes: initialLeaveTypes }) {
 
                 {/* Modal */}
                 {showModal && (
-                    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-                        <div className="relative p-5 bg-white rounded-lg shadow-xl w-1/3">
-                            <h3 className="text-lg font-bold mb-4">{editingId ? 'İzin Türü Düzenle' : 'Yeni İzin Türü Ekle'}</h3>
+                    <div className="position-fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-100 w-100 d-flex align-items-center justify-content-center">
+                        <div className="position-relative p-5 bg-white rounded-3 shadow-sm-xl w-1/3">
+                            <h5 className="fw-medium">{editingId ? 'İzin Türü Düzenle' : 'Yeni İzin Türü Ekle'}</h5>
 
                             <form onSubmit={handleSubmit}>
                                 <div className="mb-4">
-                                    <label className="block text-gray-700 text-sm font-medium mb-1">Ad</label>
-                                    <input
-                                        type="text"
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    <label className="d-block text-dark fs-sm fw-medium mb-1">Ad</label>
+                                    <input type="text" className="form-control"  
                                         value={formData.name}
                                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                                         required
@@ -157,34 +155,32 @@ export default function LeaveTypes({ leaveTypes: initialLeaveTypes }) {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="flex items-center">
+                                    <label className="d-flex align-items-center">
                                         <input
                                             type="checkbox"
-                                            className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                            className="rounded border-secondary text-primary shadow-sm-sm focus:border-indigo-300 focus:ring focus: focus:"
                                             checked={formData.is_paid}
                                             onChange={(e) => setFormData({...formData, is_paid: e.target.checked})}
                                         />
-                                        <span className="ml-2 text-sm font-medium text-gray-700">Ücretli</span>
+                                        <span className="ml-2 fs-sm fw-medium text-dark">Ücretli</span>
                                     </label>
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="flex items-center">
+                                    <label className="d-flex align-items-center">
                                         <input
                                             type="checkbox"
-                                            className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                            className="rounded border-secondary text-primary shadow-sm-sm focus:border-indigo-300 focus:ring focus: focus:"
                                             checked={formData.requires_document}
                                             onChange={(e) => setFormData({...formData, requires_document: e.target.checked})}
                                         />
-                                        <span className="ml-2 text-sm font-medium text-gray-700">Belge Gerektiriyor</span>
+                                        <span className="ml-2 fs-sm fw-medium text-dark">Belge Gerektiriyor</span>
                                     </label>
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-gray-700 text-sm font-medium mb-1">Maksimum Süre (Gün)</label>
-                                    <input
-                                        type="number"
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    <label className="d-block text-dark fs-sm fw-medium mb-1">Maksimum Süre (Gün)</label>
+                                    <input type="number" className="form-control"  
                                         value={formData.max_duration_days}
                                         onChange={(e) => setFormData({...formData, max_duration_days: e.target.value ? parseInt(e.target.value) : ''})}
                                         min="1"
@@ -193,10 +189,8 @@ export default function LeaveTypes({ leaveTypes: initialLeaveTypes }) {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-gray-700 text-sm font-medium mb-1">Kod</label>
-                                    <input
-                                        type="text"
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    <label className="d-block text-dark fs-sm fw-medium mb-1">Kod</label>
+                                    <input type="text" className="form-control"  
                                         value={formData.code}
                                         onChange={(e) => setFormData({...formData, code: e.target.value})}
                                         required
@@ -204,26 +198,25 @@ export default function LeaveTypes({ leaveTypes: initialLeaveTypes }) {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="block text-gray-700 text-sm font-medium mb-1">Açıklama</label>
-                                    <textarea
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    <label className="d-block text-dark fs-sm fw-medium mb-1">Açıklama</label>
+                                    <textarea className="form-control"
                                         value={formData.description}
                                         onChange={(e) => setFormData({...formData, description: e.target.value})}
-                                        rows="3"
+                                        rows={3}
                                     />
                                 </div>
 
-                                <div className="flex justify-end space-x-2 mt-6">
+                                <div className="d-flex justify-content-end space-x-2 mt-6">
                                     <button
                                         type="button"
                                         onClick={resetForm}
-                                        className="px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        className="px-4 py-2 bg-gray-500 border border-transparent rounded fw-semibold fs-xs text-white text-uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus: focus:  -out"
                                     >
                                         İptal
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                        className="btn btn-primary btn-sm"
                                     >
                                         {editingId ? 'Güncelle' : 'Oluştur'}
                                     </button>
@@ -241,11 +234,11 @@ export default function LeaveTypes({ leaveTypes: initialLeaveTypes }) {
 LeaveTypes.layout = page =>
     <AuthenticatedLayout
         children={page}
-        header={<div className="flex justify-between items-center">
-            <h2 className="text-lg font-medium text-gray-900">İzin Türleri</h2>
+        header={<div className="d-flex justify-content-between align-items-center">
+            <h5 className="fw-medium text-dark">İzin Türleri</h5>
             <button
                 onClick={() => document.dispatchEvent(new CustomEvent('openLeaveTypeModal'))}
-                className="ml-3 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                className="btn btn-primary btn-sm ms-auto"
             >
                 Yeni İzin Türü
             </button>

@@ -37,14 +37,14 @@ export default function Index({ submissions, forms, departments, filters }) {
     const getStatusBadge = (status) => {
         const statusInfo = STATUSES.find(s => s.value === status);
         const colors = {
-            blue: 'bg-blue-100 text-blue-800',
-            yellow: 'bg-yellow-100 text-yellow-800',
-            purple: 'bg-purple-100 text-purple-800',
-            green: 'bg-green-100 text-green-800',
-            red: 'bg-red-100 text-red-800',
+            blue: 'badge bg-info bg-opacity-10 text-info',
+            yellow: 'badge bg-warning bg-opacity-10 text-warning',
+            purple: 'badge bg-purple bg-opacity-10 text-purple',
+            green: 'badge bg-success bg-opacity-10 text-success',
+            red: 'badge bg-danger bg-opacity-10 text-danger',
         };
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[statusInfo?.color] || 'bg-gray-100'}`}>
+            <span className={`badge ${colors[statusInfo?.color] || 'bg-light'}`}>
                 {statusInfo?.label || status}
             </span>
         );
@@ -53,12 +53,12 @@ export default function Index({ submissions, forms, departments, filters }) {
     const getInvestigationBadge = (investigation) => {
         const info = INVESTIGATIONS.find(i => i.value === investigation);
         const colors = {
-            yellow: 'bg-yellow-100 text-yellow-800',
-            green: 'bg-green-100 text-green-800',
-            gray: 'bg-gray-100 text-gray-800',
+            yellow: 'badge bg-warning bg-opacity-10 text-warning',
+            green: 'badge bg-success bg-opacity-10 text-success',
+            gray: 'badge bg-secondary bg-opacity-10 text-dark',
         };
         return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${colors[info?.color] || 'bg-gray-100'}`}>
+            <span className={`badge ${colors[info?.color] || 'bg-light'}`}>
                 {info?.label || '-'}
             </span>
         );
@@ -73,13 +73,13 @@ export default function Index({ submissions, forms, departments, filters }) {
     };
 
     const renderStars = (rating) => {
-        if (!rating) return <span className="text-gray-400">-</span>;
+        if (!rating) return <span className="text-muted">-</span>;
         return (
-            <div className="flex items-center">
-                <span className="text-yellow-500">
+            <div className="d-flex align-items-center">
+                <span className="text-warning">
                     {'★'.repeat(Math.round(rating))}
                 </span>
-                <span className="text-gray-300 ml-1">
+                <span className="text-muted ms-1">
                     {rating.toFixed(1)}
                 </span>
             </div>
@@ -87,25 +87,19 @@ export default function Index({ submissions, forms, departments, filters }) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Başvurular
-                </h2>
-            }
-        >
+        <AuthenticatedLayout header="Başvurular">
             <Head title="Başvurular" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 rounded-lg shadow mb-6">
-                        <div className="grid grid-cols-5 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Durum</label>
+            <div className="py-5">
+                <div className="container">
+                    <div className="card bg-white p-4 rounded-3 shadow-sm mb-5">
+                        <div className="row g-3">
+                            <div className="col-md-2">
+                                <label className="d-block fs-sm fw-medium mb-1">Durum</label>
                                 <select
+                                    className="form-select"
                                     value={filterStatus}
                                     onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="">Tümü</option>
                                     {STATUSES.map((status) => (
@@ -116,12 +110,12 @@ export default function Index({ submissions, forms, departments, filters }) {
                                 </select>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">İstihbarat</label>
+                            <div className="col-md-2">
+                                <label className="d-block fs-sm fw-medium mb-1">İstihbarat</label>
                                 <select
+                                    className="form-select"
                                     value={filterInvestigation}
                                     onChange={(e) => setFilterInvestigation(e.target.value)}
-                                    className="w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="">Tümü</option>
                                     {INVESTIGATIONS.map((inv) => (
@@ -132,12 +126,12 @@ export default function Index({ submissions, forms, departments, filters }) {
                                 </select>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Form</label>
+                            <div className="col-md-2">
+                                <label className="d-block fs-sm fw-medium mb-1">Form</label>
                                 <select
+                                    className="form-select"
                                     value={filterForm}
                                     onChange={(e) => setFilterForm(e.target.value)}
-                                    className="w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="">Tümü</option>
                                     {forms.map((form) => (
@@ -149,11 +143,11 @@ export default function Index({ submissions, forms, departments, filters }) {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Departman</label>
+                                <label className="d-block fs-sm fw-medium text-dark mb-1">Departman</label>
                                 <select
+                                    className="form-control w-100 border-secondary rounded-3 shadow-sm-sm"
                                     value={filterDepartment}
                                     onChange={(e) => setFilterDepartment(e.target.value)}
-                                    className="w-full border-gray-300 rounded-md shadow-sm"
                                 >
                                     <option value="">Tümü</option>
                                     {departments.map((dept) => (
@@ -164,10 +158,10 @@ export default function Index({ submissions, forms, departments, filters }) {
                                 </select>
                             </div>
 
-                            <div className="flex items-end">
+                            <div className="d-flex align-items-end">
                                 <button
                                     onClick={applyFilters}
-                                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                                    className="btn btn-primary btn-sm w-100"
                                 >
                                     Filtrele
                                 </button>
@@ -175,19 +169,19 @@ export default function Index({ submissions, forms, departments, filters }) {
                         </div>
                     </div>
 
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <table className="min-w-full divide-y divide-gray-200 table table-sm">
-                            <thead className="bg-gray-50">
+                    <div className="bg-white overflow-hidden shadow-sm-sm">
+                        <table className="w-100 divide-y divide-gray-200 table table-sm">
+                            <thead className="table-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ad Soyad</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tarih</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Form</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Departman</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Durum</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">İstihbarat</th>
-                                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Yorum</th>
-                                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Puan</th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">İşlemler</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Ad Soyad</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Tarih</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Form</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Departman</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Durum</th>
+                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">İstihbarat</th>
+                                    <th className="px-4 py-3 text-center fs-xs fw-medium text-muted text-uppercase">Yorum</th>
+                                    <th className="px-4 py-3 text-center fs-xs fw-medium text-muted text-uppercase">Puan</th>
+                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -196,38 +190,38 @@ export default function Index({ submissions, forms, departments, filters }) {
                                         <td className="px-4 py-3">
                                             <Link
                                                 href={`/admin/submissions/${submission.id}`}
-                                                className="text-sm font-medium text-gray-900 hover:text-indigo-600 hover:underline"
+                                                className="fs-sm fw-medium text-dark hover:text-primary hover:underline"
                                             >
                                                 {submission.applicant_name}
                                             </Link>
-                                            <div className="text-xs text-gray-500">{submission.applicant_email}</div>
+                                            <div className="fs-xs text-muted">{submission.applicant_email}</div>
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                        <td className="px-4 py-3 text-nowrap fs-sm text-muted">
                                             {new Date(submission.created_at).toLocaleDateString('tr-TR')}
                                         </td>
-                                        <td className="px-4 py-3 text-xs text-gray-900">
+                                        <td className="px-4 py-3 fs-xs text-dark">
                                             {submission.form?.name}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-xs text-gray-500">
+                                        <td className="px-4 py-3 text-nowrap fs-xs text-muted">
                                             {submission.form?.department?.title || '-'}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
+                                        <td className="px-4 py-3 text-nowrap">
                                             {getStatusBadge(submission.status)}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap">
+                                        <td className="px-4 py-3 text-nowrap">
                                             {getInvestigationBadge(submission.investigation)}
                                         </td>
-                                        <td className="px-4 py-3 text-center text-sm text-gray-500">
+                                        <td className="px-4 py-3 text-center fs-sm text-muted">
                                             {submission.comment_count || '-'}
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             {renderStars(submission.avg_rating)}
                                         </td>
-                                        <td className="px-4 py-3 whitespace-nowrap text-right">
-                                            <div className="flex items-center justify-end gap-2">
+                                        <td className="px-4 py-3 text-nowrap text-right">
+                                            <div className="d-flex align-items-center justify-content-end">
                                                 <Link
                                                     href={`/admin/submissions/${submission.id}`}
-                                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-md transition"
+                                                    className="p-2 text-info hover:text-info hover:bg-blue-50 rounded"
                                                     title="Görüntüle"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +231,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(submission.id)}
-                                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition"
+                                                    className="p-2 text-danger hover:text-danger hover:bg-red-50 rounded"
                                                     title="Sil"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

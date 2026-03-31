@@ -55,85 +55,74 @@ export default function Index({ employees, filters, employeeTree }) {
         const hasChildren = employee.children && employee.children.length > 0;
 
         const rows = [
-            <tr key={employee.id} className="hover:bg-gray-50">
+            <tr key={employee.id} className="table-hover">
                 <td className="px-4 py-3">
-                    <div className="flex items-center" style={{ paddingLeft: indent }}>
+                    <div className="d-flex align-items-center" style={{ paddingLeft: indent }}>
                         {hasChildren ? (
-                            <svg className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <i className="bi bi-chevron-down me-2 text-muted"></i>
                         ) : level > 0 ? (
-                            <span className="w-4 h-4 mr-2 text-gray-300 flex-shrink-0">└</span>
+                            <span className="me-2 text-muted">└</span>
                         ) : (
-                            <span className="w-4 h-4 mr-2 flex-shrink-0"></span>
+                            <span className="me-2"></span>
                         )}
                         <div>
                             <Link
                                 href={route('admin.employees.show', employee.id)}
-                                className={`text-sm font-medium hover:text-indigo-600 hover:underline ${
-                                    level === 0 ? 'text-gray-900' : 'text-gray-700'
-                                }`}
+                                className={`text-decoration-none ${level === 0 ? 'text-dark fw-semibold' : 'text-dark fw-semibold'}`}
                             >
                                 {employee.first_name} {employee.last_name}
                             </Link>
                             {employee.manager && (
-                                <div className="text-xs text-gray-500">
+                                <div className="small text-muted">
                                     Yönetici: {employee.manager.first_name} {employee.manager.last_name}
                                 </div>
                             )}
                         </div>
                     </div>
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{employee.identity_no}</span>
+                <td className="px-4 py-3 text-nowrap">
+                    <span className="text-dark small">{employee.identity_no}</span>
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
+                <td className="px-4 py-3 text-nowrap">
+                    <span className="text-dark small">
                         {employee.department?.title || '-'}
                     </span>
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
+                <td className="px-4 py-3 text-nowrap">
+                    <span className="text-dark small">
                         {employee.position_title || '-'}
                     </span>
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap">
-                    <span className="text-sm text-gray-600">
+                <td className="px-4 py-3 text-nowrap">
+                    <span className="text-muted small">
                         {getEmploymentTypeLabel(employee.employment_type)}
                     </span>
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap">
+                <td className="px-4 py-3 text-nowrap">
                     {getStatusBadge(employee)}
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end gap-2">
+                <td className="px-4 py-3 text-nowrap text-end">
+                    <div className="d-flex align-items-center justify-content-end gap-2">
                         <Link
                             href={route('admin.employees.show', employee.id)}
-                            className="p-1 text-gray-500 hover:text-indigo-600"
+                            className="text-muted"
                             title="Görüntüle"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
+                            <i className="bi bi-eye"></i>
                         </Link>
                         <Link
                             href={route('admin.employees.edit', employee.id)}
-                            className="p-1 text-gray-500 hover:text-indigo-600"
+                            className="text-muted"
                             title="Düzenle"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
+                            <i className="bi bi-pencil"></i>
                         </Link>
                         <button
                             onClick={() => handleDelete(employee.id)}
-                            className="p-1 text-gray-500 hover:text-red-600"
+                            className="text-muted"
                             title="Sil"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <i className="bi bi-trash"></i>
                         </button>
                     </div>
                 </td>
@@ -156,17 +145,15 @@ export default function Index({ employees, filters, employeeTree }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold mb-0">
                         Çalışanlar
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.employees.create')}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 flex items-center gap-2 text-sm"
+                        className="btn btn-primary btn-sm d-flex align-items-center gap-2"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
+                        <i className="bi bi-plus-lg"></i>
                         Yeni Çalışan
                     </Link>
                 </div>
@@ -174,153 +161,153 @@ export default function Index({ employees, filters, employeeTree }) {
         >
             <Head title="Çalışanlar" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div className="py-4">
+                <div className="container-fluid px-0">
                     {/* Arama ve Filtreler */}
-                    <div className="bg-white rounded-lg shadow mb-6 p-4">
-                        <form onSubmit={handleSearch} className="flex flex-wrap gap-4 items-end">
-                            {/* Arama */}
-                            <div className="flex-1 min-w-[200px]">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Arama
-                                </label>
-                                <input
-                                    type="text"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="İsim, TC Kimlik No..."
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                />
-                            </div>
+                    <div className="card shadow-sm mb-4">
+                        <div className="card-body p-4">
+                            <form onSubmit={handleSearch} className="row g-3 align-items-end">
+                                {/* Arama */}
+                                <div className="col-md-3">
+                                    <label className="form-label fw-medium">
+                                        Arama
+                                    </label>
+                                    <input className="form-control" type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        placeholder="İsim, TC Kimlik No..."
+                                    />
+                                </div>
 
-                            {/* Durum Filtresi */}
-                            <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Durum
-                                </label>
-                                <select
-                                    value={localFilters.status}
-                                    onChange={(e) => handleFilterChange('status', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="">Tümü</option>
-                                    {statusFilterOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                                {/* Durum Filtresi */}
+                                <div className="col-md-2">
+                                    <label className="form-label fw-medium">
+                                        Durum
+                                    </label>
+                                    <select className="form-select" value={localFilters.status}
+                                        onChange={(e) => handleFilterChange('status', e.target.value)}
+                                    >
+                                        <option value="">Tümü</option>
+                                        {statusFilterOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            {/* Departman Filtresi */}
-                            <div className="w-48">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Departman
-                                </label>
-                                <select
-                                    value={localFilters.department_id}
-                                    onChange={(e) => handleFilterChange('department_id', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="">Tümü</option>
-                                    {props.departments?.map((dept) => (
-                                        <option key={dept.id} value={dept.id}>
-                                            {dept.title}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                                {/* Departman Filtresi */}
+                                <div className="col-md-3">
+                                    <label className="form-label fw-medium">
+                                        Departman
+                                    </label>
+                                    <select className="form-select" value={localFilters.department_id}
+                                        onChange={(e) => handleFilterChange('department_id', e.target.value)}
+                                    >
+                                        <option value="">Tümü</option>
+                                        {props.departments?.map((dept) => (
+                                            <option key={dept.id} value={dept.id}>
+                                                {dept.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            {/* Çalışma Tipi */}
-                            <div className="w-40">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Çalışma Tipi
-                                </label>
-                                <select
-                                    value={localFilters.employment_type}
-                                    onChange={(e) => handleFilterChange('employment_type', e.target.value)}
-                                    className="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                >
-                                    <option value="">Tümü</option>
-                                    {employmentTypeOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                                {/* Çalışma Tipi */}
+                                <div className="col-md-2">
+                                    <label className="form-label fw-medium">
+                                        Çalışma Tipi
+                                    </label>
+                                    <select className="form-select" value={localFilters.employment_type}
+                                        onChange={(e) => handleFilterChange('employment_type', e.target.value)}
+                                    >
+                                        <option value="">Tümü</option>
+                                        {employmentTypeOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            {/* Ara Butonu */}
-                            <button
-                                type="submit"
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                            >
-                                Ara
-                            </button>
-                        </form>
+                                {/* Ara Butonu */}
+                                <div className="col-md-2">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary w-100"
+                                    >
+                                        <i className="bi bi-search me-1"></i>
+                                        Ara
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
                     {/* Tree Yapısı - Tablo */}
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Çalışan
-                                    </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        TC Kimlik No
-                                    </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Departman
-                                    </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Pozisyon
-                                    </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Çalışma Tipi
-                                    </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Durum
-                                    </th>
-                                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                                        İşlemler
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {allRows.length > 0 ? (
-                                    allRows
-                                ) : (
+                    <div className="card shadow-sm">
+                        <div className="table-responsive">
+                            <table className="table table-hover mb-0">
+                                <thead>
                                     <tr>
-                                        <td colSpan="7" className="px-4 py-8 text-center text-sm text-gray-500">
-                                            Çalışan bulunamadı.
-                                        </td>
+                                        <th className="px-4 py-3">
+                                            Çalışan
+                                        </th>
+                                        <th className="px-4 py-3">
+                                            TC Kimlik No
+                                        </th>
+                                        <th className="px-4 py-3">
+                                            Departman
+                                        </th>
+                                        <th className="px-4 py-3">
+                                            Pozisyon
+                                        </th>
+                                        <th className="px-4 py-3">
+                                            Çalışma Tipi
+                                        </th>
+                                        <th className="px-4 py-3">
+                                            Durum
+                                        </th>
+                                        <th className="px-4 py-3 text-end">
+                                            İşlemler
+                                        </th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {allRows.length > 0 ? (
+                                        allRows
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="7" className="px-4 py-8 text-center text-muted">
+                                                Çalışan bulunamadı.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    {/* Pagination - Sadece employees.data varsa göster */}
+                    {/* Pagination */}
                     {employees?.data && employees.meta && employees.meta.last_page > 1 && (
-                        <div className="mt-4 flex justify-center">
-                            <div className="flex gap-1">
-                                {employees.meta.links.map((link, index) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url || '#'}
-                                        className={`px-4 py-2 border rounded-md ${
-                                            link.active
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'bg-white text-gray-700 hover:bg-gray-50'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        disabled={!link.url}
-                                    >
-                                        {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
-                                    </Link>
-                                ))}
-                            </div>
+                        <div className="d-flex justify-content-center mt-4">
+                            <nav>
+                                <ul className="pagination pagination-sm gap-1">
+                                    {employees.meta.links.map((link, index) => (
+                                        <li
+                                            key={index}
+                                            className={`page-item ${!link.url ? 'disabled' : ''} ${link.active ? 'active' : ''}`}
+                                        >
+                                            <Link
+                                                href={link.url || '#'}
+                                                className="page-link"
+                                            >
+                                                {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
                         </div>
                     )}
                 </div>

@@ -8,13 +8,13 @@ export default function TaxSummary({ summary }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="fw-semibold text-dark">
                         Vergi ve Sosyal Güvenlik Özeti - {period?.name}
-                    </h2>
+                    </h5>
                     <Link
                         href={route('admin.payroll-reports.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
                     >
                         Geri Dön
                     </Link>
@@ -24,54 +24,54 @@ export default function TaxSummary({ summary }) {
             <Head title={`Vergi ve SGK Özeti - ${period?.name}`} />
 
             <div className="py-12">
-                <div className="max-w-6xl mx-auto sm:px-6 lg:px-8">
+                <div className="mw-100 mx-auto">
                     {/* Özet Kartlar */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
-                            <h3 className="text-lg font-medium text-gray-500">Brüt Ücret</h3>
-                            <p className="text-3xl font-semibold text-gray-900">{formatCurrency(total_gross)}</p>
+                    <div className="d-grid d-grid-cols-1 gap-4 mb-8">
+                        <div className="bg-white p-4 rounded-3 shadow-sm border-l-4 border-blue-500">
+                            <h5 className="fw-medium">Brüt Ücret</h5>
+                            <p className="h2 fw-semibold text-dark">{formatCurrency(total_gross)}</p>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow border-l-4 border-red-500">
-                            <h3 className="text-lg font-medium text-gray-500">Toplam SGK İşçi Payı</h3>
-                            <p className="text-3xl font-semibold text-red-600">{formatCurrency(sgk.employee_share)}</p>
+                        <div className="bg-white p-4 rounded-3 shadow-sm border-l-4 border-red-500">
+                            <h5 className="fw-medium">Toplam SGK İşçi Payı</h5>
+                            <p className="h2 fw-semibold text-danger">{formatCurrency(sgk.employee_share)}</p>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
-                            <h3 className="text-lg font-medium text-gray-500">Gelir Vergisi</h3>
-                            <p className="text-3xl font-semibold text-yellow-600">{formatCurrency(income_tax)}</p>
+                        <div className="bg-white p-4 rounded-3 shadow-sm border-l-4 border-yellow-500">
+                            <h5 className="fw-medium">Gelir Vergisi</h5>
+                            <p className="h2 fw-semibold text-warning">{formatCurrency(income_tax)}</p>
                         </div>
                     </div>
 
                     {/* Toplam Tabloları */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="d-grid d-grid-cols-1 gap-8">
                         {/* SGK Tablosu */}
-                        <div className="bg-white rounded-lg shadow overflow-hidden">
+                        <div className="bg-white rounded-3 shadow-sm overflow-hidden">
                             <div className="bg-blue-50 px-6 py-4">
-                                <h2 className="text-lg font-medium text-blue-800">SGK Payları</h2>
+                                <h5 className="fw-medium text-info">SGK Payları</h5>
                             </div>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
+                            <div className="overflow-auto">
+                                <table className="w-100 divide-y divide-gray-200">
                                     <tbody className="divide-y divide-gray-200">
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr className="hover:table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                 SGK İşçi Payı (İşçi)
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
                                                 {formatCurrency(sgk.employee_share)}
                                             </td>
                                         </tr>
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr className="hover:table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                 SGK İşyeri Payı (İşveren)
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
                                                 {formatCurrency(sgk.employer_share)}
                                             </td>
                                         </tr>
-                                        <tr className="hover:bg-gray-100 font-bold bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr className="hover:bg-light fw-bold table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                 Toplam SGK Payları
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-dark">
                                                 {formatCurrency(sgk.total)}
                                             </td>
                                         </tr>
@@ -81,42 +81,42 @@ export default function TaxSummary({ summary }) {
                         </div>
 
                         {/* Vergi ve Diğer Tablosu */}
-                        <div className="bg-white rounded-lg shadow overflow-hidden">
+                        <div className="bg-white rounded-3 shadow-sm overflow-hidden">
                             <div className="bg-green-50 px-6 py-4">
-                                <h2 className="text-lg font-medium text-green-800">Vergi ve Diğeler</h2>
+                                <h5 className="fw-medium text-success">Vergi ve Diğeler</h5>
                             </div>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
+                            <div className="overflow-auto">
+                                <table className="w-100 divide-y divide-gray-200">
                                     <tbody className="divide-y divide-gray-200">
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr className="hover:table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                 Gelir Vergisi
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
                                                 {formatCurrency(income_tax)}
                                             </td>
                                         </tr>
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr className="hover:table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                 Damga Vergisi
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
                                                 {formatCurrency(stamp_tax)}
                                             </td>
                                         </tr>
-                                        <tr className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr className="hover:table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                 Toplam Kesintiler (İşçi)
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
                                                 {formatCurrency(total_deductions)}
                                             </td>
                                         </tr>
-                                        <tr className="hover:bg-gray-100 font-bold bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr className="hover:bg-light fw-bold table-light">
+                                            <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                 Net Ücret
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-dark">
                                                 {formatCurrency(total_net)}
                                             </td>
                                         </tr>
@@ -127,36 +127,36 @@ export default function TaxSummary({ summary }) {
                     </div>
 
                     {/* İşveren Maliyeti */}
-                    <div className="mt-8 bg-white rounded-lg shadow overflow-hidden">
+                    <div className="mt-8 bg-white rounded-3 shadow-sm overflow-hidden">
                         <div className="bg-purple-50 px-6 py-4">
-                            <h2 className="text-lg font-medium text-purple-800">
+                            <h5 className="fw-medium">
                                 İşveren Maliyeti Özeti
-                            </h2>
+                            </h5>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
+                        <div className="overflow-auto">
+                            <table className="w-100 divide-y divide-gray-200">
                                 <tbody className="divide-y divide-gray-200">
-                                    <tr className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr className="hover:table-light">
+                                        <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                             Toplam Brüt Ücret
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
                                             {formatCurrency(total_gross)}
                                         </td>
                                     </tr>
-                                    <tr className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr className="hover:table-light">
+                                        <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                             SGK İşyeri Payı (İşveren)
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
                                             {formatCurrency(sgk.employer_share)}
                                         </td>
                                     </tr>
-                                    <tr className="hover:bg-gray-100 font-bold bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr className="hover:bg-light fw-bold table-light">
+                                        <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                             Toplam İşveren Maliyeti
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                                        <td className="px-6 py-4 text-nowrap fs-sm text-right text-dark">
                                             {formatCurrency(total_employer_cost)}
                                         </td>
                                     </tr>

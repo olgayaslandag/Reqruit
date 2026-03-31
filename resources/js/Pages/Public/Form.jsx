@@ -156,7 +156,7 @@ export default function Form({ form }) {
         return (
             <div className="dd-success-wrapper">
                 <div className="dd-success-icon">✓</div>
-                <h2 className="dd-success-title">Başvurunuz Alındı!</h2>
+                <h5 className="text-success">Başvurunuz Alındı!</h5>
                 <p className="dd-success-message">
                     Başvurunuz başarıyla gönderildi. En kısa sürede size dönüş yapacağız.
                 </p>
