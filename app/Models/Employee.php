@@ -43,15 +43,10 @@ class Employee extends Model
         'children_count' => 'integer',
     ];
 
-    protected $appends = ['position_history'];
-
-    /**
-     * Frontend için position_history olarak expose edilir.
-     */
-    public function getPositionHistoryAttribute()
-    {
-        return $this->positionHistory()->orderByDesc('start_date')->get();
-    }
+    protected $hidden = [
+        'deleted_at',
+        'position_history',
+    ];
 
     /**
      * İlişkiler

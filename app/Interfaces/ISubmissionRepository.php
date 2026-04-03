@@ -21,6 +21,8 @@ interface ISubmissionRepository
 
     public function updateStatus(int $id, string $status);
 
+    public function updateInvestigation(int $id, string $investigation, ?string $notes = null);
+
     public function delete(int $id);
 
     public function getWithDetails(int $id);

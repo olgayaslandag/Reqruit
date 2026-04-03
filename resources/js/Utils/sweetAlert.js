@@ -1,6 +1,12 @@
 import Swal from 'sweetalert2';
 
 export const confirmDelete = (message = 'Bu kaydı silmek istediğinize emin misiniz?', onSuccess) => {
+    if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 is not loaded');
+        if (onSuccess) onSuccess();
+        return;
+    }
+
     Swal.fire({
         title: 'Emin misiniz?',
         text: message,
@@ -18,6 +24,11 @@ export const confirmDelete = (message = 'Bu kaydı silmek istediğinize emin mis
 };
 
 export const showSuccess = (message) => {
+    if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 is not loaded');
+        return;
+    }
+
     Swal.fire({
         title: 'Başarılı',
         text: message,
@@ -30,6 +41,11 @@ export const showSuccess = (message) => {
 };
 
 export const showError = (message) => {
+    if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 is not loaded');
+        return;
+    }
+
     Swal.fire({
         title: 'Hata',
         text: message,

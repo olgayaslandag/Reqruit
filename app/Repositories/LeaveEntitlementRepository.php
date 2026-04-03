@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\ILeaveEntitlementRepository;
 use App\Models\LeaveEntitlement;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class LeaveEntitlementRepository extends BaseRepository implements ILeaveEntitlementRepository
@@ -21,10 +22,23 @@ class LeaveEntitlementRepository extends BaseRepository implements ILeaveEntitle
             $query->with($with);
         }
 
-        // Filtreleri uygula
         $this->applyFilters($query, $filters);
 
         return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    public function getPaginated(array $filters = [], array $with = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = $this->model->query()
+            ->select('id', 'employee_id', 'leave_type_id', 'entitled_days', 'used_days', 'calculation_year_start', 'accrual_date', 'can_carry_over', 'max_carry_over_days');
+
+        if (! empty($with)) {
+            $query->with($with);
+        }
+
+        $this->applyFilters($query, $filters);
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     public function getByEmployeeAndYear(int $employeeId, string $year, array $with = []): Collection

@@ -19,7 +19,25 @@
       "Bash(curl -s http://localhost:8000/login -H \"Accept: text/html\")",
       "Bash(php:*)",
       "Bash(npm list:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(pkill -f \"php artisan serve\")",
+      "Bash(kill:*)",
+      "Bash(pkill:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(killall php:*)",
+      "Bash(killall node:*)",
+      "Bash(killall vite:*)",
+      "Bash(for file:*)",
+      "Bash(do)",
+      "Bash(if grep:*)",
+      "Bash(then)",
+      "Bash(echo \"Bulunan dosya: $file\")",
+      "Bash(echo \"Yorumlanmış exportUrl içeren dosya: $file\")",
+      "Bash(elif grep:*)",
+      "Bash(echo \"Aktif exportUrl içeren dosya: $file\")",
+      "Read(//projects/reqruit/**)",
+      "Bash(fi)",
+      "Bash(grep -E \"\\\\.export$\")"
     ]
   }
 }

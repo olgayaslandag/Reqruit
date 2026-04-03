@@ -23,7 +23,7 @@ class AddSubmissionCommentRequest extends FormRequest
     {
         return [
             'comment' => ['required', 'string', 'max:5000'],
-            'rating' => ['nullable', 'integer', 'min:1', 'max:5'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'is_private' => ['nullable', 'boolean'],
         ];
     }

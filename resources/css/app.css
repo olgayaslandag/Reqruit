@@ -15,3 +15,11 @@
     background: transparent;
   }
 }
+
+
+
+.card-header {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+}

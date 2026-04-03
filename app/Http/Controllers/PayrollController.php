@@ -181,6 +181,8 @@ class PayrollController extends Controller
      */
     public function generateItems(PayrollPeriod $payroll)
     {
+        $this->authorize('generateItems', $payroll);
+
         try {
             $items = $this->payrollService->generatePayrollItems($payroll->id);
 

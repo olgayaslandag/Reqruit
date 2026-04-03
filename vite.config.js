@@ -7,6 +7,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/js/app.jsx',
+                'resources/css/app.css',
             ],
             refresh: true,
         }),
@@ -16,5 +17,8 @@ export default defineConfig({
         alias: {
             '@': '/resources/js',
         }
+    },
+    build: {
+        sourcemap: false,
     },
 });

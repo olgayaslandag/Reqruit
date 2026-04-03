@@ -71,8 +71,7 @@ export default function Index({ payrollPeriods, filters }) {
                     { label: 'Bordro Dönemleri', url: route('admin.payrolls.index') },
                 ],
                 newUrl: route('admin.payrolls.create'),
-                exportUrl: route('admin.payrolls.export'),
-            }}
+            }
         >
             <Head title="Bordro Dönemleri" />
 

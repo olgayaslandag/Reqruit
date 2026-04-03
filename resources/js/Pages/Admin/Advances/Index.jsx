@@ -109,7 +109,6 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                     { label: 'Avans Talepleri', url: route('admin.advances.index') },
                 ],
                 newUrl: route('admin.advances.create'),
-                exportUrl: route('admin.advances.export'),
             }}
         >
             <Head title="Avans Talepleri" />

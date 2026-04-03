@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 
 export default function AuthenticatedLayout({ header, children, pageHeader }) {
@@ -6,6 +6,25 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
     const appName = usePage().props.appName || 'Reqruit';
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const currentRoute = usePage().url;
+    const [toasts, setToasts] = useState([]);
+    const toastIdRef = useRef(0);
+
+    useEffect(() => {
+        const handleToast = (e) => {
+            const { message, type } = e.detail;
+            const id = ++toastIdRef.current;
+            setToasts((prev) => [...prev, { id, message, type }]);
+            setTimeout(() => {
+                setToasts((prev) => prev.filter((t) => t.id !== id));
+            }, 3000);
+        };
+        window.addEventListener('toast:show', handleToast);
+        return () => window.removeEventListener('toast:show', handleToast);
+    }, []);
+
+    const removeToast = (id) => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+    };
 
     const isActive = (href) => currentRoute === href || currentRoute.startsWith(href + '?');
 
@@ -35,16 +54,13 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
     const renderPageHeaderActions = () => {
         if (!pageHeader) return null;
 
-        // Route helper'ın tanımlı olup olmadığını kontrol et
-        const hasRoute = typeof window !== 'undefined' && window.route;
-
         return (
             <div className="col text-end">
                 {/* Fiş Yükle - sadece route tanımlıysa */}
-                {pageHeader.uploadExpenseFile && hasRoute && (
+                {/* {pageHeader.uploadExpenseFile && hasRoute && (
                     <div className="d-inline">
                         <form
-                            action={route('expense.upload')}
+                            action={window.route('expense.upload')}
                             method="post"
                             className="d-inline"
                             encType="multipart/form-data"
@@ -66,7 +82,7 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                             />
                         </form>
                     </div>
-                )}
+                )} */}
 
                 {/* Geri Butonu */}
                 {pageHeader.backUrl && (
@@ -126,57 +142,57 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
         {
             title: 'Ana Sayfa',
             items: [
-            { title: 'Dashboard', icon: 'dashboard', href: route('dashboard') },
+            { title: 'Dashboard', icon: 'dashboard', href: window.route('dashboard') },
             ],
         },
         {
             title: 'İnsan Kaynakları',
             items: [
-            { title: 'Başvurular', icon: 'clipboard-list', href: route('admin.submissions.index') },
-            { title: 'Formlar', icon: 'file-text', href: route('admin.forms.index') },
-            { title: 'Departmanlar', icon: 'building', href: route('admin.departments.index') },
-            { title: 'Çalışanlar', icon: 'users', href: route('admin.employees.index') },
-            { title: 'Kullanıcılar', icon: 'user-shield', href: route('admin.users.index') },
+            { title: 'Başvurular', icon: 'clipboard-list', href: window.route('admin.submissions.index') },
+            { title: 'Formlar', icon: 'file-text', href: window.route('admin.forms.index') },
+            { title: 'Departmanlar', icon: 'building', href: window.route('admin.departments.index') },
+            { title: 'Çalışanlar', icon: 'users', href: window.route('admin.employees.index') },
+            { title: 'Kullanıcılar', icon: 'users', href: window.route('admin.users.index') },
             ],
         },
         {
             title: 'Zaman Yönetimi',
             items: [
-            { title: 'Devam Takibi', icon: 'clock', href: route('admin.attendance.index') },
-            { title: 'QR Giriş/Çıkış', icon: 'qrcode', href: route('admin.attendance.scan') },
-            { title: 'Vardiyalar', icon: 'clock', href: route('admin.shifts.index') },
-            { title: 'Vardiya Takvimi', icon: 'calendar-event', href: route('admin.shifts.schedules') },
-            { title: 'Düzeltme Talepleri', icon: 'edit', href: route('admin.adjustments.index') },
-            { title: 'Çalışma Takvimleri', icon: 'calendar-event', href: route('admin.work-calendars.index') },
-            { title: 'Resmi Tatiller', icon: 'confetti', href: route('admin.holidays.index') },
+            { title: 'Devam Takibi', icon: 'clock', href: window.route('admin.attendance.index') },
+            { title: 'QR Giriş/Çıkış', icon: 'qrcode', href: window.route('admin.attendance.scan') },
+            { title: 'Vardiyalar', icon: 'clock', href: window.route('admin.shifts.index') },
+            { title: 'Vardiya Takvimi', icon: 'calendar-event', href: window.route('admin.shifts.schedules') },
+            { title: 'Düzeltme Talepleri', icon: 'edit', href: window.route('admin.adjustments.index') },
+            { title: 'Çalışma Takvimleri', icon: 'calendar-event', href: window.route('admin.work-calendars.index') },
+            { title: 'Resmi Tatiller', icon: 'confetti', href: window.route('admin.holidays.index') },
             ],
         },
         {
             title: 'İzin Yönetimi',
             items: [
-            { title: 'İzin Talepleri', icon: 'calendar-check', href: route('admin.leave.requests.index') },
-            { title: 'İzin Türleri', icon: 'tag', href: route('admin.leave.types.index') },
-            { title: 'İzin Hakları', icon: 'list-check', href: route('admin.leave.entitlements.index') },
+            { title: 'İzin Talepleri', icon: 'calendar-check', href: window.route('admin.leave.requests.index') },
+            { title: 'İzin Türleri', icon: 'tag', href: window.route('admin.leave.types.index') },
+            { title: 'İzin Hakları', icon: 'list-check', href: window.route('admin.leave.entitlements.index') },
             ],
         },
         {
             title: 'Bordro ve Maaş',
             items: [
-            { title: 'Bordrolar', icon: 'cash-banknote', href: route('admin.payrolls.index') },
-            { title: 'Maaş Bileşenleri', icon: 'calculator', href: route('admin.salary-components.index') },
-            { title: 'Avans Talepleri', icon: 'hand-finger', href: route('admin.advances.index') },
+            { title: 'Bordrolar', icon: 'cash-banknote', href: window.route('admin.payrolls.index') },
+            { title: 'Maaş Bileşenleri', icon: 'calculator', href: window.route('admin.salary-components.index') },
+            { title: 'Avans Talepleri', icon: 'hand-finger', href: window.route('admin.advances.index') },
             ],
         },
         {
             title: 'Raporlar',
             items: [
-            { title: 'Bordro Raporları', icon: 'chart-bar', href: route('admin.payroll-reports.index') },
-            { title: 'Yıllık Özet', icon: 'chart-dots', href: route('admin.payroll-reports.annual') },
-            { title: 'Karşılaştırma', icon: 'arrows-left-right', href: route('admin.payroll-reports.compare') },
-            { title: 'Devam Raporları', icon: 'file-analytics', href: route('admin.attendance-reports.index') },
-            { title: 'Günlük Rapor', icon: 'journal', href: route('admin.attendance-reports.daily') },
-            { title: 'Aylık Rapor', icon: 'calendar-stats', href: route('admin.attendance-reports.monthly') },
-            { title: 'Fazla Mesai', icon: 'clock', href: route('admin.attendance-reports.overtime') },
+            { title: 'Bordro Raporları', icon: 'chart-bar', href: window.route('admin.payroll-reports.index') },
+            { title: 'Yıllık Özet', icon: 'chart-dots', href: window.route('admin.payroll-reports.annual') },
+            { title: 'Karşılaştırma', icon: 'arrows-left-right', href: window.route('admin.payroll-reports.compare') },
+            { title: 'Devam Raporları', icon: 'file-analytics', href: window.route('admin.attendance-reports.index') },
+            { title: 'Günlük Rapor', icon: 'journal', href: window.route('admin.attendance-reports.daily') },
+            { title: 'Aylık Rapor', icon: 'calendar-stats', href: window.route('admin.attendance-reports.monthly') },
+            { title: 'Fazla Mesai', icon: 'clock', href: window.route('admin.attendance-reports.overtime') },
             ],
         },
     ];
@@ -186,7 +202,7 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
             <nav className={`pc-sidebar ${sidebarOpen ? '' : 'pc-sidebar-hide'}`}>
                 <div className="navbar-wrapper">
                     <div className="m-header">
-                        <Link href={route('dashboard')}>
+                        <Link href={window.route('dashboard')}>
                             <span style={{ fontSize: "1.3rem", fontWeight: "bold", textTransform: "uppercase" }}>
                                 {appName}
                             </span>
@@ -292,11 +308,11 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                                     </ul>
                                     <div className="tab-content">
                                         <div className="tab-pane fade show active">
-                                            <Link href={route('profile.edit')} className="dropdown-item">
+                                                 <Link href={window.route('profile.edit')} className="dropdown-item">
                                                 <i className="ti ti-user"></i>
                                                 <span>Profil</span>
                                             </Link>
-                                            <Link href={route('logout')} method="post" className="dropdown-item">
+                                                 <Link href={window.route('logout')} method="post" className="dropdown-item">
                                                 <i className="ti ti-logout"></i>
                                                 <span>Çıkış Yap</span>
                                             </Link>
@@ -343,16 +359,74 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
 
                     {children}
                 </div>
-            </div>
-
-            {/* Footer */}
-            <footer className="footer">
+                {/* Footer */}
+            <footer className="footer pb-3">
                 <div className="container-fluid text-center">
                     <p className="mb-0 text-muted small">
                         Copyright © {new Date().getFullYear()} {appName}. Tüm hakları saklıdır.
                     </p>
                 </div>
             </footer>
+            </div>
+
+
+
+            {/* Toast Container */}
+            <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {toasts.map((toast) => {
+                    const colors = {
+                        success: { bg: '#d1e7dd', border: '#0f5132', text: '#0f5132', icon: '✓' },
+                        error: { bg: '#f8d7da', border: '#842029', text: '#842029', icon: '✕' },
+                        warning: { bg: '#fff3cd', border: '#664d03', text: '#664d03', icon: '!' },
+                        info: { bg: '#cff4fc', border: '#055160', text: '#055160', icon: 'i' },
+                    };
+                    const c = colors[toast.type] || colors.info;
+                    return (
+                        <div
+                            key={toast.id}
+                            onClick={() => removeToast(toast.id)}
+                            style={{
+                                background: c.bg,
+                                borderLeft: `4px solid ${c.border}`,
+                                color: c.text,
+                                padding: '12px 16px',
+                                borderRadius: 6,
+                                fontSize: 14,
+                                fontWeight: 500,
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                cursor: 'pointer',
+                                minWidth: 280,
+                                maxWidth: 400,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 10,
+                                animation: 'slideIn 0.3s ease',
+                            }}
+                        >
+                            <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: 22,
+                                height: 22,
+                                borderRadius: '50%',
+                                background: c.border,
+                                color: c.bg,
+                                fontSize: 12,
+                                fontWeight: 700,
+                                flexShrink: 0,
+                            }}>{c.icon}</span>
+                            {toast.message}
+                        </div>
+                    );
+                })}
+            </div>
+            <style>{`
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `}</style>
         </>
     );
 }

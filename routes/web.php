@@ -89,7 +89,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Admin - Departments
     Route::prefix('admin/departments')->name('admin.departments.')->group(function () {
         Route::get('/', [DepartmentController::class, 'index'])->name('index');
+        Route::get('/create', [DepartmentController::class, 'create'])->name('create');
         Route::post('/', [DepartmentController::class, 'store'])->name('store');
+        Route::get('/{department}/edit', [DepartmentController::class, 'edit'])->name('edit');
         Route::put('/{department}', [DepartmentController::class, 'update'])->name('update');
         Route::delete('/{department}', [DepartmentController::class, 'destroy'])->name('destroy');
     });
@@ -282,6 +284,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [ShiftController::class, 'index'])->name('index');
         Route::get('/create', [ShiftController::class, 'create'])->name('create');
         Route::post('/', [ShiftController::class, 'store'])->name('store');
+        Route::get('/schedules', [ShiftController::class, 'schedules'])->name('schedules');
         Route::get('/{shift}', [ShiftController::class, 'show'])->name('show');
         Route::get('/{shift}/edit', [ShiftController::class, 'edit'])->name('edit');
         Route::put('/{shift}', [ShiftController::class, 'update'])->name('update');
@@ -289,7 +292,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/assign', [ShiftController::class, 'assignToEmployee'])->name('assign');
         Route::post('/assign-bulk', [ShiftController::class, 'assignBulk'])->name('assignBulk');
         Route::get('/schedule/{employeeId}', [ShiftController::class, 'getEmployeeSchedule'])->name('schedule');
-        Route::get('/schedules', [ShiftController::class, 'schedules'])->name('schedules');
     });
 
     // Admin - Work Calendars

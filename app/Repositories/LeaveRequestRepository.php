@@ -29,13 +29,13 @@ class LeaveRequestRepository extends BaseRepository implements ILeaveRequestRepo
 
     public function getPaginated(array $filters = [], array $with = [], int $perPage = 15)
     {
-        $query = $this->model->query();
+        $query = $this->model->query()
+            ->select('id', 'employee_id', 'leave_type_id', 'start_date', 'end_date', 'is_half_day', 'status', 'reason');
 
         if (! empty($with)) {
             $query->with($with);
         }
 
-        // Filtreleri uygula
         $this->applyFilters($query, $filters);
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);

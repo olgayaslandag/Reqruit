@@ -21,7 +21,7 @@ class FormRepository extends BaseRepository implements IFormRepository
      */
     public function getAll(array $filters = []): Collection
     {
-        $query = Form::with('department', 'fields');
+        $query = Form::query()->select('id', 'name');
 
         if (isset($filters['department_id'])) {
             $query->where('department_id', $filters['department_id']);

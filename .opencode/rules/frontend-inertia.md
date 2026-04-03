@@ -29,3 +29,17 @@
 - Yükleme durumlarını ve iyimser güncellemeleri etkili şekilde yönetin
 - Sunucu doğrulama hatalarını ilgili form alanlarına senkronize edin
 - Kapsayıcı kullanıcı deneyimleri için erişilebilirlik yönergelerini takip edin
+
+## Form Doğrulama Sırası
+- **Önce frontend doğrulama:** Form submit olayında `e.preventDefault()` ile gönderimi durdur, gerekli alanları kontrol et. Eksik/hatalı alan varsa toast ile hata göster ve sunucuya gönderme.
+- **Sonra backend doğrulama:** Frontend kontrolünden geçen veri sunucuya gönderilir. Laravel FormRequest validation başarısız olursa `onError` callback ile hata mesajları toast olarak gösterilir.
+- **Asla doğrudan sunucuya gönderme:** Frontend validasyonu atlanmamalı. Boş/eksik veri ile sunucuya istek yapılmamalı. Bu, gereksiz sistem hatalarını ve kullanıcı deneyimi sorunlarını önler.
+- **Toast kullanımı:** Başarı/hata bildirimleri için `@/Utils/toast` modülündeki `showSuccess`/`showError` fonksiyonlarını kullan. SweetAlert toast kullanma.
+- **Hata mesajları:** Backend'den dönen validation hatalarını `Object.values(errors).flat().join('\n')` ile birleştir ve toast'ta göster.
+
+## Form Doğrulama Sırası
+- **Önce frontend doğrulama:** Form submit olayında `e.preventDefault()` ile gönderimi durdur, gerekli alanları kontrol et. Eksik/hatalı alan varsa toast ile hata göster ve sunucuya gönderme.
+- **Sonra backend doğrulama:** Frontend kontrolünden geçen veri sunucuya gönderilir. Laravel FormRequest validation başarısız olursa `onError` callback ile hata mesajları toast olarak gösterilir.
+- **Asla doğrudan sunucuya gönderme:** Frontend validasyonu atlanmamalı. Boş/eksik veri ile sunucuya istek yapılmamalı. Bu, gereksiz sistem hatalarını ve kullanıcı deneyimi sorunlarını önler.
+- **Toast kullanımı:** Başarı/hata bildirimleri için `@/Utils/toast` modülündeki `showSuccess`/`showError` fonksiyonlarını kullan. SweetAlert toast kullanma.
+- **Hata mesajları:** Backend'den dönen validation hatalarını `Object.values(errors).flat().join('\n')` ile birleştir ve toast'ta göster.

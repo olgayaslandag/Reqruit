@@ -7,6 +7,7 @@ use App\Models\PayrollPeriod;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class PayrollControllerTest extends TestCase
@@ -23,7 +24,9 @@ class PayrollControllerTest extends TestCase
     {
         parent::setUp();
 
-        // Kullanıcı oluşturma
+        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'web']);
+
         $this->adminUser = User::factory()->create();
         $this->adminUser->assignRole('admin');
 
@@ -118,9 +121,8 @@ class PayrollControllerTest extends TestCase
         $response = $this->actingAs($this->adminUser)
             ->put("/admin/payrolls/{$period->id}", $data);
 
-        // 422 validation hatasıysa en azından izin verilmiş demektir
-        // 403 forbidden değilse yetkilendirme çalışmaktadır
-        $response->assertStatus(200); // Redirect successful updates
+        // Redirect after successful update
+        $response->assertStatus(302);
     }
 
     public function test_destroy_requires_admin_or_hr_role(): void

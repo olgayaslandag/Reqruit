@@ -31,11 +31,11 @@ class UpdateEmployeeRequest extends FormRequest
 
         return [
             // Kimlik bilgileri
-            'identity_no' => ['required', 'string', 'max:11', 'min:11', 'unique:employees,identity_no,' . $employeeId],
+            'identity_no' => ['required', 'string', 'max:11', 'min:11', 'unique:employees,identity_no,'.$employeeId],
             'first_name' => ['required', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'birth_date' => ['required', 'date', 'before:today', 'after_or_equal:' . now()->subYears(65)->format('Y-m-d')],
-            'gender' => ['required', Rule::enum(GenderEnum::class)],
+            'birth_date' => ['nullable', 'date', 'before:today', 'after_or_equal:'.now()->subYears(65)->format('Y-m-d')],
+            'gender' => ['nullable', Rule::enum(GenderEnum::class)],
 
             // İletişim bilgileri
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9\+\-\s]+$/'],
@@ -57,7 +57,7 @@ class UpdateEmployeeRequest extends FormRequest
             'department_id' => ['required', 'exists:departments,id'],
             'employment_type' => ['required', Rule::enum(EmploymentTypeEnum::class)],
             'contract_type' => ['required', Rule::enum(ContractTypeEnum::class)],
-            'manager_id' => ['nullable', 'exists:employees,id', 'not_in:' . $employeeId],
+            'manager_id' => ['nullable', 'exists:employees,id', 'not_in:'.$employeeId],
 
             // İşten ayrılma bilgileri (sadece update için)
             'termination_date' => ['nullable', 'date', 'before_or_equal:today'],
@@ -69,7 +69,7 @@ class UpdateEmployeeRequest extends FormRequest
             'education.*.school_name' => ['required_with:education', 'string', 'max:200'],
             'education.*.department' => ['nullable', 'string', 'max:200'],
             'education.*.degree' => ['required_with:education', Rule::enum(DegreeEnum::class)],
-            'education.*.graduation_year' => ['nullable', 'integer', 'min:1950', 'max:' . now()->year],
+            'education.*.graduation_year' => ['nullable', 'integer', 'min:1950', 'max:'.now()->year],
         ];
     }
 

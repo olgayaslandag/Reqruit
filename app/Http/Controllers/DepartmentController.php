@@ -24,6 +24,25 @@ class DepartmentController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        $departments = $this->departmentService->getTree();
+
+        return Inertia::render('Admin/Departments/Create', [
+            'departments' => $departments,
+        ]);
+    }
+
+    public function edit(Department $department)
+    {
+        $departments = $this->departmentService->getTree();
+
+        return Inertia::render('Admin/Departments/Edit', [
+            'department' => $department,
+            'departments' => $departments,
+        ]);
+    }
+
     public function store(StoreDepartmentRequest $request)
     {
         $this->departmentService->create($request->validated());

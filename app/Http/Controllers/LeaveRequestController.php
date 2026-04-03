@@ -24,15 +24,14 @@ class LeaveRequestController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['employee_id', 'leave_type_id', 'status', 'approver_id', 'start_date_from', 'start_date_to', 'year']);
-        $with = ['employee', 'leaveType', 'approver'];
 
-        $leaveRequests = $this->leaveRequestRepository->getAll($filters, $with);
+        $leaveRequests = $this->leaveRequestRepository->getPaginated($filters, [], 15);
 
         $employees = Employee::orderBy('first_name')->get(['id', 'first_name', 'last_name'])->toArray();
         $leaveTypes = LeaveType::orderBy('name')->get(['id', 'name'])->toArray();
 
         return Inertia::render('Admin/Leave/LeaveRequests', [
-            'leaveRequests' => $leaveRequests->toArray(),
+            'leaveRequests' => $leaveRequests,
             'employees' => $employees,
             'leaveTypes' => $leaveTypes,
             'filters' => $filters,

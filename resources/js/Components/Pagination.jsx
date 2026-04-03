@@ -1,7 +1,8 @@
 import { Link } from '@inertiajs/react';
+import React from 'react';
 
 export default function Pagination({ meta, baseUrl }) {
-    if (!meta || meta.last_page <= 1) return null;
+    if (!meta) return null;
 
     const getPageNumbers = () => {
         const pages = [];
@@ -56,52 +57,55 @@ export default function Pagination({ meta, baseUrl }) {
     const pageNumbers = getPageNumbers();
 
     return (
-        <div className="d-flex justify-content-between align-items-center mt-4">
-            <div className="text-muted small">
-                Toplam <strong>{meta.total}</strong> kayıttan{' '}
-                <strong>{meta.from}</strong>-<strong>{meta.to}</strong> arası gösteriliyor
-            </div>
-            <nav>
-                <ul className="pagination pagination-sm mb-0">
-                    {/* Previous */}
-                    <li className={`page-item ${meta.current_page === 1 ? 'disabled' : ''}`}>
-                        <Link
-                            href={getPageUrl(meta.current_page - 1)}
-                            className="page-link"
-                            tabIndex={meta.current_page === 1 ? -1 : undefined}
-                        >
-                            <i className="bi bi-chevron-left"></i>
-                        </Link>
-                    </li>
-
-                    {/* Sayfa numaraları */}
-                    {pageNumbers.map((page, index) => (
-                        <li
-                            key={index}
-                            className={`page-item ${typeof page === 'number' && page === meta.current_page ? 'active' : ''} ${page === '...' ? 'disabled' : ''}`}
-                        >
-                            {page === '...' ? (
-                                <span className="page-link">...</span>
-                            ) : (
-                                <Link href={getPageUrl(page)} className="page-link">
-                                    {page}
-                                </Link>
-                            )}
+        <>
+            <div className="d-flex justify-content-between align-items-center mt-4 mb-5">
+                <div className="text-muted small">
+                    Toplam <strong>{meta.total}</strong> kayıttan{' '}
+                    <strong>{meta.from}</strong>-<strong>{meta.to}</strong> arası gösteriliyor
+                </div>
+                <nav>
+                    <ul className="pagination pagination-sm mb-0">
+                        {/* Previous */}
+                        <li className={`page-item ${meta.current_page === 1 ? 'disabled' : ''}`}>
+                            <Link
+                                href={getPageUrl(meta.current_page - 1)}
+                                className="page-link"
+                                tabIndex={meta.current_page === 1 ? -1 : undefined}
+                            >
+                                <i className="ti ti-chevron-left"></i>
+                            </Link>
                         </li>
-                    ))}
 
-                    {/* Next */}
-                    <li className={`page-item ${meta.current_page === meta.last_page ? 'disabled' : ''}`}>
-                        <Link
-                            href={getPageUrl(meta.current_page + 1)}
-                            className="page-link"
-                            tabIndex={meta.current_page === meta.last_page ? -1 : undefined}
-                        >
-                            <i className="bi bi-chevron-right"></i>
-                        </Link>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+                        {/* Sayfa numaraları */}
+                        {pageNumbers.map((page, index) => (
+                            <li
+                                key={index}
+                                className={`page-item ${typeof page === 'number' && page === meta.current_page ? 'active' : ''} ${page === '...' ? 'disabled' : ''}`}
+                            >
+                                {page === '...' ? (
+                                    <span className="page-link">...</span>
+                                ) : (
+                                    <Link href={getPageUrl(page)} className="page-link">
+                                        {page}
+                                    </Link>
+                                )}
+                            </li>
+                        ))}
+
+                        {/* Next */}
+                        <li className={`page-item ${meta.current_page === meta.last_page ? 'disabled' : ''}`}>
+                            <Link
+                                href={getPageUrl(meta.current_page + 1)}
+                                className="page-link"
+                                tabIndex={meta.current_page === meta.last_page ? -1 : undefined}
+                            >
+                                <i className="ti ti-chevron-right"></i>
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div className='clearfix'>&nbsp;</div>
+        </>
     );
 }

@@ -8,6 +8,7 @@ use App\Models\EmployeeDocument;
 use App\Models\EmployeeEducation;
 use App\Models\EmployeePositionHistory;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class EmployeeService
@@ -312,7 +313,7 @@ class EmployeeService
      */
     public function createWithEducation(array $data, array $educationData = []): Employee
     {
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
             // Employee oluştur
             $employee = $this->create($data);
@@ -322,11 +323,11 @@ class EmployeeService
                 $this->storeEducations($employee->id, $educationData);
             }
 
-            \DB::commit();
+            DB::commit();
 
             return $employee;
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             throw $e;
         }
     }
@@ -336,7 +337,7 @@ class EmployeeService
      */
     public function updateWithEducation(int $employeeId, array $data, array $educationData = []): Employee
     {
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
             // Employee güncelle
             $employee = $this->update($employeeId, $data);
@@ -346,11 +347,11 @@ class EmployeeService
                 $this->updateEducations($employee->id, $educationData);
             }
 
-            \DB::commit();
+            DB::commit();
 
             return $employee;
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             throw $e;
         }
     }

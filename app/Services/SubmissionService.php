@@ -19,6 +19,11 @@ class SubmissionService
         return $this->submissionRepository->getAll($filters);
     }
 
+    public function getPaginated(array $filters = [], int $perPage = 15)
+    {
+        return $this->submissionRepository->getPaginated($filters, $perPage);
+    }
+
     public function getById(int $id)
     {
         return $this->submissionRepository->getWithDetails($id);
@@ -81,9 +86,9 @@ class SubmissionService
         return $this->submissionRepository->updateStatus($id, $status);
     }
 
-    public function updateInvestigation(int $id, string $investigation)
+    public function updateInvestigation(int $id, string $investigation, ?string $notes = null)
     {
-        return $this->submissionRepository->updateInvestigation($id, $investigation);
+        return $this->submissionRepository->updateInvestigation($id, $investigation, $notes);
     }
 
     public function addComment(int $submissionId, array $data, ?int $userId = null)

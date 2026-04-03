@@ -62,7 +62,7 @@ export default function Index({ users, filters }) {
                     { label: 'Kullanıcılar', url: route('admin.users.index') },
                 ],
                 newUrl: route('admin.users.create'),
-                exportUrl: route('admin.users.export'),
+
             }}
         >
             <Head title="Kullanıcılar" />
@@ -81,7 +81,7 @@ export default function Index({ users, filters }) {
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                                 <button type="submit" className="btn btn-primary">
-                                    <i className="ti ti-search"></i> Ara
+                                    <i className="ti ti-search"></i>
                                 </button>
                             </form>
                         </div>

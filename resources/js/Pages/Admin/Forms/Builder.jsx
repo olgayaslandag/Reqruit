@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { showSuccess as showToastSuccess, showError as showToastError } from '@/Utils/toast';
 
 const FIELD_TYPES = [
     { value: 'text', label: 'Metin' },
@@ -16,6 +17,18 @@ const FIELD_TYPES = [
 ];
 
 export default function Builder({ departments, form }) {
+    const { props } = usePage();
+    const flash = props.flash;
+
+    useEffect(() => {
+        if (flash?.success) {
+            showToastSuccess(flash.success);
+        }
+        if (flash?.error) {
+            showToastError(flash.error);
+        }
+    }, [flash]);
+
     const { data, setData, post, put } = useForm({
         name: form?.name || '',
         department_id: form?.department_id || '',
@@ -36,7 +49,7 @@ export default function Builder({ departments, form }) {
         const existingNames = data.fields
             .map((f, i) => i !== excludeIndex ? f.name : null)
             .filter(Boolean);
-        
+
         let name = baseName;
         let counter = 1;
         while (existingNames.includes(name)) {
@@ -82,20 +95,18 @@ export default function Builder({ departments, form }) {
 
     const updateField = (index, key, value) => {
         const newFields = [...data.fields];
-        
+
         if (key === 'label' && !newFields[index].name) {
             newFields[index].name = generateUniqueName(newFields[index].label.toLowerCase().replace(/\s+/g, '_'), index);
         }
-        
+
         if (key === 'name') {
-            // Generate unique name from the provided value
             const uniqueName = generateUniqueName(value, index);
             newFields[index].name = uniqueName;
-            // Don't set newFields[index][key] = value here, because we want the unique name
         } else {
             newFields[index][key] = value;
         }
-        
+
         setData('fields', newFields);
     };
 
@@ -120,7 +131,7 @@ export default function Builder({ departments, form }) {
         const draggedField = newFields[draggedIndex];
         newFields.splice(draggedIndex, 1);
         newFields.splice(index, 0, draggedField);
-        
+
         setData('fields', newFields);
         setDraggedIndex(index);
     };
@@ -153,64 +164,54 @@ export default function Builder({ departments, form }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
-        // Clean up notification emails - remove empty ones
+
         const cleanedNotificationEmails = (data.notification_emails || []).filter(email => email.trim() !== '');
-        
-        // Prepare the data to send
+
         const formData = {
             ...data,
             notification_emails: cleanedNotificationEmails
         };
-        
-        // Debug: Log the data being sent
-        console.log('Form data being submitted:', formData);
-        
+
         if (form?.id) {
-            put(`/admin/forms/${form.id}`, formData, {
-                onSuccess: () => router.visit('/admin/forms'),
-                onError: (errors) => {
-                    console.error('Form update errors:', errors);
-                    // Optionally display errors to user
-                    alert('Form güncellenirken hata oluştu. Konsolu kontrol edin.');
-                },
-            });
+            put(`/admin/forms/${form.id}`, formData);
         } else {
-            post('/admin/forms', formData, {
-                onSuccess: () => router.visit('/admin/forms'),
-                onError: (errors) => {
-                    console.error('Form create errors:', errors);
-                    // Optionally display errors to user
-                    alert('Form oluşturulurken hata oluştu. Konsolu kontrol edin.');
-                },
-            });
+            post('/admin/forms', formData);
         }
     };
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout
+            pageHeader={{
+                title: form ? 'Form Düzenle' : 'Yeni Form',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Formlar', url: route('admin.forms.index') },
+                    { label: form ? 'Düzenle' : 'Oluştur', url: '#' },
+                ],
+            }}
+        >
             <Head title={form ? 'Form Düzenle' : 'Yeni Form'} />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    <form onSubmit={handleSubmit}>
-                        <div className="d-grid d-grid-cols-3 gap-4">
-                            {/* Form Settings */}
-                            <div className="col-span-1 bg-white p-4 rounded-3 shadow-sm">
-                                <h5 className="fw-semibold mb-3">Form Ayarları</h5>
-                                
-                                <div className="mb-4">
-                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Form Adı</label>
-                                    <input className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" type="text"
+            <form onSubmit={handleSubmit}>
+                <div className="row">
+                    <div className="col-lg-4">
+                        <div className="card mb-4">
+                            <div className="card-header">
+                                <h5 className="mb-0">Form Ayarları</h5>
+                            </div>
+                            <div className="card-body">
+                                <div className="mb-3">
+                                    <label className="form-label">Form Adı</label>
+                                    <input className="form-control" type="text"
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
                                         required
                                     />
                                 </div>
 
-                                <div className="mb-4">
-                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Departman</label>
-                                    <select className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" value={data.department_id}
+                                <div className="mb-3">
+                                    <label className="form-label">Departman</label>
+                                    <select className="form-select" value={data.department_id}
                                         onChange={(e) => setData('department_id', e.target.value)}
                                         required
                                     >
@@ -223,20 +224,20 @@ export default function Builder({ departments, form }) {
                                     </select>
                                 </div>
 
-                                <div className="mb-4">
-                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Açıklama</label>
-                                    <textarea className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" value={data.description}
+                                <div className="mb-3">
+                                    <label className="form-label">Açıklama</label>
+                                    <textarea className="form-control" value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                         rows={3}
                                     />
                                 </div>
 
-                                <div className="mb-4">
-                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Bildirim E-postaları</label>
-                                    <p className="fs-xs text-muted mb-2">Bu formdan başvuru geldiğinde bildirim gönderilecek e-postalar (departmandan bağımsız)</p>
+                                <div className="mb-3">
+                                    <label className="form-label">Bildirim E-postaları</label>
+                                    <small className="text-muted d-block mb-2">Bu formdan başvuru geldiğinde bildirim gönderilecek e-postalar</small>
                                     {(data.notification_emails || []).map((email, index) => (
                                         <div key={index} className="d-flex gap-2 mb-2">
-                                            <input className="form-control d-flex-1 border-secondary rounded-3 shadow-sm-sm" type="email"
+                                            <input className="form-control" type="email"
                                                 value={email || ''}
                                                 onChange={(e) => {
                                                     const newEmails = [...(data.notification_emails || [])];
@@ -252,11 +253,9 @@ export default function Builder({ departments, form }) {
                                                         const newEmails = (data.notification_emails || []).filter((_, i) => i !== index);
                                                         setData('notification_emails', newEmails);
                                                     }}
-                                                    className="p-2 text-danger hover:text-red-900"
+                                                    className="btn btn-outline-danger btn-sm"
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    <i className="ti ti-x"></i>
                                                 </button>
                                             )}
                                         </div>
@@ -264,7 +263,7 @@ export default function Builder({ departments, form }) {
                                     <button
                                         type="button"
                                         onClick={() => setData('notification_emails', [...(data.notification_emails || []), ''])}
-                                        className="text-primary hover:text-indigo-900 fs-sm"
+                                        className="btn btn-link btn-sm p-0"
                                     >
                                         + E-posta ekle
                                     </button>
@@ -272,141 +271,145 @@ export default function Builder({ departments, form }) {
 
                                 <button
                                     type="submit"
-                                    className="btn btn-primary btn-sm w-100"
+                                    className="btn btn-primary w-100"
                                 >
                                     {form ? 'Güncelle' : 'Oluştur'}
                                 </button>
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Fields */}
-                            <div className="col-span-2">
-                                <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 className="fw-semibold">Form Alanları</h5>
-                                    <div className="d-flex gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => addField('name')}
-                                            className="px-3 py-1.5 bg-light text-dark fs-sm rounded hover:bg-gray-200"
-                                        >
-                                            + Ad Soyad
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => addField('email')}
-                                            className="px-3 py-1.5 bg-light text-dark fs-sm rounded hover:bg-gray-200"
-                                        >
-                                            + E-posta
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => addField('default')}
-                                            className="btn btn-success btn-sm"
-                                        >
-                                            + Alan Ekle
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {data.fields.map((field, index) => (
-                                        <div
-                                            key={index}
-                                            draggable
-                                            onDragStart={() => handleDragStart(index)}
-                                            onDragOver={(e) => handleDragOver(e, index)}
-                                            onDragEnd={handleDragEnd}
-                                            className={`bg-white p-4 rounded-3 shadow-sm cursor-move ${
-                                                draggedIndex === index ? 'opacity-50' : ''
-                                            }`}
-                                        >
-                                            <div className="d-flex justify-content-between align-items-start mb-3">
-                                                <span className="text-muted">☰</span>
-                                                {field.name !== 'name' && field.name !== 'email' && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeField(index)}
-                                                        className="text-danger hover:text-red-900"
-                                                    >
-                                                        Sil
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            <div className="d-grid d-grid-cols-2 gap-3">
-                                                <div>
-                                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Etiket</label>
-                                                    <input className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" type="text"
-                                                        value={field.label}
-                                                        onChange={(e) => updateField(index, 'label', e.target.value)}
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    <label className="d-block fs-sm fw-medium text-dark mb-1">Tür</label>
-                                                    <select className="form-control w-100 border-secondary rounded-3 shadow-sm-sm" value={field.type}
-                                                        onChange={(e) => updateField(index, 'type', e.target.value)}
-                                                    >
-                                                        {FIELD_TYPES.map((type) => (
-                                                            <option key={type.value} value={type.value}>
-                                                                {type.label}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-
-                                                <div className="d-flex align-items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={field.required}
-                                                        onChange={(e) => updateField(index, 'required', e.target.checked)}
-                                                        className="h-4 w-4 text-primary border-secondary rounded"
-                                                    />
-                                                    <label className="ml-2 fs-sm text-dark">Zorunlu</label>
-                                                </div>
-                                            </div>
-
-                                            {/* Options for select/checkbox/radio */}
-                                            {['select', 'checkbox', 'radio'].includes(field.type) && (
-                                                <div className="mt-4">
-                                                    <label className="d-block fs-sm fw-medium text-dark mb-2">Seçenekler</label>
-                                                    {(field.options || []).map((option, optionIndex) => (
-                                                        <div key={optionIndex} className="d-flex gap-2 mb-2">
-                                                            <input className="form-control d-flex-1 border-secondary rounded-3 shadow-sm-sm fs-sm" type="text"
-                                                                value={option}
-                                                                onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => removeOption(index, optionIndex)}
-                                                                className="text-danger hover:text-red-900 fs-sm"
-                                                            >
-                                                                Sil
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => addOption(index)}
-                                                        className="text-primary hover:text-indigo-900 fs-sm"
-                                                    >
-                                                        + Seçenek ekle
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-
-                                    {data.fields.length === 0 && (
-                                        <div className="table-light p-8 rounded text-center text-muted">
-                                            Henüz alan eklenmedi. "Alan Ekle" butonuna tıklayarak başlayabilirsiniz.
-                                        </div>
-                                    )}
+                    <div className="col-lg-8">
+                        <div className="card">
+                            <div className="card-header d-flex justify-content-between align-items-center">
+                                <h5 className="mb-0">Form Alanları</h5>
+                                <div className="d-flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => addField('name')}
+                                        className="btn btn-outline-secondary btn-sm"
+                                    >
+                                        + Ad Soyad
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => addField('email')}
+                                        className="btn btn-outline-secondary btn-sm"
+                                    >
+                                        + E-posta
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => addField('default')}
+                                        className="btn btn-success btn-sm"
+                                    >
+                                        + Alan Ekle
+                                    </button>
                                 </div>
                             </div>
+                            <div className="card-body">
+                                {data.fields.length > 0 ? (
+                                    <div className="d-flex flex-column gap-3">
+                                        {data.fields.map((field, index) => (
+                                            <div
+                                                key={index}
+                                                draggable
+                                                onDragStart={() => handleDragStart(index)}
+                                                onDragOver={(e) => handleDragOver(e, index)}
+                                                onDragEnd={handleDragEnd}
+                                                className={`border rounded p-3 ${draggedIndex === index ? 'opacity-50' : ''}`}
+                                            >
+                                                <div className="d-flex justify-content-between align-items-start mb-3">
+                                                    <span className="text-muted"><i className="ti ti-draggable"></i></span>
+                                                    {field.name !== 'name' && field.name !== 'email' && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeField(index)}
+                                                            className="btn btn-outline-danger btn-sm"
+                                                        >
+                                                            <i className="ti ti-trash"></i> Sil
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                <div className="row">
+                                                    <div className="col-md-6 mb-3">
+                                                        <label className="form-label">Etiket</label>
+                                                        <input className="form-control" type="text"
+                                                            value={field.label}
+                                                            onChange={(e) => updateField(index, 'label', e.target.value)}
+                                                        />
+                                                    </div>
+
+                                                    <div className="col-md-6 mb-3">
+                                                        <label className="form-label">Tür</label>
+                                                        <select className="form-select" value={field.type}
+                                                            onChange={(e) => updateField(index, 'type', e.target.value)}
+                                                        >
+                                                            {FIELD_TYPES.map((type) => (
+                                                                <option key={type.value} value={type.value}>
+                                                                    {type.label}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+
+                                                    <div className="col-md-12">
+                                                        <div className="form-check">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={field.required}
+                                                                onChange={(e) => updateField(index, 'required', e.target.checked)}
+                                                                className="form-check-input"
+                                                                id={`required_${index}`}
+                                                            />
+                                                            <label className="form-check-label" htmlFor={`required_${index}`}>
+                                                                Zorunlu
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {['select', 'checkbox', 'radio'].includes(field.type) && (
+                                                    <div className="mt-3">
+                                                        <label className="form-label">Seçenekler</label>
+                                                        {(field.options || []).map((option, optionIndex) => (
+                                                            <div key={optionIndex} className="d-flex gap-2 mb-2">
+                                                                <input className="form-control" type="text"
+                                                                    value={option}
+                                                                    onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeOption(index, optionIndex)}
+                                                                    className="btn btn-outline-danger btn-sm"
+                                                                >
+                                                                    <i className="ti ti-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => addOption(index)}
+                                                            className="btn btn-link btn-sm p-0"
+                                                        >
+                                                            + Seçenek ekle
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center text-muted py-5">
+                                        Henüz alan eklenmedi. "Alan Ekle" butonuna tıklayarak başlayabilirsiniz.
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+            </form>
         </AuthenticatedLayout>
     );
 }

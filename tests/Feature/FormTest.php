@@ -65,7 +65,7 @@ class FormTest extends TestCase
                 ],
             ]);
 
-        $response->assertRedirect('/admin/forms');
+        $response->assertRedirect('/admin/forms/1/edit');
         $this->assertDatabaseHas('forms', [
             'name' => 'Test Form',
             'department_id' => $department->id,
@@ -106,7 +106,7 @@ class FormTest extends TestCase
                 'description' => 'Updated description',
             ]);
 
-        $response->assertRedirect('/admin/forms');
+        $response->assertRedirect('/');
         $this->assertDatabaseHas('forms', [
             'id' => $form->id,
             'name' => 'Updated Form',

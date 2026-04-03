@@ -1,27 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Pagination from '@/Components/Pagination';
 import { Head } from '@inertiajs/react';
-import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
+import { confirmDelete } from '@/Utils/sweetAlert';
+import { showSuccess as showToastSuccess, showError as showToastError } from '@/Utils/toast';
 
 export default function Index({ forms, departments, filters }) {
     const { props } = usePage();
+    const flash = props.flash;
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+
+    useEffect(() => {
+        if (flash?.success) {
+            showToastSuccess(flash.success);
+        }
+        if (flash?.error) {
+            showToastError(flash.error);
+        }
+    }, [flash]);
+    const formList = forms?.data || forms || [];
 
     const handleSearch = (e) => {
         e.preventDefault();
-        const url = typeof route !== 'undefined' ? route('admin.forms.index') : '/admin/forms';
-        router.get(url, {
+        router.get(route('admin.forms.index'), {
             search: searchTerm,
         }, { replace: true });
     };
 
     const handleDelete = (id) => {
         confirmDelete('Bu formu silmek istediğinize emin misiniz?', () => {
-            router.delete(`/admin/forms/${id}`, {
-                onSuccess: () => showSuccess('Form başarıyla silindi.'),
-            });
+            router.delete(`/admin/forms/${id}`);
         });
     };
 
@@ -30,109 +39,109 @@ export default function Index({ forms, departments, filters }) {
             pageHeader={{
                 title: 'Formlar',
                 breadcrumbs: [
-                    { label: 'Ana Sayfa', url: typeof route !== 'undefined' ? route('dashboard') : '/' },
+                    { label: 'Ana Sayfa', url: route('dashboard') },
                     { label: 'İnsan Kaynakları', url: '#' },
-                    { label: 'Formlar', url: typeof route !== 'undefined' ? route('admin.forms.index') : '/admin/forms' },
+                    { label: 'Formlar', url: route('admin.forms.index') },
                 ],
-                newUrl: typeof route !== 'undefined' ? route('admin.forms.create') : '/admin/forms/create',
-                exportUrl: typeof route !== 'undefined' ? route('admin.forms.export') : '/admin/forms/export',
+                newUrl: route('admin.forms.create'),
+                filterCollapse: 'filterCollapse',
             }}
         >
             <Head title="Formlar" />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    {/* Arama */}
-                    <div className="card shadow-sm mb-4">
-                        <div className="card-body p-3">
-                            <form onSubmit={handleSearch} className="d-flex gap-2">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Form ara..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                                <button type="submit" className="btn btn-primary">
-                                    <i className="ti ti-search"></i> Ara
-                                </button>
-                            </form>
+            {/* Arama */}
+            <div className="card collapse mb-4" id="filterCollapse">
+                <div className="card-body">
+                    <form onSubmit={handleSearch} className="row g-3 align-items-end">
+                        <div className="col-md-10">
+                            <label className="form-label">Form Ara</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Form ara..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                    </div>
-
-                    <div className="card shadow-sm">
-                        <table className="w-100 table table-sm mb-0">
-                            <thead className="table-light">
-                                <tr>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Form Adı</th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Departman</th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Alan Sayısı</th>
-                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {(forms?.data || []).map((form) => (
-                                    <tr key={form.id}>
-                                        <td className="px-4 py-3">
-                                            <Link
-                                                href={`/admin/forms/${form.id}/edit`}
-                                                className="fs-sm fw-medium text-dark"
-                                            >
-                                                {form.name}
-                                            </Link>
-                                            <div className="fs-sm text-muted">/{form.slug}</div>
-                                        </td>
-                                        <td className="px-4 py-3 text-nowrap">
-                                            {form.department?.title || '-'}
-                                        </td>
-                                        <td className="px-4 py-3 text-nowrap">
-                                            {form.fields?.length || 0}
-                                        </td>
-                                        <td className="px-4 py-3 text-nowrap text-right">
-                                            <div className="d-flex align-items-center justify-content-end gap-2">
-                                                <Link
-                                                    href={`/admin/forms/${form.id}/edit`}
-                                                    className="btn btn-link btn-sm text-primary p-0"
-                                                    title="Düzenle"
-                                                >
-                                                    <i className="ti ti-edit"></i>
-                                                </Link>
-                                                <Link
-                                                    href={`/forms/${form.slug}`}
-                                                    target="_blank"
-                                                    className="btn btn-link btn-sm text-success p-0"
-                                                    title="Önizleme"
-                                                >
-                                                    <i className="ti ti-external-link"></i>
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleDelete(form.id)}
-                                                    className="btn btn-link btn-sm text-danger p-0"
-                                                    title="Sil"
-                                                >
-                                                    <i className="ti ti-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {(!forms?.data || forms.data.length === 0) && (
-                                    <tr>
-                                        <td colSpan="4" className="px-4 py-8 text-center fs-sm text-muted">
-                                            Form bulunamadı.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Pagination */}
-                    {forms?.meta && forms.meta.last_page > 1 && (
-                        <Pagination meta={forms.meta} baseUrl={typeof route !== 'undefined' ? route('admin.forms.index') : '/admin/forms'} />
-                    )}
+                        <div className="col-md-2">
+                            <button type="submit" className="btn btn-primary">
+                                <i className="ti ti-search me-1"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
+
+            <div className="card">
+                <div className="card-body p-0">
+                    <table className="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th className="px-4 py-3">Form Adı</th>
+                                <th className="px-4 py-3">Departman</th>
+                                <th className="px-4 py-3">Alan Sayısı</th>
+                                <th className="px-4 py-3 text-end">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {formList.length > 0 ? (
+                                formList.map((form) => (
+                                <tr key={form.id}>
+                                    <td className="px-4 py-3">
+                                        <Link
+                                            href={`/admin/forms/${form.id}/edit`}
+                                            className="text-decoration-none text-dark fw-medium"
+                                        >
+                                            {form.name}
+                                        </Link>
+                                        <div className="text-muted small">/{form.slug}</div>
+                                    </td>
+                                    <td className="px-4 py-3 text-nowrap">
+                                        {form.department?.title || '-'}
+                                    </td>
+                                    <td className="px-4 py-3 text-nowrap">
+                                        {form.fields?.length || 0}
+                                    </td>
+                                    <td className="px-4 py-3 text-nowrap text-end">
+                                        <div className="d-flex gap-2 justify-content-end">
+                                            <Link
+                                                href={`/admin/forms/${form.id}/edit`}
+                                                className="btn btn-link text-secondary p-0"
+                                                title="Düzenle"
+                                            >
+                                                <i className="ti ti-edit"></i>
+                                            </Link>
+                                            <Link
+                                                href={`/forms/${form.slug}`}
+                                                target="_blank"
+                                                className="btn btn-link text-primary p-0"
+                                                title="Önizleme"
+                                            >
+                                                <i className="ti ti-external-link"></i>
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDelete(form.id)}
+                                                className="btn btn-link text-danger p-0"
+                                                title="Sil"
+                                            >
+                                                <i className="ti ti-trash"></i>
+                                            </button>
+                                        </div>
+                                </td>
+                            </tr>
+                        ))) : (
+                            <tr>
+                                <td colSpan="4" className="px-4 py-8 text-center text-muted">
+                                    Form bulunamadı.
+                                </td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <Pagination meta={forms} baseUrl={route('admin.forms.index')} />
         </AuthenticatedLayout>
     );
 }

@@ -25,9 +25,9 @@ class FormController extends Controller
 
         // Arama
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('slug', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('slug', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -55,9 +55,9 @@ class FormController extends Controller
 
     public function store(StoreFormRequest $request)
     {
-        $this->formService->create($request->validated());
+        $form = $this->formService->create($request->validated());
 
-        return redirect()->route('admin.forms.index')
+        return redirect()->route('admin.forms.edit', $form->id)
             ->with('success', 'Form başarıyla oluşturuldu.');
     }
 
@@ -78,8 +78,7 @@ class FormController extends Controller
     {
         $this->formService->update($form->id, $request->validated());
 
-        return redirect()->route('admin.forms.index')
-            ->with('success', 'Form başarıyla güncellendi.');
+        return back()->with('success', 'Form başarıyla güncellendi.');
     }
 
     public function destroy(Form $form)

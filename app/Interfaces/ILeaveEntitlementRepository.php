@@ -6,6 +6,8 @@ interface ILeaveEntitlementRepository
 {
     public function getAll(array $filters = [], array $with = []);
 
+    public function getPaginated(array $filters = [], array $with = [], int $perPage = 15);
+
     public function getByEmployeeAndYear(int $employeeId, string $year, array $with = []);
 
     public function getById(int $id, array $with = []);

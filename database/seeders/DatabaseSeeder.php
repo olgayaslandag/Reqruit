@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
 
         // Import all initial data from JSON files
         $this->call([
+            PermissionSeeder::class,
             ImportAllDataSeeder::class,
             UserSeeder::class,
             EmployeeSeeder::class,

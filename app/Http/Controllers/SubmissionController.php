@@ -9,6 +9,7 @@ use App\Services\DepartmentService;
 use App\Services\FormService;
 use App\Services\SubmissionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class SubmissionController extends Controller
@@ -25,7 +26,7 @@ class SubmissionController extends Controller
     {
         $filters = $request->only(['form_id', 'status', 'investigation', 'date_from', 'date_to', 'department_id']);
 
-        $submissions = $this->submissionService->getAll($filters);
+        $submissions = $this->submissionService->getPaginated($filters, 15);
         $forms = $this->formService->getAll();
         $departments = $this->departmentService->getAll();
 
@@ -61,9 +62,14 @@ class SubmissionController extends Controller
 
         $validated = $request->validate([
             'investigation' => ['required', 'string', 'in:pending,completed,none'],
+            'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $this->submissionService->updateInvestigation($submission->id, $validated['investigation']);
+        $this->submissionService->updateInvestigation(
+            $submission->id,
+            $validated['investigation'],
+            $validated['notes'] ?? null
+        );
 
         return back()->with('success', 'İstihbarat durumu güncellendi.');
     }
@@ -72,7 +78,7 @@ class SubmissionController extends Controller
     {
         $this->authorize('addComment', $submission);
 
-        $this->submissionService->addComment($submission->id, $request->validated(), auth()->id());
+        $this->submissionService->addComment($submission->id, $request->validated(), Auth::id());
 
         return back()->with('success', 'Yorum eklendi.');
     }

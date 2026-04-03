@@ -41,6 +41,7 @@ class EmployeeController extends Controller
             $request->get('per_page', 15)
         );
 
+
         return Inertia::render('Admin/Employees/Index', [
             'employees' => $employees,
             'filters' => $filters,

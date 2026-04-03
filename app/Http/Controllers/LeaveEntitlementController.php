@@ -22,9 +22,8 @@ class LeaveEntitlementController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['employee_id', 'leave_type_id', 'year', 'has_remaining']);
-        $with = ['employee', 'leaveType'];
 
-        $entitlements = $this->leaveEntitlementRepository->getAll($filters, $with)->toArray();
+        $entitlements = $this->leaveEntitlementRepository->getPaginated($filters, [], 15);
 
         $employees = Employee::orderBy('first_name')->get(['id', 'first_name', 'last_name'])->toArray();
         $leaveTypes = LeaveType::orderBy('name')->get(['id', 'name'])->toArray();

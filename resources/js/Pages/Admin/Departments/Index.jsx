@@ -49,7 +49,7 @@ export default function Index({ departments }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         if (editingDepartment) {
             router.put(`/admin/departments/${editingDepartment.id}`, {
                 ...data,
@@ -109,7 +109,6 @@ export default function Index({ departments }) {
                         </span>
                     </div>
                 </td>
-                <td className="px-4 py-3 text-nowrap">{department.slug}</td>
                 <td className="px-4 py-3">
                     {(department.emails || []).map((email, i) => (
                         <span key={i} className="badge bg-light text-dark me-1">
@@ -121,14 +120,14 @@ export default function Index({ departments }) {
                     <div className="d-flex align-items-center justify-content-end gap-1">
                         <button
                             onClick={() => openModal(department)}
-                            className="btn btn-link btn-sm text-primary"
+                            className="btn btn-link text-primary p-0"
                             title="Düzenle"
                         >
                             <i className="ti ti-edit"></i>
                         </button>
                         <button
                             onClick={() => handleDelete(department.id)}
-                            className="btn btn-link btn-sm text-danger"
+                            className="btn btn-link text-danger p-0"
                             title="Sil"
                         >
                             <i className="ti ti-trash"></i>
@@ -158,7 +157,6 @@ export default function Index({ departments }) {
                     { label: 'Departmanlar', url: route('admin.departments.index') },
                 ],
                 newUrl: route('admin.departments.create'),
-                exportUrl: route('admin.departments.export'),
             }}
         >
             <Head title="Departmanlar" />
@@ -171,7 +169,6 @@ export default function Index({ departments }) {
                                 <thead>
                                     <tr>
                                         <th className="px-4 py-3">Başlık</th>
-                                        <th className="px-4 py-3">Slug</th>
                                         <th className="px-4 py-3">E-postalar</th>
                                         <th className="px-4 py-3 text-end">İşlemler</th>
                                     </tr>

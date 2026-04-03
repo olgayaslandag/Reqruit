@@ -17,8 +17,8 @@ class PayrollSeeder extends Seeder
         // Payroll Periods - Bordro Dönemleri (12 months)
         $periods = $this->createPayrollPeriods();
 
-        // Employees - Çalışanlar
-        $employees = \DB::table('employees')->get()->toArray();
+        // Employees - Çalışanlar (limit to avoid memory issues)
+        $employees = \DB::table('employees')->limit(200)->get()->map(fn ($e) => (array) $e)->toArray();
 
         if (empty($employees)) {
             $this->command->warn('No employees found. Run EmployeeSeeder first.');
@@ -237,7 +237,7 @@ class PayrollSeeder extends Seeder
                     'payment_date' => $paymentDate,
                     'status' => $status,
                 ]);
-                $periods[] = (object) ['id' => $existing->id];
+                $periods[] = (object) ['id' => $existing->id, 'payment_date' => $paymentDate];
             } else {
                 $id = \DB::table('payroll_periods')->insertGetId([
                     'start_date' => $startDate,
@@ -247,7 +247,7 @@ class PayrollSeeder extends Seeder
                     'payment_date' => $paymentDate,
                     'status' => $status,
                 ]);
-                $periods[] = (object) ['id' => $id];
+                $periods[] = (object) ['id' => $id, 'payment_date' => $paymentDate];
             }
         }
 

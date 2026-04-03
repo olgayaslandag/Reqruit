@@ -18,7 +18,7 @@ class DepartmentRepository extends BaseRepository implements IDepartmentReposito
      */
     public function getAll(array $filters = []): Collection
     {
-        $query = Department::query();
+        $query = Department::query()->select('id', 'title');
 
         if (isset($filters['parent_id'])) {
             $query->where('parent_id', $filters['parent_id']);

@@ -5,10 +5,9 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Reqruit';
+import i18n from './i18n';
 
-// Initialize Bootstrap only in browser environment since it manipulates the DOM
-// We'll import the Bootstrap JS directly which will be available through the script tag in app.blade.php
+const appName = import.meta.env.VITE_APP_NAME || 'Reqruit';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

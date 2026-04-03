@@ -169,7 +169,9 @@ class EmployeeSeeder extends Seeder
 
         $this->command->info('Created '.count($employeeData).' employees');
 
-        return $allEmployees->keyBy('id')->toArray();
+        return $allEmployees->map(function ($emp) {
+            return (array) $emp;
+        })->keyBy('id')->toArray();
     }
 
     private function seedEducation(array $employees): void
