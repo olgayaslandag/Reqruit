@@ -202,6 +202,36 @@ class AttendanceController extends Controller
         ]);
     }
 
+    public function manualClock(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'timestamp' => 'required|date',
+            'type' => 'required|in:clock_in,clock_out',
+        ]);
+
+        try {
+            $employeeId = (int) $request->employee_id;
+            $timestamp = Carbon::parse($request->timestamp);
+
+            if ($request->type === 'clock_in') {
+                $result = $this->attendanceService->manualClockIn(
+                    $employeeId,
+                    $timestamp,
+                );
+            } else {
+                $result = $this->attendanceService->manualClockOut(
+                    $employeeId,
+                    $timestamp,
+                );
+            }
+
+            return redirect()->back()->with('success', $request->type === 'clock_in' ? 'Giriş kaydı başarıyla oluşturuldu.' : 'Çıkış kaydı başarıyla oluşturuldu.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Kayıt başarısız: '.$e->getMessage());
+        }
+    }
+
     public function scan(Request $request)
     {
         $employees = Employee::whereNull('termination_date')
@@ -211,8 +241,37 @@ class AttendanceController extends Controller
 
         $employees->load('department');
 
+        $recentAttendances = AttendanceRecord::with('employee:id,first_name,last_name,identity_no')
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($record) {
+                $timestamp = null;
+                if ($record->date && $record->time) {
+                    $timeStr = is_string($record->time) ? $record->time : $record->time->format('H:i:s');
+                    $timestamp = Carbon::parse($record->date->format('Y-m-d').' '.$timeStr);
+                }
+
+                $type = $record->type?->value ?? '';
+                $typeDisplay = $type === 'check_in' ? 'clock_in' : ($type === 'check_out' ? 'clock_out' : $type);
+
+                return [
+                    'id' => $record->id,
+                    'employee' => [
+                        'first_name' => $record->employee->first_name,
+                        'last_name' => $record->employee->last_name,
+                        'identity_no' => $record->employee->identity_no,
+                    ],
+                    'timestamp' => $timestamp?->toISOString(),
+                    'timestamp_formatted' => $timestamp?->format('d.m.Y H:i'),
+                    'type' => $typeDisplay,
+                    'status' => $record->status?->value ?? '',
+                ];
+            });
+
         return inertia('Admin/Attendance/Scan', [
             'employees' => $employees,
+            'recentAttendances' => $recentAttendances,
         ]);
     }
 

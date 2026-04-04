@@ -47,13 +47,15 @@ export default function Export() {
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Devam Raporları Dışa Aktar
-                    </h5>
-                </div>
-            }
+            pageHeader={{
+                title: 'Devam Raporları Dışa Aktar',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Raporlar', url: route('admin.reports.index') },
+                    { label: 'Devam Raporları', url: route('admin.attendance-reports.index') },
+                    { label: 'Dışa Aktar', url: route('admin.attendance-reports.export') },
+                ],
+            }}
         >
             <Head title="Rapor Dışa Aktar" />
 

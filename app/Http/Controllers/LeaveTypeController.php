@@ -26,12 +26,17 @@ class LeaveTypeController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Admin/Leave/Create');
+    }
+
     public function store(StoreLeaveTypeRequest $request)
     {
         try {
             $leaveType = $this->leaveTypeRepository->create($request->validated());
 
-            return redirect()->back()->with('success', 'İzin türü başarıyla oluşturuldu.');
+            return redirect()->route('admin.leave.types.index')->with('success', 'İzin türü başarıyla oluşturuldu.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -42,12 +47,19 @@ class LeaveTypeController extends Controller
         return response()->json($leaveType);
     }
 
+    public function edit(LeaveType $leaveType)
+    {
+        return Inertia::render('Admin/Leave/Edit', [
+            'leaveType' => $leaveType,
+        ]);
+    }
+
     public function update(UpdateLeaveTypeRequest $request, LeaveType $leaveType)
     {
         try {
             $updated = $this->leaveTypeRepository->update($leaveType->id, $request->validated());
 
-            return redirect()->back()->with('success', 'İzin türü başarıyla güncellendi.');
+            return redirect()->route('admin.leave.types.index')->with('success', 'İzin türü başarıyla güncellendi.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

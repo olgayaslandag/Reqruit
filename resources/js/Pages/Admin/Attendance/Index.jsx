@@ -54,11 +54,14 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                 newUrl: route('admin.attendance.scan'),
                 filterCollapse: 'filterCollapse',
             }}
+            showFilters={true}
+            filterTitle={'Filtreleme Seçenekleri'}
+            filterId={'filterCollapse'}
         >
             <Head title="Devam Kayıtları" />
 
             <div className="card mb-4 collapse" id="filterCollapse">
-                <div className="card-body">
+                <div className="p-4">
                     <div className="row g-3">
                         <div className="col-md-3">
                             <label className="form-label">Çalışan</label>
@@ -161,14 +164,14 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                                             <div className="d-flex gap-1 justify-content-end">
                                                 <Link
                                                     href={route('admin.attendance.edit', attendance.id)}
-                                                    className="btn btn-link btn-sm p-0 text-primary"
+                                                    className="btn btn-link p-0 text-primary"
                                                     title="Düzenle"
                                                 >
                                                     <i className="ti ti-edit"></i>
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(attendance.id)}
-                                                    className="btn btn-link btn-sm p-0 text-danger"
+                                                    className="btn btn-link p-0 text-danger"
                                                     title="Sil"
                                                 >
                                                     <i className="ti ti-trash"></i>

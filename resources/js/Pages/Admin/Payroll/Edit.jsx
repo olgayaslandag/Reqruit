@@ -1,12 +1,7 @@
 import { useForm, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import { InputLabel } from '@/Components/InputLabel';
-import { TextInput } from '@/Components/TextInput';
-import { InputError } from '@/Components/InputError';
-import { Select } from '@/Components/Select';
-import { PrimaryButton } from '@/Components/PrimaryButton';
-import { Checkbox } from '@/Components/Checkbox';
+import { showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatDate } from '@/Utils/formatters';
 
 export default function Edit({ period }) {
@@ -22,143 +17,238 @@ export default function Edit({ period }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        patch(route('admin.payrolls.update', period.id));
+        patch(route('admin.payrolls.update', period.id), {
+            onSuccess: () => {
+                showSuccess('Bordro dönemi güncellendi.');
+            },
+            onError: () => {
+                showError('Güncelleme sırasında hata oluştu.');
+            }
+        });
+    };
+
+    const getStatusBadgeClass = (status) => {
+        switch (status) {
+            case 'draft': return 'bg-light text-dark border';
+            case 'pending': return 'bg-warning text-dark';
+            case 'approved': return 'bg-success';
+            case 'paid': return 'bg-primary';
+            case 'locked': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        const labels = {
+            draft: 'Taslak',
+            pending: 'Beklemede',
+            approved: 'Onaylandı',
+            paid: 'Ödendi',
+            locked: 'Kilitli',
+        };
+        return labels[status] || status;
     };
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold text-dark">
-                        Bordro Dönemi Güncelle
-                    </h5>
-                    <Link
-                        href={route('admin.payrolls.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
-                    >
-                        Geri Dön
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Bordro Dönemi Güncelle',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro ve Maaş', url: '#' },
+                    { label: 'Bordro Dönemleri', url: route('admin.payrolls.index') },
+                    { label: period.name, url: route('admin.payrolls.edit', period.id) },
+                ],
+                backUrl: route('admin.payrolls.index'),
+            }}
         >
             <Head title="Bordro Güncelle" />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    <div className="bg-white overflow-hidden shadow-sm-sm">
-                        <div className="p-4 text-dark">
-                            {flash.success && (
-                                <div className="mb-4 p-4 bg-success bg-opacity-10 text-success rounded">
+            <div className="row">
+                <div className="col-lg-8">
+                    <div className="card">
+                        <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0 fw-bold">
+                                <i className="ti ti-calendar-edit me-2"></i> Dönem Bilgileri
+                            </h5>
+                            <span className={`badge ${getStatusBadgeClass(period.status)}`}>
+                                {getStatusLabel(period.status)}
+                            </span>
+                        </div>
+                        <div className="card-body">
+                            {flash?.success && (
+                                <div className="alert alert-success mb-4" role="alert">
+                                    <i className="ti ti-check me-2"></i>
                                     {flash.success}
                                 </div>
                             )}
 
-                            <form onSubmit={handleSubmit} className="mb-3">
-                                <div className="d-grid d-grid-cols-1 gap-4">
+                            <form onSubmit={handleSubmit}>
+                                <div className="row g-3">
                                     {/* Dönem Adı */}
-                                    <div>
-                                        <InputLabel htmlFor="name" value="Dönem Adı" />
-                                        <TextInput
-                                            id="name"
+                                    <div className="col-12">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-tag me-1"></i> Dönem Adı <span className="text-danger">*</span>
+                                        </label>
+                                        <input
                                             type="text"
-                                            className="mt-1 d-block w-100"
+                                            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                             required
                                         />
-                                        <InputError message={errors.name} className="mt-2" />
+                                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                                     </div>
 
                                     {/* Başlangıç Tarihi */}
-                                    <div>
-                                        <InputLabel htmlFor="start_date" value="Başlangıç Tarihi" />
-                                        <TextInput
-                                            id="start_date"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-calendar-event me-1"></i> Başlangıç Tarihi <span className="text-danger">*</span>
+                                        </label>
+                                        <input
                                             type="date"
-                                            className="mt-1 d-block w-100"
+                                            className={`form-control ${errors.start_date ? 'is-invalid' : ''}`}
                                             value={data.start_date}
                                             onChange={(e) => setData('start_date', e.target.value)}
                                             required
                                         />
-                                        <InputError message={errors.start_date} className="mt-2" />
+                                        {errors.start_date && <div className="invalid-feedback">{errors.start_date}</div>}
                                     </div>
 
                                     {/* Bitiş Tarihi */}
-                                    <div>
-                                        <InputLabel htmlFor="end_date" value="Bitiş Tarihi" />
-                                        <TextInput
-                                            id="end_date"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-calendar-event me-1"></i> Bitiş Tarihi <span className="text-danger">*</span>
+                                        </label>
+                                        <input
                                             type="date"
-                                            className="mt-1 d-block w-100"
+                                            className={`form-control ${errors.end_date ? 'is-invalid' : ''}`}
                                             value={data.end_date}
                                             onChange={(e) => setData('end_date', e.target.value)}
                                             required
                                         />
-                                        <InputError message={errors.end_date} className="mt-2" />
+                                        {errors.end_date && <div className="invalid-feedback">{errors.end_date}</div>}
                                     </div>
 
                                     {/* Ödeme Sıklığı */}
-                                    <div>
-                                        <InputLabel htmlFor="payment_frequency" value="Ödeme Sıklığı" />
-                                        <Select
-                                            id="payment_frequency"
-                                            className="mt-1 d-block w-100"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-repeat me-1"></i> Ödeme Sıklığı
+                                        </label>
+                                        <select
+                                            className="form-select"
                                             value={data.payment_frequency}
                                             onChange={(e) => setData('payment_frequency', e.target.value)}
                                         >
                                             <option value="monthly">Aylık</option>
                                             <option value="biweekly">İki Haftalık</option>
                                             <option value="weekly">Haftalık</option>
-                                        </Select>
-                                        <InputError message={errors.payment_frequency} className="mt-2" />
+                                        </select>
                                     </div>
 
                                     {/* Ödeme Tarihi */}
-                                    <div>
-                                        <InputLabel htmlFor="payment_date" value="Ödeme Tarihi" />
-                                        <TextInput
-                                            id="payment_date"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-calendar-check me-1"></i> Ödeme Tarihi
+                                        </label>
+                                        <input
                                             type="date"
-                                            className="mt-1 d-block w-100"
+                                            className="form-control"
                                             value={data.payment_date}
                                             onChange={(e) => setData('payment_date', e.target.value)}
                                         />
-                                        <InputError message={errors.payment_date} className="mt-2" />
+                                    </div>
+
+                                    {/* Notlar */}
+                                    <div className="col-12">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-file-text me-1"></i> Notlar
+                                        </label>
+                                        <textarea
+                                            className="form-control"
+                                            rows={4}
+                                            value={data.notes}
+                                            onChange={(e) => setData('notes', e.target.value)}
+                                        />
+                                        {errors.notes && <div className="invalid-feedback">{errors.notes}</div>}
                                     </div>
                                 </div>
 
-                                {/* Notlar */}
-                                <div>
-                                    <InputLabel htmlFor="notes" value="Notlar" />
-                                    <textarea className="form-control mt-1 d-block w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" id="notes"
-                                        rows="4"
-                                        
-                                        value={data.notes}
-                                        onChange={(e) => setData('notes', e.target.value)}
-                                    />
-                                    <InputError message={errors.notes} className="mt-2" />
-                                </div>
-
                                 {/* Butonlar */}
-                                <div className="d-flex align-items-center gap-3">
-                                    <PrimaryButton disabled={processing}>
-                                        Güncelle
-                                    </PrimaryButton>
-
+                                <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                                     <Link
                                         href={route('admin.payrolls.index')}
-                                        className="ml-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                        className="btn btn-light"
                                     >
-                                        İptal
+                                        <i className="ti ti-arrow-left me-1"></i> İptal
                                     </Link>
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="btn btn-primary"
+                                    >
+                                        {processing ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-1"></span>
+                                                Güncelleniyor...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="ti ti-check me-1"></i> Güncelle
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
 
                                 {recentlySuccessful && (
-                                    <p className="fs-sm text-muted">Kaydedildi.</p>
+                                    <div className="alert alert-success mt-3" role="alert">
+                                        <i className="ti ti-check me-2"></i> Kaydedildi.
+                                    </div>
                                 )}
                             </form>
                         </div>
                     </div>
+                </div>
+
+                {/* Sağ Panel - Bilgi */}
+                <div className="col-lg-4">
+                    <div className="card border-primary mb-4">
+                        <div className="card-header bg-primary text-white">
+                            <h6 className="mb-0 fw-bold">
+                                <i className="ti ti-info-circle me-1"></i> Dönem Detayları
+                            </h6>
+                        </div>
+                        <div className="card-body">
+                            <div className="mb-3">
+                                <label className="text-muted small">Oluşturulma Tarihi</label>
+                                <div className="fw-medium">
+                                    {formatDate(period.created_at)}
+                                </div>
+                            </div>
+                            <div className="mb-3">
+                                <label className="text-muted small">Son Güncelleme</label>
+                                <div className="fw-medium">
+                                    {formatDate(period.updated_at)}
+                                </div>
+                            </div>
+                            <div className="mb-0">
+                                <label className="text-muted small">Dönem ID</label>
+                                <div className="fw-medium text-muted">#{period.id}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {period.status !== 'draft' && (
+                        <div className="alert alert-warning" role="alert">
+                            <h6 className="alert-heading fw-bold">
+                                <i className="ti ti-alert-triangle me-1"></i> Dikkat
+                            </h6>
+                            <p className="mb-0 small">
+                                Bu dönem <strong>{getStatusLabel(period.status)}</strong> durumunda.
+                                Değişiklikler mevcut hesaplamaları etkileyebilir.
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>

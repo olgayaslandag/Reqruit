@@ -170,9 +170,9 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
         {
             title: 'İzin Yönetimi',
             items: [
-            { title: 'İzin Talepleri', icon: 'calendar-check', href: window.route('admin.leave.requests.index') },
+            { title: 'İzin Talepleri', icon: 'calendar-event', href: window.route('admin.leave.requests.index') },
             { title: 'İzin Türleri', icon: 'tag', href: window.route('admin.leave.types.index') },
-            { title: 'İzin Hakları', icon: 'list-check', href: window.route('admin.leave.entitlements.index') },
+            { title: 'İzin Hakları', icon: 'clipboard-check', href: window.route('admin.leave.entitlements.index') },
             ],
         },
         {
@@ -223,6 +223,7 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                                             <Link
                                                 href={item.href}
                                                 className={`pc-link${isActive(item.href) ? ' active' : ''}`}
+                                                preserveScroll
                                             >
                                                 <span className='pc-micon'>
                                                     <i className={`ti ti-${item.icon}`}></i>

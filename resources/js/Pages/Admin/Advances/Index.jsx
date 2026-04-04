@@ -5,17 +5,12 @@ import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatDate, formatCurrency } from '@/Utils/formatters';
 
-/**
- * Avans talepleri listesi
- * GET /admin/advances
- */
 export default function Index({ advances, filters, pendingCount, approvedCount, rejectedCount }) {
     const { props } = usePage();
-    
-    const [searchTerm, setSearchTerm] = useState(filters.search || '');
-    const [statusFilter, setStatusFilter] = useState(filters.status || '');
 
-    // Arama
+    const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [statusFilter, setStatusFilter] = useState(filters?.status || '');
+
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('admin.advances.index'), {
@@ -24,7 +19,6 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
         }, { replace: true });
     };
 
-    // Filtre
     const handleFilterChange = (key, value) => {
         router.get(route('admin.advances.index'), {
             ...(key === 'status' ? { status: value } : { [key]: value }),
@@ -32,7 +26,6 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
         }, { replace: true });
     };
 
-    // Silme (iptal)
     const handleCancel = (id) => {
         confirmDelete('Bu avans talebini iptal etmek istediğinize emin misiniz?', () => {
             router.post(route('admin.advances.cancel', id), {}, {
@@ -41,26 +34,52 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
         });
     };
 
-    // Durum badge
-    const getStatusBadge = (status) => {
-        const statusConfig = {
-            pending: { label: 'Beklemede', class: 'bg-warning bg-opacity-10 text-warning' },
-            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
-            rejected: { label: 'Reddedildi', class: 'bg-danger bg-opacity-10 text-danger' },
-            cancelled: { label: 'İptal', class: 'bg-light text-dark' },
-            paid: { label: 'Ödendi', class: 'bg-primary bg-opacity-10 text-info' },
-        };
-        
-        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
-        
-        return (
-            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
-                {config.label}
-            </span>
-        );
+    const handleApprove = (id) => {
+        confirmDelete('Bu avans talebini onaylamak istediğinize emin misiniz?', () => {
+            router.post(route('admin.advances.approve', id), {}, {
+                onSuccess: () => showSuccess('Avans onaylandı.'),
+            });
+        });
     };
 
-    // Avans türü etiketi
+    const handleReject = (id) => {
+        const reason = prompt('Reddetme nedeni:');
+        if (reason) {
+            router.post(route('admin.advances.reject', id), { reason }, {
+                onSuccess: () => showSuccess('Avans reddedildi.'),
+                onError: () => showError('İşlem sırasında hata oluştu.'),
+            });
+        }
+    };
+
+    const handleMarkAsPaid = (id) => {
+        router.post(route('admin.advances.mark-as-paid', id), {}, {
+            onSuccess: () => showSuccess('Avans ödendi olarak işaretlendi.'),
+        });
+    };
+
+    const getStatusBadgeClass = (status) => {
+        switch (status) {
+            case 'pending': return 'bg-warning text-dark';
+            case 'approved': return 'bg-success';
+            case 'rejected': return 'bg-danger';
+            case 'cancelled': return 'bg-secondary';
+            case 'paid': return 'bg-primary';
+            default: return 'bg-light text-dark';
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        const labels = {
+            pending: 'Beklemede',
+            approved: 'Onaylandı',
+            rejected: 'Reddedildi',
+            cancelled: 'İptal',
+            paid: 'Ödendi',
+        };
+        return labels[status] || status;
+    };
+
     const getTypeLabel = (type) => {
         const types = {
             salary: 'Maaş Avansı',
@@ -72,32 +91,13 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
         return types[type] || type;
     };
 
-    // Onayla
-    const handleApprove = (id) => {
-        confirmDelete('Bu avans talebini onaylamak istediğinize emin misiniz?', () => {
-            router.post(route('admin.advances.approve', id), {}, {
-                onSuccess: () => showSuccess('Avans onaylandı.'),
-            });
-        });
-    };
-
-    // Reddet
-    const handleReject = (id) => {
-        const reason = prompt('Reddetme nedeni:');
-        if (reason) {
-            router.post(route('admin.advances.reject', id), { reason }, {
-                onSuccess: () => showSuccess('Avans reddedildi.'),
-                onError: () => showError('İşlem sırasında hata oluştu.'),
-            });
-        }
-    };
-
-    // Ödendi işaretle
-    const handleMarkAsPaid = (id) => {
-        router.post(route('admin.advances.mark-as-paid', id), {}, {
-            onSuccess: () => showSuccess('Avans ödendi olarak işaretlendi.'),
-        });
-    };
+    // Array kontrolü
+    const advancesArray = Array.isArray(advances) ? advances : (advances?.data || []);
+    
+    // Toplam ödenen tutar
+    const totalPaid = advancesArray
+        .filter(a => a.status === 'paid')
+        .reduce((sum, a) => sum + (parseFloat(a.amount) || 0), 0);
 
     return (
         <AuthenticatedLayout
@@ -109,142 +109,155 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                     { label: 'Avans Talepleri', url: route('admin.advances.index') },
                 ],
                 newUrl: route('admin.advances.create'),
+                filterCollapse: true,
             }}
         >
             <Head title="Avans Talepleri" />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    {/* İstatistikler */}
-                    <div className="d-grid d-grid-cols-1 gap-3 mb-5">
-                        <div className="bg-white rounded-3 shadow-sm p-4">
-                            <div className="fs-sm text-muted">Bekleyen</div>
-                            <div className="fs-2 fw-bold text-warning">{pendingCount || 0}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm p-4">
-                            <div className="fs-sm text-muted">Onaylanan</div>
-                            <div className="fs-2 fw-bold text-success">{approvedCount || 0}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm p-4">
-                            <div className="fs-sm text-muted">Reddedilen</div>
-                            <div className="fs-2 fw-bold text-danger">{rejectedCount || 0}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm p-4">
-                            <div className="fs-sm text-muted">Ödenen</div>
-                            <div className="fs-2 fw-bold text-info">{advances?.data?.filter(a => a.status === 'paid').reduce((sum, a) => sum + parseFloat(a.amount), 0) || 0} TL</div>
-                        </div>
-                    </div>
+            {/* Collapse Filtre Paneli */}
+            <div className="collapse mb-4" id="filterCollapse">
+                <div className="card">
+                    <div className="card-body">
+                        <form onSubmit={handleSearch}>
+                            <div className="row g-3">
+                                <div className="col-md-6">
+                                    <label className="form-label fw-medium">
+                                        <i className="ti ti-search me-1"></i> Ara
+                                    </label>
+                                    <input
+                                        className="form-control"
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        placeholder="Çalışan adı, TC Kimlik No..."
+                                    />
+                                </div>
 
-                    {/* Arama ve Filtre */}
-                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
-                        <form onSubmit={handleSearch} className="d-flex d-flex-wrap gap-3 align-items-end">
-                            <div className="d-flex-1 min-w-[200px]">
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                    Ara
-                                </label>
-                                <input className="form-control" type="text"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Çalışan adı, TC Kimlik No..."
-                                />
+                                <div className="col-md-4">
+                                    <label className="form-label fw-medium">
+                                        <i className="ti ti-toggle-right me-1"></i> Durum
+                                    </label>
+                                    <select
+                                        className="form-select"
+                                        value={statusFilter}
+                                        onChange={(e) => {
+                                            setStatusFilter(e.target.value);
+                                            handleFilterChange('status', e.target.value);
+                                        }}
+                                    >
+                                        <option value="">Tümü</option>
+                                        <option value="pending">Beklemede</option>
+                                        <option value="approved">Onaylandı</option>
+                                        <option value="rejected">Reddedildi</option>
+                                        <option value="cancelled">İptal</option>
+                                        <option value="paid">Ödendi</option>
+                                    </select>
+                                </div>
+
+                                <div className="col-md-2 d-flex align-items-end">
+                                    <button type="submit" className="btn btn-primary w-100">
+                                        <i className="ti ti-filter me-1"></i> Filtrele
+                                    </button>
+                                </div>
                             </div>
-
-                            <div className="w-40">
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                    Durum
-                                </label>
-                                <select className="form-control" value={statusFilter}
-                                    onChange={(e) => {
-                                        setStatusFilter(e.target.value);
-                                        handleFilterChange('status', e.target.value);
-                                    }}
-                                >
-                                    <option value="">Tümü</option>
-                                    <option value="pending">Beklemede</option>
-                                    <option value="approved">Onaylandı</option>
-                                    <option value="rejected">Reddedildi</option>
-                                    <option value="cancelled">İptal</option>
-                                    <option value="paid">Ödendi</option>
-                                </select>
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="btn btn-primary btn-sm"
-                            >
-                                Ara
-                            </button>
                         </form>
                     </div>
+                </div>
+            </div>
 
-                    {/* Tablo */}
-                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
-                        <table className="w-100 divide-y divide-gray-200">
+            {/* Stats Cards */}
+            <div className="row g-3 mb-4">
+                <div className="col-md-3">
+                    <div className="card border-warning">
+                        <div className="card-body text-center">
+                            <i className="ti ti-clock fs-2 text-warning mb-2"></i>
+                            <h6 className="text-warning fw-medium">Bekleyen</h6>
+                            <h3 className="fw-bold text-warning">{pendingCount || 0}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-3">
+                    <div className="card border-success">
+                        <div className="card-body text-center">
+                            <i className="ti ti-check fs-2 text-success mb-2"></i>
+                            <h6 className="text-success fw-medium">Onaylanan</h6>
+                            <h3 className="fw-bold text-success">{approvedCount || 0}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-3">
+                    <div className="card border-danger">
+                        <div className="card-body text-center">
+                            <i className="ti ti-x fs-2 text-danger mb-2"></i>
+                            <h6 className="text-danger fw-medium">Reddedilen</h6>
+                            <h3 className="fw-bold text-danger">{rejectedCount || 0}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-3">
+                    <div className="card border-info">
+                        <div className="card-body text-center">
+                            <i className="ti ti-coin fs-2 text-info mb-2"></i>
+                            <h6 className="text-info fw-medium">Ödenen Toplam</h6>
+                            <h4 className="fw-bold text-info">{formatCurrency(totalPaid)}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Avans Tablosu */}
+            <div className="card">
+                <div className="card-header bg-light">
+                    <h5 className="mb-0 fw-bold">
+                        <i className="ti ti-hand-finger me-2"></i> Avans Talepleri Listesi
+                    </h5>
+                </div>
+                <div className="card-body p-0">
+                    <div className="table-responsive">
+                        <table className="table table-hover mb-0">
                             <thead className="table-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Çalışan
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Tür
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Tutar
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Taksit
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Talep Tarihi
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Durum
-                                    </th>
-                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
-                                        İşlemler
-                                    </th>
+                                    <th className="fw-medium">Çalışan</th>
+                                    <th className="fw-medium">Tür</th>
+                                    <th className="fw-medium text-end">Tutar</th>
+                                    <th className="fw-medium text-center">Taksit</th>
+                                    <th className="fw-medium">Talep Tarihi</th>
+                                    <th className="fw-medium text-center">Durum</th>
+                                    <th className="fw-medium text-end">İşlemler</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {advances?.data?.length > 0 ? (
-                                    (advances?.data || []).map((advance) => (
-                                        <tr key={advance.id} className="hover:table-light">
-                                            <td className="px-4 py-3">
-                                                <div className="fs-sm fw-medium text-dark">
-                                                    {advance.employee_name}
-                                                </div>
-                                                <div className="fs-xs text-muted">
-                                                    {advance.employee_identity_no}
-                                                </div>
+                            <tbody>
+                                {advancesArray.length > 0 ? (
+                                    advancesArray.map((advance) => (
+                                        <tr key={advance.id}>
+                                            <td>
+                                                <div className="fw-medium">{advance.employee_name}</div>
+                                                <small className="text-muted">{advance.employee_identity_no}</small>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <span className="fs-sm text-dark">
+                                            <td>
+                                                <span className="badge bg-light text-dark border">
                                                     {getTypeLabel(advance.type)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <span className="fs-sm fw-bold text-dark">
-                                                    {formatCurrency(advance.amount)}
+                                            <td className="text-end">
+                                                <span className="fw-bold">{formatCurrency(advance.amount)}</span>
+                                            </td>
+                                            <td className="text-center">
+                                                <span className="badge bg-secondary">{advance.installments || 1} taksit</span>
+                                            </td>
+                                            <td>
+                                                <span className="text-dark">{formatDate(advance.request_date)}</span>
+                                            </td>
+                                            <td className="text-center">
+                                                <span className={`badge ${getStatusBadgeClass(advance.status)}`}>
+                                                    {getStatusLabel(advance.status)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <span className="fs-sm text-dark">
-                                                    {advance.installments || 1} taksit
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-nowrap">
-                                                <span className="fs-sm text-dark">
-                                                    {formatDate(advance.request_date)}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-3 text-nowrap">
-                                                {getStatusBadge(advance.status)}
-                                            </td>
-                                            <td className="px-4 py-3 text-right">
-                                                <div className="d-flex align-items-center justify-content-end">
+                                            <td className="text-end">
+                                                <div className="d-flex justify-content-end gap-1">
                                                     <Link
                                                         href={route('admin.advances.show', advance.id)}
-                                                        className="p-1 text-muted hover:text-primary"
+                                                        className="btn btn-sm btn-outline-info"
                                                         title="Görüntüle"
                                                     >
                                                         <i className="ti ti-eye"></i>
@@ -254,14 +267,14 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                         <>
                                                             <button
                                                                 onClick={() => handleApprove(advance.id)}
-                                                                className="p-1 text-success hover:text-success"
+                                                                className="btn btn-sm btn-outline-success"
                                                                 title="Onayla"
                                                             >
                                                                 <i className="ti ti-check"></i>
                                                             </button>
                                                             <button
                                                                 onClick={() => handleReject(advance.id)}
-                                                                className="p-1 text-danger hover:text-danger"
+                                                                className="btn btn-sm btn-outline-danger"
                                                                 title="Reddet"
                                                             >
                                                                 <i className="ti ti-x"></i>
@@ -272,20 +285,20 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                     {advance.status === 'approved' && (
                                                         <button
                                                             onClick={() => handleMarkAsPaid(advance.id)}
-                                                            className="p-1 text-info hover:text-info"
+                                                            className="btn btn-sm btn-outline-primary"
                                                             title="Ödendi"
                                                         >
-                                                            <i className="ti ti-cash"></i>
+                                                            <i className="ti ti-coin"></i>
                                                         </button>
                                                     )}
 
                                                     {advance.status === 'pending' && (
                                                         <button
                                                             onClick={() => handleCancel(advance.id)}
-                                                            className="p-1 text-muted hover:text-danger"
+                                                            className="btn btn-sm btn-outline-secondary"
                                                             title="İptal"
                                                         >
-                                                            <i className="ti ti-x"></i>
+                                                            <i className="ti ti-ban"></i>
                                                         </button>
                                                     )}
                                                 </div>
@@ -294,7 +307,8 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="px-4 py-8 text-center fs-sm text-muted">
+                                        <td colSpan="7" className="text-center py-4 text-muted">
+                                            <i className="ti ti-hand-finger-off fs-1 d-block mb-2"></i>
                                             Avans talebi bulunamadı.
                                         </td>
                                     </tr>
@@ -302,29 +316,35 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Pagination */}
-                    {advances?.meta && advances.meta.last_page > 1 && (
-                        <div className="mt-4 d-flex justify-content-center">
-                            <div className="d-flex gap-1">
-                                {(advances?.meta?.links || []).map((link, index) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url || '#'}
-                                        className={`px-4 py-2 border rounded ${
-                                            link.active
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'bg-white text-dark hover:table-light'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        disabled={!link.url}
-                                    >
-                                        {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
+
+                {/* Pagination */}
+                {advances?.meta && advances.meta.last_page > 1 && (
+                    <div className="card-footer bg-light">
+                        <div className="d-flex align-items-center justify-content-between">
+                            <div>
+                                <small className="text-muted">
+                                    {advances.meta.from} - {advances.meta.to} arası, toplam {advances.meta.total} öğe
+                                </small>
+                            </div>
+                            <nav>
+                                <ul className="pagination pagination-sm mb-0">
+                                    {advances.meta.links.filter(link => link.url).map((link, index) => (
+                                        <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                            <Link
+                                                href={link.url}
+                                                className="page-link"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
+                                                }}
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );

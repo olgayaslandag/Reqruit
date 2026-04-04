@@ -1,214 +1,419 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { showSuccess, showError } from '@/Utils/sweetAlert';
-import { formatDateTime, formatDate } from '@/Utils/attendanceHelpers.jsx';
+import { showSuccess, showError } from '@/Utils/toast';
+import { Html5Qrcode } from 'html5-qrcode';
 
 export default function Scan() {
     const { props } = usePage();
     const flash = props.flash;
 
-    const [mode, setMode] = useState('clock_in'); // clock_in or clock_out
+    useEffect(() => {
+        if (flash?.success) {
+            showSuccess(flash.success);
+        }
+        if (flash?.error) {
+            showError(flash.error);
+        }
+    }, [flash]);
+
+    const [mode, setMode] = useState('clock_in');
     const [selectedEmployee, setSelectedEmployee] = useState('');
     const [manualClockTime, setManualClockTime] = useState(new Date().toISOString().slice(0, 16));
+    const [cameraOpen, setCameraOpen] = useState(false);
+    const [scanning, setScanning] = useState(false);
+    const [lastScannedEmployee, setLastScannedEmployee] = useState(null);
+    const [initScanner, setInitScanner] = useState(false);
 
-    const videoRef = useRef(null);
-    const streamRef = useRef(null);
+    const html5QrCodeRef = useRef(null);
+    const scannerRegionId = 'qr-reader';
 
     const handleModeChange = (newMode) => {
         setMode(newMode);
     };
 
-    const handleClock = async () => {
+    const handleClock = () => {
         if (!selectedEmployee) {
             showError('Lütfen bir çalışan seçin.');
             return;
         }
 
-        try {
+        const formData = {
+            employee_id: selectedEmployee,
+            timestamp: manualClockTime,
+            type: mode,
+        };
+
+        router.post(route('admin.attendance.manual-clock'), formData, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setManualClockTime(new Date().toISOString().slice(0, 16));
+                setSelectedEmployee('');
+                router.reload({ only: ['recentAttendances'] });
+            },
+            onError: (errors) => {
+                const errorMessage = Object.values(errors).flat().join(', ');
+                showError(errorMessage || 'Kayıt sırasında bir hata oluştu.');
+            }
+        });
+    };
+
+    const handleQRScanSuccess = (decodedText) => {
+        if (scanning) return;
+        setScanning(true);
+
+        const employee = (props.employees || []).find(emp => 
+            emp.id.toString() === decodedText || 
+            emp.identity_no === decodedText
+        );
+
+        if (employee) {
+            if (lastScannedEmployee?.id === employee.id) {
+                showSuccess(`${employee.first_name} ${employee.last_name} zaten tarandı.`);
+                setTimeout(() => setScanning(false), 2000);
+                return;
+            }
+
+            setLastScannedEmployee(employee);
+            setSelectedEmployee(employee.id);
+            
             const formData = {
-                employee_id: selectedEmployee,
-                timestamp: manualClockTime,
-                type: mode, // clock_in or clock_out
+                employee_id: employee.id,
+                timestamp: new Date().toISOString().slice(0, 16),
+                type: mode,
             };
 
             router.post(route('admin.attendance.manual-clock'), formData, {
+                preserveScroll: true,
                 onSuccess: () => {
-                    showSuccess(mode === 'clock_in' ? 'Giriş kaydı oluşturuldu.' : 'Çıkış kaydı oluşturuldu.');
-                    setManualClockTime(new Date().toISOString().slice(0, 16));
+                    showSuccess(`${employee.first_name} ${employee.last_name} - ${mode === 'clock_in' ? 'Giriş' : 'Çıkış'} kaydedildi.`);
+                    router.reload({ only: ['recentAttendances'] });
+                    setTimeout(() => setScanning(false), 1500);
                 },
                 onError: (errors) => {
-                    if (errors.message) {
-                        showError(errors.message);
-                    } else {
-                        showError('Kayıt sırasında bir hata oluştu.');
-                    }
+                    const errorMessage = Object.values(errors).flat().join(', ');
+                    showError(errorMessage || 'Kayıt sırasında bir hata oluştu.');
+                    setTimeout(() => setScanning(false), 2000);
                 }
             });
-        } catch (error) {
-            console.error('Clock error:', error);
-            showError('Kayıt işlemi sırasında bir hata oluştu.');
+        } else {
+            showError('QR kod tanımlanamadı. Çalışan bulunamadı.');
+            setTimeout(() => setScanning(false), 2000);
         }
     };
 
+    const handleQRScanError = (error) => {
+        console.warn('QR scan error:', error);
+    };
+
+    const startScanner = async () => {
+        try {
+            const element = document.getElementById(scannerRegionId);
+            if (!element) {
+                showError('Tarayıcı alanı bulunamadı. Lütfen sayfayı yenileyin.');
+                setCameraOpen(false);
+                return;
+            }
+
+            html5QrCodeRef.current = new Html5Qrcode(scannerRegionId);
+
+            const cameras = await Html5Qrcode.getCameras();
+            if (!cameras || cameras.length === 0) {
+                showError('Kamera bulunamadı.');
+                setCameraOpen(false);
+                return;
+            }
+
+            const backCamera = cameras.find(camera => 
+                camera.label.toLowerCase().includes('back') || 
+                camera.label.toLowerCase().includes('rear') ||
+                camera.label.toLowerCase().includes('environment')
+            ) || cameras[0];
+
+            await html5QrCodeRef.current.start(
+                backCamera.id,
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                },
+                handleQRScanSuccess,
+                handleQRScanError
+            );
+        } catch (err) {
+            console.error('Kamera başlatma hatası:', err);
+            showError('Kamera başlatılamadı: ' + (err.message || err || 'Bilinmeyen hata'));
+            setCameraOpen(false);
+        }
+    };
+
+    const stopScanner = async () => {
+        try {
+            if (html5QrCodeRef.current) {
+                const scannerState = html5QrCodeRef.current.getState();
+                if (scannerState === 2) {
+                    await html5QrCodeRef.current.stop();
+                }
+                html5QrCodeRef.current = null;
+            }
+        } catch (err) {
+            console.warn('Scanner stop error:', err);
+        }
+        setCameraOpen(false);
+        setScanning(false);
+    };
+
+    const toggleCamera = () => {
+        if (cameraOpen) {
+            stopScanner();
+        } else {
+            setInitScanner(true);
+            setCameraOpen(true);
+        }
+    };
+
+    useEffect(() => {
+        if (initScanner && cameraOpen) {
+            setTimeout(() => {
+                startScanner();
+                setInitScanner(false);
+            }, 150);
+        }
+    }, [initScanner, cameraOpen]);
+
+    useEffect(() => {
+        return () => {
+            if (html5QrCodeRef.current) {
+                html5QrCodeRef.current.stop().catch(() => {});
+            }
+        };
+    }, []);
+
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        QR Tarayıcı & Manuel Kayıt
-                    </h5>
-                </div>
-            }
+            pageHeader={{
+                title: 'QR Tarayıcı & Manuel Kayıt',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Zaman Yönetimi', url: route('admin.attendance.index') },
+                    { label: 'QR Giriş/Çıkış', url: route('admin.attendance.scan') },
+                ],
+            }}
         >
-            <Head title="Devam Kaydı" />
-
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
-                        <div className="p-4">
-                            <div className="d-flex gap-3 mb-5 border-b pb-4">
-                                <button
-                                    onClick={() => handleModeChange('clock_in')}
-                                    className={`px-6 py-3 rounded fw-medium ${
-                                        mode === 'clock_in'
-                                            ? 'bg-green-600 text-white'
-                                            : 'bg-gray-200 text-dark hover:bg-gray-300'
-                                    }`}
-                                >
-                                    Giriş
-                                </button>
-                                <button
-                                    onClick={() => handleModeChange('clock_out')}
-                                    className={`px-6 py-3 rounded fw-medium ${
-                                        mode === 'clock_out'
-                                            ? 'bg-red-600 text-white'
-                                            : 'bg-gray-200 text-dark hover:bg-gray-300'
-                                    }`}
-                                >
-                                    Çıkış
-                                </button>
-                            </div>
-
-                            {/* Manual Entry Section */}
-                            <div className="mb-5">
-                                <h5 className="fw-medium">Manuel Kayıt</h5>
-                                
-                                <div className="d-grid d-grid-cols-1 gap-3">
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Personel
-                                        </label>
-                                        <select className="form-control" value={selectedEmployee}
-                                            onChange={(e) => setSelectedEmployee(e.target.value)}
-                                        >
-                                            <option value="">Personel Seçin</option>
-                                            {(props.employees || []).map((emp) => (
-                                                <option key={emp.id} value={emp.id}>
-                                                    {emp.first_name} {emp.last_name} - {emp.identity_no}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Zaman
-                                        </label>
-                                        <input className="form-control" type="datetime-local"
-                                            value={manualClockTime}
-                                            onChange={(e) => setManualClockTime(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="mt-4">
+            <Head title="Giriş/Çıkış Kaydet - Devam Kaydı" />
+            <div className="row">
+                {/* Manuel Kayıt Kartı */}
+                <div className="col-md-6 mb-4">
+                    <div className="card">
+                        <div className="card-header bg-light">
+                            <h5 className="mb-0 fw-bold">
+                                <i className="ti ti-manual-gearbox me-2"></i> Manuel Kayıt
+                            </h5>
+                        </div>
+                        <div className="card-body">
+                            {/* Mod Seçimi */}
+                            <div className="row g-3 mb-4">
+                                <div className="col-md-6">
                                     <button
-                                        onClick={handleClock}
-                                        disabled={!selectedEmployee}
-                                        className={`btn fw-medium ${
-                                            selectedEmployee
-                                                ? mode === 'clock_in'
-                                                    ? 'btn-success'
-                                                    : 'btn-danger'
-                                                : 'btn-secondary disabled'
+                                        onClick={() => handleModeChange('clock_in')}
+                                        className={`btn w-100 ${
+                                            mode === 'clock_in'
+                                                ? 'btn-success'
+                                                : 'btn-outline-success'
                                         }`}
                                     >
-                                        {mode === 'clock_in' ? 'Giriş Yap' : 'Çıkış Yap'} - {new Date(manualClockTime).toLocaleTimeString('tr-TR')}
+                                        <i className="ti ti-login me-2"></i> Giriş
+                                    </button>
+                                </div>
+                                <div className="col-md-6">
+                                    <button
+                                        onClick={() => handleModeChange('clock_out')}
+                                        className={`btn w-100 ${
+                                            mode === 'clock_out'
+                                                ? 'btn-danger'
+                                                : 'btn-outline-danger'
+                                        }`}
+                                    >
+                                        <i className="ti ti-logout me-2"></i> Çıkış
                                     </button>
                                 </div>
                             </div>
 
-                            {/* QR Scanner Section */}
-                            <div className="border-t pt-6">
-                                <h5 className="fw-medium">QR Kod ile Kayıt</h5>
-                                
-                                <div className="bg-light border-2 border-dashed border-secondary rounded p-8 text-center">
-                                    <div className="d-flex d-flex-column align-items-center">
-                                        <svg className="w-16 h-16 text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                                        </svg>
-                                        <h5 className="fw-medium text-dark mb-2">QR Tarayıcı Kamerayı Aç</h5>
-                                        <p className="fs-sm text-muted mb-4">
-                                            Çalışan kimlik kartındaki QR kodunu tarayın
-                                        </p>
-                                        <button className="btn btn-primary btn-sm">
-                                            Kamera Aç
-                                        </button>
-                                    </div>
+                            {/* Form */}
+                            <div className="row g-3">
+                                <div className="col-md-12">
+                                    <label className="form-label fw-medium">Personel</label>
+                                    <select className="form-control" value={selectedEmployee}
+                                        onChange={(e) => setSelectedEmployee(e.target.value)}
+                                    >
+                                        <option value="">Personel Seçin</option>
+                                        {(props.employees || []).map((emp) => (
+                                            <option key={emp.id} value={emp.id}>
+                                                {emp.first_name} {emp.last_name} - {emp.identity_no}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="col-md-12">
+                                    <label className="form-label fw-medium">Zaman</label>
+                                    <input className="form-control" type="datetime-local"
+                                        value={manualClockTime}
+                                        onChange={(e) => setManualClockTime(e.target.value)}
+                                    />
                                 </div>
                             </div>
 
-                            {/* Recent Attendance Records */}
-                            <div className="border-t pt-6 mt-8">
-                                <h5 className="fw-medium">Son Kayıtlar</h5>
-                                
-                                {props.recentAttendances && props.recentAttendances.length > 0 ? (
-                                    <div className="overflow-auto">
-                                        <table className="w-100 divide-y divide-gray-200">
-                                            <thead className="table-light">
-                                                <tr>
-                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Personel</th>
-                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Zaman</th>
-                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Tip</th>
-                                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Durum</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {(props.recentAttendances || []).map((record, index) => (
-                                                    <tr key={index} className="hover:table-light">
-                                                        <td className="px-4 py-3 text-nowrap fs-sm fw-medium text-dark">
-                                                            {record.employee.first_name} {record.employee.last_name}
-                                                        </td>
-                                                        <td className="px-4 py-3 text-nowrap fs-sm text-dark">
-                                                            {formatDateTime(record.timestamp)}
-                                                        </td>
-                                                        <td className="px-4 py-3 text-nowrap fs-sm">
-                                                            <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
-                                                                record.type === 'clock_in' 
-                                                                    ? 'bg-success bg-opacity-10 text-success' 
-                                                                    : 'bg-danger bg-opacity-10 text-danger'
-                                                            }`}>
-                                                                {record.type === 'clock_in' ? 'Giriş' : 'Çıkış'}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-4 py-3 text-nowrap fs-sm">
-                                                            <span className="d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium bg-success bg-opacity-10 text-success">
-                                                                Kaydedildi
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                            <div className="mt-4">
+                                <button
+                                    onClick={handleClock}
+                                    disabled={!selectedEmployee}
+                                    className={`btn w-100 ${
+                                        selectedEmployee
+                                            ? mode === 'clock_in'
+                                                ? 'btn-success'
+                                                : 'btn-danger'
+                                            : 'btn-secondary disabled'
+                                    }`}
+                                >
+                                    {mode === 'clock_in' ? (
+                                        <><i className="ti ti-login me-2"></i> Giriş Yap</>
+                                    ) : (
+                                        <><i className="ti ti-logout me-2"></i> Çıkış Yap</>
+                                    )}
+                                    - {new Date(manualClockTime).toLocaleTimeString('tr-TR')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* QR Kod Tarayıcı ve Son Kayıtlar */}
+                <div className="col-md-6">
+                    {/* QR Kod ile Kayıt */}
+                    <div className="card mb-4">
+                        <div className="card-header bg-light">
+                            <h5 className="mb-0 fw-bold">
+                                <i className="ti ti-qrcode me-2"></i> QR Kod ile Kayıt
+                            </h5>
+                        </div>
+                        <div className="card-body">
+                            {/* Mod Seçimi */}
+                            <div className="row g-3 mb-3">
+                                <div className="col-md-6">
+                                    <button
+                                        onClick={() => handleModeChange('clock_in')}
+                                        className={`btn w-100 ${
+                                            mode === 'clock_in'
+                                                ? 'btn-success'
+                                                : 'btn-outline-success'
+                                        }`}
+                                    >
+                                        <i className="ti ti-login me-2"></i> Giriş
+                                    </button>
+                                </div>
+                                <div className="col-md-6">
+                                    <button
+                                        onClick={() => handleModeChange('clock_out')}
+                                        className={`btn w-100 ${
+                                            mode === 'clock_out'
+                                                ? 'btn-danger'
+                                                : 'btn-outline-danger'
+                                        }`}
+                                    >
+                                        <i className="ti ti-logout me-2"></i> Çıkış
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="text-center">
+                                {!cameraOpen ? (
+                                    <div className="bg-light border border-2 border-dashed rounded p-4">
+                                        <div className="d-flex flex-column align-items-center">
+                                            <i className="ti ti-camera-plus fs-1 text-muted mb-3" style={{fontSize: '3rem'}}></i>
+                                            <h6 className="fw-medium text-dark mb-2">QR Tarayıcı</h6>
+                                            <p className="text-muted mb-3">
+                                                Çalışan kimlik kartındaki QR kodunu tarayın
+                                            </p>
+                                            <button onClick={toggleCamera} className="btn btn-primary btn-sm">
+                                                <i className="ti ti-camera me-2"></i> Kamera Başlat
+                                            </button>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <p className="fs-sm text-muted text-center py-4">
-                                        Son kayıt bulunamadı.
-                                    </p>
+                                    <div>
+                                        <div id={scannerRegionId} style={{ width: '100%', maxWidth: '350px', margin: '0 auto' }}></div>
+                                        {lastScannedEmployee && (
+                                            <div className="alert alert-success mt-3 mb-0">
+                                                <i className="ti ti-user-check me-2"></i>
+                                                <strong>{lastScannedEmployee.first_name} {lastScannedEmployee.last_name}</strong>
+                                                <small className="ms-2">({lastScannedEmployee.identity_no})</small>
+                                            </div>
+                                        )}
+                                        <button onClick={toggleCamera} className="btn btn-danger btn-sm mt-3">
+                                            <i className="ti ti-camera-off me-2"></i> Kamerayı Durdur
+                                        </button>
+                                    </div>
                                 )}
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Son Kayıtlar */}
+                    <div className="card">
+                        <div className="card-header bg-light">
+                            <h5 className="mb-0 fw-bold">
+                                <i className="ti ti-history me-2"></i> Son Kayıtlar
+                            </h5>
+                        </div>
+                        <div className="card-body p-0">
+                            {props.recentAttendances && props.recentAttendances.length > 0 ? (
+                                <div className="table-responsive">
+                                    <table className="table table-hover mb-0">
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th className="fw-medium">Personel</th>
+                                                <th className="fw-medium">Zaman</th>
+                                                <th className="fw-medium">Tip</th>
+                                                <th className="fw-medium">Durum</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {props.recentAttendances.map((record, index) => (
+                                                <tr key={index}>
+                                                    <td className="fw-medium">
+                                                        {record.employee.first_name} {record.employee.last_name}
+                                                    </td>
+                                                    <td>
+                                                        {record.timestamp_formatted || (record.timestamp ? new Date(record.timestamp).toLocaleString('tr-TR') : '-')}
+                                                    </td>
+                                                    <td>
+                                                        <span className={`badge ${
+                                                            record.type === 'clock_in'
+                                                                ? 'bg-success'
+                                                                : 'bg-danger'
+                                                        }`}>
+                                                            {record.type === 'clock_in' ? 'Giriş' : 'Çıkış'}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span className="badge bg-success">
+                                                            Kaydedildi
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <div className="text-center p-4">
+                                    <p className="text-muted mb-0">
+                                        Son kayıt bulunamadı.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

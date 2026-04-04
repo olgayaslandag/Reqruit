@@ -7,61 +7,54 @@ export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         code: '',
-        type: 'earning',
-        category: 'position-fixed',
-        description: '',
-        is_active: true,
-        is_taxable: true,
-        is_sgk_applicable: true,
-        default_amount: '',
-        sort_order: 0,
+        is_paid: true,
+        requires_document: false,
+        max_duration_days: '',
+        description: ''
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('admin.salary-components.store'), {
+        post(route('admin.leave.types.store'), {
             onSuccess: () => {
-                showSuccess('Maaş kalemi oluşturuldu.');
+                showSuccess('İzin türü oluşturuldu.');
             },
             onError: () => {
-                showError('Oluşturma sırasında hata oluştu.');
+                showError('Oluşturma başarısız.');
             }
         });
     };
 
-    const getTypeLabel = (type) => type === 'earning' ? 'Kazanç' : 'Kesinti';
-    const getCategoryLabel = (cat) => cat === 'position-fixed' ? 'Sabit' : 'Değişken';
-
     return (
         <AuthenticatedLayout
             pageHeader={{
-                title: 'Yeni Maaş Kalemi',
+                title: 'Yeni İzin Türü',
                 breadcrumbs: [
                     { label: 'Ana Sayfa', url: route('dashboard') },
-                    { label: 'Bordro ve Maaş', url: '#' },
-                    { label: 'Maaş Bileşenleri', url: route('admin.salary-components.index') },
-                    { label: 'Yeni Kalemi', url: route('admin.salary-components.create') },
+                    { label: 'İzin Yönetimi', url: '#' },
+                    { label: 'İzin Türleri', url: route('admin.leave.types.index') },
+                    { label: 'Yeni Tür', url: route('admin.leave.types.create') },
                 ],
-                backUrl: route('admin.salary-components.index'),
+                backUrl: route('admin.leave.types.index'),
             }}
         >
-            <Head title="Yeni Maaş Kalemi" />
+            <Head title="Yeni İzin Türü" />
 
             <div className="row">
                 <div className="col-lg-8">
                     <div className="card">
                         <div className="card-header bg-light">
                             <h5 className="mb-0 fw-bold">
-                                <i className="ti ti-calculator me-2"></i> Kalem Bilgileri
+                                <i className="ti ti-tag me-2"></i> İzin Türü Bilgileri
                             </h5>
                         </div>
                         <div className="card-body">
                             <form onSubmit={handleSubmit}>
                                 <div className="row g-3">
-                                    {/* Kalem Adı */}
+                                    {/* İzin Türü Adı */}
                                     <div className="col-12">
                                         <label className="form-label fw-medium">
-                                            <i className="ti ti-tag me-1"></i> Kalem Adı <span className="text-danger">*</span>
+                                            <i className="ti ti-tag me-1"></i> İzin Türü Adı <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -69,8 +62,7 @@ export default function Create() {
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                             required
-                                            autoFocus
-                                            placeholder="Örn: Yemek Yardımı"
+                                            placeholder="Örn: Yıllık İzin"
                                         />
                                         {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                                     </div>
@@ -86,68 +78,23 @@ export default function Create() {
                                             value={data.code}
                                             onChange={(e) => setData('code', e.target.value)}
                                             required
-                                            placeholder="Örn: YEMEK"
+                                            placeholder="Örn: YILLIK"
                                         />
                                         {errors.code && <div className="invalid-feedback">{errors.code}</div>}
                                     </div>
 
-                                    {/* Varsayılan Tutar */}
+                                    {/* Maks. Gün */}
                                     <div className="col-md-6">
                                         <label className="form-label fw-medium">
-                                            <i className="ti ti-coin me-1"></i> Varsayılan Tutar
-                                        </label>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            className="form-control"
-                                            value={data.default_amount}
-                                            onChange={(e) => setData('default_amount', e.target.value)}
-                                            min="0"
-                                            placeholder="0.00"
-                                        />
-                                    </div>
-
-                                    {/* Tip */}
-                                    <div className="col-md-6">
-                                        <label className="form-label fw-medium">
-                                            <i className="ti ti-category me-1"></i> Tip <span className="text-danger">*</span>
-                                        </label>
-                                        <select
-                                            className="form-select"
-                                            value={data.type}
-                                            onChange={(e) => setData('type', e.target.value)}
-                                        >
-                                            <option value="earning">Kazanç (Ek Ödeme)</option>
-                                            <option value="deduction">Kesinti</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Kategori */}
-                                    <div className="col-md-6">
-                                        <label className="form-label fw-medium">
-                                            <i className="ti ti-folder me-1"></i> Kategori
-                                        </label>
-                                        <select
-                                            className="form-select"
-                                            value={data.category}
-                                            onChange={(e) => setData('category', e.target.value)}
-                                        >
-                                            <option value="position-fixed">Sabit</option>
-                                            <option value="variable">Değişken</option>
-                                        </select>
-                                    </div>
-
-                                    {/* Sıralama */}
-                                    <div className="col-md-6">
-                                        <label className="form-label fw-medium">
-                                            <i className="ti ti-list-numbers me-1"></i> Sıralama
+                                            <i className="ti ti-calendar me-1"></i> Maks. Gün
                                         </label>
                                         <input
                                             type="number"
                                             className="form-control"
-                                            value={data.sort_order}
-                                            onChange={(e) => setData('sort_order', parseInt(e.target.value) || 0)}
-                                            min="0"
+                                            value={data.max_duration_days}
+                                            onChange={(e) => setData('max_duration_days', e.target.value)}
+                                            min="1"
+                                            placeholder="Sınırsız için boş bırakın"
                                         />
                                     </div>
 
@@ -161,51 +108,36 @@ export default function Create() {
                                             rows={3}
                                             value={data.description}
                                             onChange={(e) => setData('description', e.target.value)}
-                                            placeholder="Kalem açıklaması..."
+                                            placeholder="İzin türü açıklaması..."
                                         />
-                                        {errors.description && <div className="invalid-feedback d-block">{errors.description}</div>}
                                     </div>
 
                                     {/* Checkbox'lar */}
-                                    <div className="col-md-4">
+                                    <div className="col-md-6">
                                         <div className="form-check">
                                             <input
                                                 type="checkbox"
                                                 className="form-check-input"
-                                                id="is_active"
-                                                checked={data.is_active}
-                                                onChange={(e) => setData('is_active', e.target.checked)}
+                                                id="is_paid"
+                                                checked={data.is_paid}
+                                                onChange={(e) => setData('is_paid', e.target.checked)}
                                             />
-                                            <label className="form-check-label" htmlFor="is_active">
-                                                Aktif
+                                            <label className="form-check-label" htmlFor="is_paid">
+                                                <i className="ti ti-coin me-1"></i> Ücretli İzin
                                             </label>
                                         </div>
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="col-md-6">
                                         <div className="form-check">
                                             <input
                                                 type="checkbox"
                                                 className="form-check-input"
-                                                id="is_taxable"
-                                                checked={data.is_taxable}
-                                                onChange={(e) => setData('is_taxable', e.target.checked)}
+                                                id="requires_document"
+                                                checked={data.requires_document}
+                                                onChange={(e) => setData('requires_document', e.target.checked)}
                                             />
-                                            <label className="form-check-label" htmlFor="is_taxable">
-                                                Vergilendirilir
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="form-check">
-                                            <input
-                                                type="checkbox"
-                                                className="form-check-input"
-                                                id="is_sgk_applicable"
-                                                checked={data.is_sgk_applicable}
-                                                onChange={(e) => setData('is_sgk_applicable', e.target.checked)}
-                                            />
-                                            <label className="form-check-label" htmlFor="is_sgk_applicable">
-                                                SGK Uygulanır
+                                            <label className="form-check-label" htmlFor="requires_document">
+                                                <i className="ti ti-file me-1"></i> Belge Gerektirir
                                             </label>
                                         </div>
                                     </div>
@@ -214,7 +146,7 @@ export default function Create() {
                                 {/* Butonlar */}
                                 <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                                     <Link
-                                        href={route('admin.salary-components.index')}
+                                        href={route('admin.leave.types.index')}
                                         className="btn btn-light"
                                     >
                                         <i className="ti ti-arrow-left me-1"></i> İptal
@@ -246,22 +178,22 @@ export default function Create() {
                     <div className="card border-info mb-4">
                         <div className="card-header bg-info text-white">
                             <h6 className="mb-0 fw-bold">
-                                <i className="ti ti-info-circle me-1"></i> Kalem Tipleri
+                                <i className="ti ti-info-circle me-1"></i> İzin Türleri
                             </h6>
                         </div>
                         <div className="card-body">
                             <div className="mb-3">
-                                <span className="badge bg-success mb-2">Kazanç</span>
-                                <p className="mb-0 small">Maaşa eklenen ödemeler (yemek, ulaşım vb.)</p>
+                                <span className="badge bg-success mb-2">Ücretli</span>
+                                <p className="mb-0 small">Personelin maaşından kesinti yapılmadan kullanabileceği izinler</p>
                             </div>
                             <div className="mb-3">
-                                <span className="badge bg-danger mb-2">Kesinti</span>
-                                <p className="mb-0 small">Maaştan düşülen tutarlar (avans, icra vb.)</p>
+                                <span className="badge bg-secondary mb-2">Ücretsiz</span>
+                                <p className="mb-0 small">Maaştan kesinti yapılarak kullanılan izinler</p>
                             </div>
                             <hr />
                             <div className="mb-0">
-                                <span className="badge bg-primary mb-2">Sabit</span>
-                                <p className="mb-0 small">Her ay otomatik uygulanan kalemler</p>
+                                <span className="badge bg-warning text-dark mb-2">Belge Gerekli</span>
+                                <p className="mb-0 small">Sağlık raporu, doğum belgesi vb. gerektiren izinler</p>
                             </div>
                         </div>
                     </div>
@@ -271,7 +203,7 @@ export default function Create() {
                             <i className="ti ti-alert-triangle me-1"></i> Dikkat
                         </h6>
                         <p className="mb-0 small">
-                            Kod alanı benzersiz olmalıdır. Aynı kodlu başka bir kalem olamaz.
+                            Kod alanı benzersiz olmalıdır. Aynı kodlu başka bir izin türü olamaz.
                         </p>
                     </div>
                 </div>

@@ -30,7 +30,6 @@ class AttendanceRecord extends Model
     protected $casts = [
         'employee_id' => 'integer',
         'date' => 'date',
-        'time' => 'datetime',
         'type' => AttendanceTypeEnum::class,
         'source' => AttendanceSourceEnum::class,
         'status' => AttendanceStatusEnum::class,

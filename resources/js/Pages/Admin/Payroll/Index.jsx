@@ -5,18 +5,13 @@ import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import { formatDate, formatCurrency, formatMonthYear } from '@/Utils/formatters';
 
-/**
- * Bordro dönemleri listesi
- * GET /admin/payrolls
- */
 export default function Index({ payrollPeriods, filters }) {
     const { props } = usePage();
     const flash = props.flash;
 
-    const [searchTerm, setSearchTerm] = useState(filters.search || '');
-    const [statusFilter, setStatusFilter] = useState(filters.status || '');
+    const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [statusFilter, setStatusFilter] = useState(filters?.status || '');
 
-    // Arama işlemi
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('admin.payrolls.index'), {
@@ -25,7 +20,6 @@ export default function Index({ payrollPeriods, filters }) {
         }, { replace: true });
     };
 
-    // Filtre değişikliği
     const handleFilterChange = (key, value) => {
         router.get(route('admin.payrolls.index'), {
             ...(key === 'status' ? { status: value } : { [key]: value }),
@@ -33,7 +27,6 @@ export default function Index({ payrollPeriods, filters }) {
         }, { replace: true });
     };
 
-    // Silme işlemi
     const handleDelete = (id) => {
         confirmDelete('Bu bordro dönemini silmek istediğinize emin misiniz?', () => {
             router.delete(route('admin.payrolls.destroy', id), {
@@ -42,23 +35,36 @@ export default function Index({ payrollPeriods, filters }) {
         });
     };
 
-    // Durum badge bileşeni
-    const getStatusBadge = (status) => {
-        const statusConfig = {
-            draft: { label: 'Taslak', class: 'bg-light text-dark' },
-            pending: { label: 'Beklemede', class: 'bg-warning bg-opacity-10 text-warning' },
-            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
-            paid: { label: 'Ödendi', class: 'bg-primary bg-opacity-10 text-info' },
-            locked: { label: 'Kilitli', class: 'bg-danger bg-opacity-10 text-danger' },
+    const getStatusBadgeClass = (status) => {
+        switch (status) {
+            case 'draft': return 'bg-light text-dark border';
+            case 'pending': return 'bg-warning text-dark';
+            case 'approved': return 'bg-success';
+            case 'paid': return 'bg-primary';
+            case 'locked': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        const labels = {
+            draft: 'Taslak',
+            pending: 'Beklemede',
+            approved: 'Onaylandı',
+            paid: 'Ödendi',
+            locked: 'Kilitli',
         };
-        
-        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
-        
-        return (
-            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
-                {config.label}
-            </span>
-        );
+        return labels[status] || status;
+    };
+
+    // İstatistikler
+    const payrollArray = Array.isArray(payrollPeriods) ? payrollPeriods : (payrollPeriods?.data || []);
+    const stats = {
+        total: payrollArray.length || 0,
+        draft: payrollArray.filter(p => p.status === 'draft').length || 0,
+        approved: payrollArray.filter(p => p.status === 'approved').length || 0,
+        paid: payrollArray.filter(p => p.status === 'paid').length || 0,
+        totalGross: payrollArray.reduce((sum, p) => sum + (parseFloat(p.total_gross) || 0), 0),
     };
 
     return (
@@ -71,157 +77,214 @@ export default function Index({ payrollPeriods, filters }) {
                     { label: 'Bordro Dönemleri', url: route('admin.payrolls.index') },
                 ],
                 newUrl: route('admin.payrolls.create'),
-            }
+                filterCollapse: true,
+            }}
         >
             <Head title="Bordro Dönemleri" />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    {/* Arama ve Filtreler */}
-                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
-                        <form onSubmit={handleSearch} className="d-flex d-flex-wrap gap-3 align-items-end">
-                            {/* Arama */}
-                            <div className="d-flex-1 min-w-[200px]">
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                    Dönem Ara
-                                </label>
-                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Dönem adı..."
-                                />
-                            </div>
+            {/* Collapse Filtre Paneli */}
+            <div className="collapse mb-4" id="filterCollapse">
+                <div className="card">
+                    <div className="card-body">
+                        <form onSubmit={handleSearch}>
+                            <div className="row g-3">
+                                <div className="col-md-6">
+                                    <label className="form-label fw-medium">
+                                        <i className="ti ti-search me-1"></i> Dönem Ara
+                                    </label>
+                                    <input
+                                        className="form-control"
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        placeholder="Dönem adı..."
+                                    />
+                                </div>
 
-                            {/* Durum Filtresi */}
-                            <div className="w-40">
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                    Durum
-                                </label>
-                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={statusFilter}
-                                    onChange={(e) => {
-                                        setStatusFilter(e.target.value);
-                                        handleFilterChange('status', e.target.value);
-                                    }}
-                                >
-                                    <option value="">Tümü</option>
-                                    <option value="draft">Taslak</option>
-                                    <option value="pending">Beklemede</option>
-                                    <option value="approved">Onaylandı</option>
-                                    <option value="paid">Ödendi</option>
-                                    <option value="locked">Kilitli</option>
-                                </select>
-                            </div>
+                                <div className="col-md-4">
+                                    <label className="form-label fw-medium">
+                                        <i className="ti ti-toggle-right me-1"></i> Durum
+                                    </label>
+                                    <select
+                                        className="form-select"
+                                        value={statusFilter}
+                                        onChange={(e) => {
+                                            setStatusFilter(e.target.value);
+                                            handleFilterChange('status', e.target.value);
+                                        }}
+                                    >
+                                        <option value="">Tümü</option>
+                                        <option value="draft">Taslak</option>
+                                        <option value="pending">Beklemede</option>
+                                        <option value="approved">Onaylandı</option>
+                                        <option value="paid">Ödendi</option>
+                                        <option value="locked">Kilitli</option>
+                                    </select>
+                                </div>
 
-                            {/* Ara Butonu */}
-                            <button
-                                type="submit"
-                                className="btn btn-primary btn-sm"
-                            >
-                                Ara
-                            </button>
+                                <div className="col-md-2 d-flex align-items-end">
+                                    <button type="submit" className="btn btn-primary w-100">
+                                        <i className="ti ti-filter me-1"></i> Filtrele
+                                    </button>
+                                </div>
+                            </div>
                         </form>
                     </div>
+                </div>
+            </div>
 
-                    {/* Tablo */}
-                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
-                        <table className="w-100 divide-y divide-gray-200">
+            {/* Stats Cards */}
+            <div className="row g-3 mb-4">
+                <div className="col-md-3">
+                    <div className="card border-primary">
+                        <div className="card-body text-center">
+                            <i className="ti ti-calendar fs-2 text-primary mb-2"></i>
+                            <h6 className="text-primary fw-medium">Toplam Dönem</h6>
+                            <h3 className="fw-bold text-primary">{stats.total}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-3">
+                    <div className="card border-light">
+                        <div className="card-body text-center">
+                            <i className="ti ti-file fs-2 text-secondary mb-2"></i>
+                            <h6 className="text-secondary fw-medium">Taslak</h6>
+                            <h3 className="fw-bold text-secondary">{stats.draft}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-3">
+                    <div className="card border-success">
+                        <div className="card-body text-center">
+                            <i className="ti ti-check fs-2 text-success mb-2"></i>
+                            <h6 className="text-success fw-medium">Onaylanan</h6>
+                            <h3 className="fw-bold text-success">{stats.approved}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-3">
+                    <div className="card border-info">
+                        <div className="card-body text-center">
+                            <i className="ti ti-coin fs-2 text-info mb-2"></i>
+                            <h6 className="text-info fw-medium">Ödenen</h6>
+                            <h3 className="fw-bold text-info">{stats.paid}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Toplam Brüt Card */}
+            <div className="card border-primary mb-4">
+                <div className="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 className="text-primary fw-medium mb-1">
+                            <i className="ti ti-calculator me-2"></i> Toplam Brüt Ücret
+                        </h6>
+                        <h3 className="fw-bold text-primary">{formatCurrency(stats.totalGross)}</h3>
+                    </div>
+                    <div className="bg-primary bg-opacity-10 rounded p-3">
+                        <i className="ti ti-moneybag fs-1 text-primary"></i>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bordro Tablosu */}
+            <div className="card">
+                <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0 fw-bold">
+                        <i className="ti ti-calendar-event me-2"></i> Bordro Dönemleri Listesi
+                    </h5>
+                    <Link href={route('admin.payrolls.create')} className="btn btn-primary btn-sm">
+                        <i className="ti ti-plus me-1"></i> Yeni Dönem
+                    </Link>
+                </div>
+                <div className="card-body p-0">
+                    <div className="table-responsive">
+                        <table className="table table-hover mb-0">
                             <thead className="table-light">
                                 <tr>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Dönem
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Tarih Aralığı
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Çalışma Günü
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Çalışan Sayısı
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Toplam Brüt
-                                    </th>
-                                    <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                        Durum
-                                    </th>
-                                    <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
-                                        İşlemler
-                                    </th>
+                                    <th className="fw-medium">Dönem</th>
+                                    <th className="fw-medium">Tarih Aralığı</th>
+                                    <th className="fw-medium text-center">Çalışma Günü</th>
+                                    <th className="fw-medium text-center">Çalışan</th>
+                                    <th className="fw-medium text-end">Toplam Brüt</th>
+                                    <th className="fw-medium text-center">Durum</th>
+                                    <th className="fw-medium text-end">İşlemler</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {payrollPeriods?.data?.length > 0 ? (
-                                    (payrollPeriods?.data || []).map((period) => (
-                                        <tr key={period.id} className="hover:table-light">
-                                            <td className="px-4 py-3">
+                            <tbody>
+                                {payrollArray.length > 0 ? (
+                                    payrollArray.map((period) => (
+                                        <tr key={period.id}>
+                                            <td>
                                                 <Link
                                                     href={route('admin.payrolls.show', period.id)}
-                                                    className="fs-sm fw-medium text-primary hover:text-indigo-900 hover:underline"
+                                                    className="fw-medium text-primary"
                                                 >
                                                     {period.name}
                                                 </Link>
-                                                <div className="fs-xs text-muted">
+                                                <small className="text-muted d-block">
                                                     {formatMonthYear(period.start_date)}
-                                                </div>
+                                                </small>
                                             </td>
-                                            <td className="px-4 py-3 text-nowrap">
-                                                <span className="fs-sm text-dark">
+                                            <td>
+                                                <span className="text-dark">
                                                     {formatDate(period.start_date)} - {formatDate(period.end_date)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-nowrap">
-                                                <span className="fs-sm text-dark">
+                                            <td className="text-center">
+                                                <span className="badge bg-light text-dark border">
                                                     {period.work_days || 0} gün
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-nowrap">
-                                                <span className="fs-sm text-dark">
+                                            <td className="text-center">
+                                                <span className="badge bg-info">
                                                     {period.employee_count || 0}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-nowrap text-right">
-                                                <span className="fs-sm fw-medium text-dark">
+                                            <td className="text-end">
+                                                <span className="fw-medium">
                                                     {formatCurrency(period.total_gross)}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-nowrap">
-                                                {getStatusBadge(period.status)}
+                                            <td className="text-center">
+                                                <span className={`badge ${getStatusBadgeClass(period.status)}`}>
+                                                    {getStatusLabel(period.status)}
+                                                </span>
                                             </td>
-                                            <td className="px-4 py-3 text-nowrap text-right">
-                                                <div className="d-flex align-items-center justify-content-end">
+                                            <td className="text-end">
+                                                <div className="d-flex justify-content-end gap-1">
                                                     <Link
                                                         href={route('admin.payrolls.show', period.id)}
-                                                        className="p-1 text-muted hover:text-primary"
+                                                        className="btn btn-sm btn-outline-info"
                                                         title="Görüntüle"
                                                     >
                                                         <i className="ti ti-eye"></i>
                                                     </Link>
 
                                                     {period.status === 'draft' && (
-                                                        <Link
-                                                            href={route('admin.payrolls.edit', period.id)}
-                                                            className="p-1 text-muted hover:text-primary"
-                                                            title="Düzenle"
-                                                        >
-                                                            <i className="ti ti-edit"></i>
-                                                        </Link>
-                                                    )}
-
-                                                    {period.status === 'draft' && (
-                                                        <button
-                                                            onClick={() => handleDelete(period.id)}
-                                                            className="p-1 text-muted hover:text-danger"
-                                                            title="Sil"
-                                                        >
-                                                            <i className="ti ti-trash"></i>
-                                                        </button>
+                                                        <>
+                                                            <Link
+                                                                href={route('admin.payrolls.edit', period.id)}
+                                                                className="btn btn-sm btn-outline-primary"
+                                                                title="Düzenle"
+                                                            >
+                                                                <i className="ti ti-edit"></i>
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => handleDelete(period.id)}
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                title="Sil"
+                                                            >
+                                                                <i className="ti ti-trash"></i>
+                                                            </button>
+                                                        </>
                                                     )}
 
                                                     {['pending', 'approved'].includes(period.status) && (
                                                         <Link
                                                             href={route('admin.payrolls.approve', period.id)}
-                                                            className="p-1 text-muted hover:text-success"
+                                                            className="btn btn-sm btn-outline-success"
                                                             title="Onayla"
                                                         >
                                                             <i className="ti ti-check"></i>
@@ -233,7 +296,8 @@ export default function Index({ payrollPeriods, filters }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="px-4 py-8 text-center fs-sm text-muted">
+                                        <td colSpan="7" className="text-center py-4 text-muted">
+                                            <i className="ti ti-calendar-off fs-1 d-block mb-2"></i>
                                             Bordro dönemi bulunamadı.
                                         </td>
                                     </tr>
@@ -241,29 +305,35 @@ export default function Index({ payrollPeriods, filters }) {
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Pagination */}
-                    {payrollPeriods?.meta && payrollPeriods.meta.last_page > 1 && (
-                        <div className="mt-4 d-flex justify-content-center">
-                            <div className="d-flex gap-1">
-                                {(payrollPeriods?.meta?.links || []).map((link, index) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url || '#'}
-                                        className={`px-4 py-2 border rounded ${
-                                            link.active
-                                                ? 'bg-indigo-600 text-white'
-                                                : 'bg-white text-dark hover:table-light'
-                                        } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        disabled={!link.url}
-                                    >
-                                        {link.label.replace('&laquo;', '«').replace('&raquo;', '»')}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
+
+                {/* Pagination */}
+                {payrollPeriods?.meta && payrollPeriods.meta.last_page > 1 && (
+                    <div className="card-footer bg-light">
+                        <div className="d-flex align-items-center justify-content-between">
+                            <div>
+                                <small className="text-muted">
+                                    {payrollPeriods.meta.from} - {payrollPeriods.meta.to} arası, toplam {payrollPeriods.meta.total} öğe
+                                </small>
+                            </div>
+                            <nav>
+                                <ul className="pagination pagination-sm mb-0">
+                                    {payrollPeriods.meta.links.filter(link => link.url).map((link, index) => (
+                                        <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                            <Link
+                                                href={link.url}
+                                                className="page-link"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
+                                                }}
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );

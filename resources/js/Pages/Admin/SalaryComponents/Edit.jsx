@@ -1,12 +1,8 @@
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import { InputLabel } from '@/Components/InputLabel';
-import { TextInput } from '@/Components/TextInput';
-import { InputError } from '@/Components/InputError';
-import { Select } from '@/Components/Select';
-import { PrimaryButton } from '@/Components/PrimaryButton';
-import { Checkbox } from '@/Components/Checkbox';
+import { showSuccess, showError } from '@/Utils/sweetAlert';
+import { formatDate } from '@/Utils/formatters';
 
 export default function Edit({ component }) {
     const { data, setData, put, processing, errors, recentlySuccessful } = useForm({
@@ -24,185 +20,292 @@ export default function Edit({ component }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route('admin.salary-components.update', component.id));
+        put(route('admin.salary-components.update', component.id), {
+            onSuccess: () => {
+                showSuccess('Maaş kalemi güncellendi.');
+            },
+            onError: () => {
+                showError('Güncelleme sırasında hata oluştu.');
+            }
+        });
     };
+
+    const getTypeBadgeClass = (type) => type === 'earning' ? 'bg-success' : 'bg-danger';
+    const getCategoryBadgeClass = (cat) => cat === 'position-fixed' ? 'bg-primary' : 'bg-warning text-dark';
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold text-dark">
-                        Maaş Kalemini Güncelle - {component.name}
-                    </h5>
-                    <Link
-                        href={route('admin.salary-components.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
-                    >
-                        Geri Dön
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Maaş Kalemi Güncelle',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro ve Maaş', url: '#' },
+                    { label: 'Maaş Bileşenleri', url: route('admin.salary-components.index') },
+                    { label: component.name, url: route('admin.salary-components.edit', component.id) },
+                ],
+                backUrl: route('admin.salary-components.index'),
+            }}
         >
-            <Head title={`Maaş Kalemı Güncelle - ${component.name}`} />
+            <Head title={`Maaş Kalemı - ${component.name}`} />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    <div className="bg-white overflow-hidden shadow-sm-sm">
-                        <div className="p-4 text-dark">
-                            <form onSubmit={handleSubmit} className="mb-3">
-                                <div className="d-grid d-grid-cols-1 gap-4">
+            <div className="row">
+                <div className="col-lg-8">
+                    <div className="card">
+                        <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0 fw-bold">
+                                <i className="ti ti-calculator me-2"></i> Kalem Bilgileri
+                            </h5>
+                            <div>
+                                <span className={`badge ${getTypeBadgeClass(component.type)} me-1`}>
+                                    {component.type === 'earning' ? 'Kazanç' : 'Kesinti'}
+                                </span>
+                                <span className={`badge ${getCategoryBadgeClass(component.category)}`}>
+                                    {component.category === 'position-fixed' ? 'Sabit' : 'Değişken'}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="card-body">
+                            <form onSubmit={handleSubmit}>
+                                <div className="row g-3">
                                     {/* Kalem Adı */}
-                                    <div className="">
-                                        <InputLabel htmlFor="name" value="Kalem Adı" />
-                                        <TextInput
-                                            id="name"
+                                    <div className="col-12">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-tag me-1"></i> Kalem Adı <span className="text-danger">*</span>
+                                        </label>
+                                        <input
                                             type="text"
-                                            className="mt-1 d-block w-100"
+                                            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                             required
                                         />
-                                        <InputError message={errors.name} className="mt-2" />
+                                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                                     </div>
 
                                     {/* Kod */}
-                                    <div>
-                                        <InputLabel htmlFor="code" value="Kod" />
-                                        <TextInput
-                                            id="code"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-code me-1"></i> Kod <span className="text-danger">*</span>
+                                        </label>
+                                        <input
                                             type="text"
-                                            className="mt-1 d-block w-100"
+                                            className={`form-control ${errors.code ? 'is-invalid' : ''}`}
                                             value={data.code}
                                             onChange={(e) => setData('code', e.target.value)}
                                             required
                                         />
-                                        <InputError message={errors.code} className="mt-2" />
+                                        {errors.code && <div className="invalid-feedback">{errors.code}</div>}
+                                    </div>
+
+                                    {/* Varsayılan Tutar */}
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-coin me-1"></i> Varsayılan Tutar
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            className="form-control"
+                                            value={data.default_amount}
+                                            onChange={(e) => setData('default_amount', e.target.value)}
+                                            min="0"
+                                        />
                                     </div>
 
                                     {/* Tip */}
-                                    <div>
-                                        <InputLabel htmlFor="type" value="Tip" />
-                                        <Select
-                                            id="type"
-                                            className="mt-1 d-block w-100"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-category me-1"></i> Tip <span className="text-danger">*</span>
+                                        </label>
+                                        <select
+                                            className="form-select"
                                             value={data.type}
                                             onChange={(e) => setData('type', e.target.value)}
                                         >
-                                            <option value="earning">Kazanç</option>
+                                            <option value="earning">Kazanç (Ek Ödeme)</option>
                                             <option value="deduction">Kesinti</option>
-                                        </Select>
-                                        <InputError message={errors.type} className="mt-2" />
+                                        </select>
                                     </div>
 
                                     {/* Kategori */}
-                                    <div>
-                                        <InputLabel htmlFor="category" value="Kategori" />
-                                        <Select
-                                            id="category"
-                                            className="mt-1 d-block w-100"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-folder me-1"></i> Kategori
+                                        </label>
+                                        <select
+                                            className="form-select"
                                             value={data.category}
                                             onChange={(e) => setData('category', e.target.value)}
                                         >
                                             <option value="position-fixed">Sabit</option>
                                             <option value="variable">Değişken</option>
-                                        </Select>
-                                        <InputError message={errors.category} className="mt-2" />
-                                    </div>
-
-                                    {/* Varsayılan Tutar */}
-                                    <div>
-                                        <InputLabel htmlFor="default_amount" value="Varsayılan Tutar" />
-                                        <TextInput
-                                            id="default_amount"
-                                            type="number"
-                                            step="0.01"
-                                            className="mt-1 d-block w-100"
-                                            value={data.default_amount}
-                                            onChange={(e) => setData('default_amount', e.target.value)}
-                                            min="0"
-                                        />
-                                        <InputError message={errors.default_amount} className="mt-2" />
+                                        </select>
                                     </div>
 
                                     {/* Sıralama */}
-                                    <div>
-                                        <InputLabel htmlFor="sort_order" value="Sıralama" />
-                                        <TextInput
-                                            id="sort_order"
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-list-numbers me-1"></i> Sıralama
+                                        </label>
+                                        <input
                                             type="number"
-                                            className="mt-1 d-block w-100"
+                                            className="form-control"
                                             value={data.sort_order}
-                                            onChange={(e) => setData('sort_order', parseInt(e.target.value))}
+                                            onChange={(e) => setData('sort_order', parseInt(e.target.value) || 0)}
                                             min="0"
                                         />
-                                        <InputError message={errors.sort_order} className="mt-2" />
                                     </div>
-                                </div>
 
-                                {/* Açıklama */}
-                                <div>
-                                    <InputLabel htmlFor="description" value="Açıklama" />
-                                    <textarea className="form-control mt-1 d-block w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" id="description"
-                                        rows="3"
-                                        
-                                        value={data.description}
-                                        onChange={(e) => setData('description', e.target.value)}
-                                    />
-                                    <InputError message={errors.description} className="mt-2" />
-                                </div>
+                                    {/* Açıklama */}
+                                    <div className="col-12">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-file-text me-1"></i> Açıklama
+                                        </label>
+                                        <textarea
+                                            className="form-control"
+                                            rows={3}
+                                            value={data.description}
+                                            onChange={(e) => setData('description', e.target.value)}
+                                        />
+                                        {errors.description && <div className="invalid-feedback d-block">{errors.description}</div>}
+                                    </div>
 
-                                {/* Seçenekler */}
-                                <div className="d-grid d-grid-cols-1 gap-3">
-                                    <div>
-                                        <label className="d-flex align-items-start">
-                                            <Checkbox
-                                                name="is_active"
+                                    {/* Checkbox'lar */}
+                                    <div className="col-md-4">
+                                        <div className="form-check">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                id="is_active"
                                                 checked={data.is_active}
                                                 onChange={(e) => setData('is_active', e.target.checked)}
                                             />
-                                            <span className="ml-2 fs-sm text-muted">Aktif</span>
-                                        </label>
+                                            <label className="form-check-label" htmlFor="is_active">
+                                                Aktif
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="d-flex align-items-start">
-                                            <Checkbox
-                                                name="is_taxable"
+                                    <div className="col-md-4">
+                                        <div className="form-check">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                id="is_taxable"
                                                 checked={data.is_taxable}
                                                 onChange={(e) => setData('is_taxable', e.target.checked)}
                                             />
-                                            <span className="ml-2 fs-sm text-muted">Vergilendirilir</span>
-                                        </label>
+                                            <label className="form-check-label" htmlFor="is_taxable">
+                                                Vergilendirilir
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="d-flex align-items-start">
-                                            <Checkbox
-                                                name="is_sgk_applicable"
+                                    <div className="col-md-4">
+                                        <div className="form-check">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                id="is_sgk_applicable"
                                                 checked={data.is_sgk_applicable}
                                                 onChange={(e) => setData('is_sgk_applicable', e.target.checked)}
                                             />
-                                            <span className="ml-2 fs-sm text-muted">SGK Uygulanır</span>
-                                        </label>
+                                            <label className="form-check-label" htmlFor="is_sgk_applicable">
+                                                SGK Uygulanır
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Butonlar */}
-                                <div className="d-flex align-items-center gap-3">
-                                    <PrimaryButton disabled={processing}>
-                                        Güncelle
-                                    </PrimaryButton>
-
+                                <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                                     <Link
                                         href={route('admin.salary-components.index')}
-                                        className="ml-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                        className="btn btn-light"
                                     >
-                                        İptal
+                                        <i className="ti ti-arrow-left me-1"></i> İptal
                                     </Link>
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="btn btn-primary"
+                                    >
+                                        {processing ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-1"></span>
+                                                Güncelleniyor...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="ti ti-check me-1"></i> Güncelle
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
 
                                 {recentlySuccessful && (
-                                    <p className="fs-sm text-muted">Kaydedildi.</p>
+                                    <div className="alert alert-success mt-3" role="alert">
+                                        <i className="ti ti-check me-2"></i> Kaydedildi.
+                                    </div>
                                 )}
                             </form>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sağ Panel - Detay */}
+                <div className="col-lg-4">
+                    <div className="card border-primary mb-4">
+                        <div className="card-header bg-primary text-white">
+                            <h6 className="mb-0 fw-bold">
+                                <i className="ti ti-info-circle me-1"></i> Kalem Detayları
+                            </h6>
+                        </div>
+                        <div className="card-body">
+                            <div className="mb-3">
+                                <label className="text-muted small">Oluşturulma Tarihi</label>
+                                <div className="fw-medium">{formatDate(component.created_at)}</div>
+                            </div>
+                            <div className="mb-3">
+                                <label className="text-muted small">Son Güncelleme</label>
+                                <div className="fw-medium">{formatDate(component.updated_at)}</div>
+                            </div>
+                            <div className="mb-0">
+                                <label className="text-muted small">Kalem ID</label>
+                                <div className="fw-medium text-muted">#{component.id}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="card border-info mb-4">
+                        <div className="card-header bg-info text-white">
+                            <h6 className="mb-0 fw-bold">
+                                <i className="ti ti-settings me-1"></i> Durum
+                            </h6>
+                        </div>
+                        <div className="card-body">
+                            <div className="mb-2">
+                                <div className="d-flex justify-content-between">
+                                    <span>Durum:</span>
+                                    <span className={`badge ${component.is_active ? 'bg-success' : 'bg-secondary'}`}>
+                                        {component.is_active ? 'Aktif' : 'Pasif'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mb-2">
+                                <div className="d-flex justify-content-between">
+                                    <span>Vergi:</span>
+                                    <span className={`badge ${component.is_taxable ? 'bg-success' : 'bg-secondary'}`}>
+                                        {component.is_taxable ? 'Evet' : 'Hayır'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mb-0">
+                                <div className="d-flex justify-content-between">
+                                    <span>SGK:</span>
+                                    <span className={`badge ${component.is_sgk_applicable ? 'bg-success' : 'bg-secondary'}`}>
+                                        {component.is_sgk_applicable ? 'Evet' : 'Hayır'}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,21 +1,15 @@
 import { useState } from 'react';
-import { router, useForm, Link } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { showSuccess, showError, confirmDelete } from '@/Utils/sweetAlert';
-import { formatDate, formatCurrency, formatMoney } from '@/Utils/formatters';
-import { calculateNetSalary } from '@/Utils/payrollCalculations';
+import { confirmDelete, showSuccess, showError } from '@/Utils/sweetAlert';
+import { formatDate, formatCurrency } from '@/Utils/formatters';
 
-/**
- * Bordro onay akışı
- * GET /admin/payrolls/{id}/approve
- */
 export default function Approve({ period, employees, approvalHistory, approvers }) {
     const [selectedEmployees, setSelectedEmployees] = useState([]);
     const [approvalNote, setApprovalNote] = useState('');
     const [processing, setProcessing] = useState(false);
 
-    // Çalışan seçme
     const toggleEmployee = (employeeId) => {
         setSelectedEmployees(prev => 
             prev.includes(employeeId)
@@ -32,19 +26,13 @@ export default function Approve({ period, employees, approvalHistory, approvers 
         }
     };
 
-    // Bordro hesapla
+    // Basit hesaplama
     const calculateEmployeePayroll = (employee) => {
-        const calculation = calculateNetSalary(employee.gross_salary, {
-            maritalStatus: employee.marital_status,
-            childrenCount: employee.children_count,
-            mealAllowance: employee.meal_allowance || 0,
-            transportAllowance: employee.transport_allowance || 0,
-            housingAllowance: employee.housing_allowance || 0,
-        });
-        return calculation;
+        const gross = parseFloat(employee.gross_salary) || 0;
+        const net = gross * 0.66; // Basitleştirilmiş net hesaplama
+        return { gross, net };
     };
 
-    // Toplamlar
     const totals = employees.reduce((acc, emp) => {
         const calc = calculateEmployeePayroll(emp);
         return {
@@ -54,7 +42,6 @@ export default function Approve({ period, employees, approvalHistory, approvers 
         };
     }, { gross: 0, net: 0, count: 0 });
 
-    // Onayla
     const handleApprove = async () => {
         if (selectedEmployees.length === 0) {
             showError('Lütfen en az bir çalışan seçin.');
@@ -64,7 +51,7 @@ export default function Approve({ period, employees, approvalHistory, approvers 
         setProcessing(true);
 
         try {
-            const response = await router.post(route('admin.payrolls.approve', period.id), {
+            await router.post(route('admin.payrolls.approve', period.id), {
                 employee_ids: selectedEmployees,
                 note: approvalNote,
             });
@@ -78,7 +65,6 @@ export default function Approve({ period, employees, approvalHistory, approvers 
         }
     };
 
-    // Reddet
     const handleReject = async (employeeId) => {
         confirmDelete('Bu çalışanın bordrosunu reddetmek istediğinize emin misiniz?', async () => {
             try {
@@ -96,7 +82,6 @@ export default function Approve({ period, employees, approvalHistory, approvers 
         });
     };
 
-    // Tamamını onayla
     const handleApproveAll = async () => {
         confirmDelete('Tüm çalışanların bordrosunu onaylamak istediğinize emin misiniz?', async () => {
             setProcessing(true);
@@ -112,151 +97,138 @@ export default function Approve({ period, employees, approvalHistory, approvers 
         });
     };
 
-    // Onay durumu badge
-    const getApprovalStatusBadge = (status) => {
-        const statusConfig = {
-            pending: { label: 'Beklemede', class: 'bg-warning bg-opacity-10 text-warning' },
-            approved: { label: 'Onaylandı', class: 'bg-success bg-opacity-10 text-success' },
-            rejected: { label: 'Reddedildi', class: 'bg-danger bg-opacity-10 text-danger' },
+    const getApprovalStatusBadgeClass = (status) => {
+        switch (status) {
+            case 'pending': return 'bg-warning text-dark';
+            case 'approved': return 'bg-success';
+            case 'rejected': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    };
+
+    const getApprovalStatusLabel = (status) => {
+        const labels = {
+            pending: 'Beklemede',
+            approved: 'Onaylandı',
+            rejected: 'Reddedildi',
         };
-        
-        const config = statusConfig[status] || { label: status, class: 'bg-light text-dark' };
-        
-        return (
-            <span className={`px-2 py-1 fs-xs fw-medium rounded-pill ${config.class}`}>
-                {config.label}
-            </span>
-        );
+        return labels[status] || status;
     };
 
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center gap-3">
-                        <Link
-                            href={route('admin.payrolls.show', period.id)}
-                            className="p-2 text-muted hover:text-dark hover:bg-light rounded"
-                            title="Geri"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </Link>
-                        <div>
-                            <h5 className="fw-semibold">
-                                Bordro Onayı
-                            </h5>
-                            <p className="fs-sm text-muted">
-                                {period.name} - {formatDate(period.start_date)} / {formatDate(period.end_date)}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            }
+            pageHeader={{
+                title: 'Bordro Onayı',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro ve Maaş', url: '#' },
+                    { label: 'Bordro Dönemleri', url: route('admin.payrolls.index') },
+                    { label: period.name, url: route('admin.payrolls.show', period.id) },
+                    { label: 'Onay', url: route('admin.payrolls.approve', period.id) },
+                ],
+                backUrl: route('admin.payrolls.show', period.id),
+            }}
         >
             <Head title="Bordro Onayı" />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    {/* Özet */}
-                    <div className="d-grid d-grid-cols-1 gap-3 mb-5">
-                        <div className="bg-white rounded-3 shadow-sm p-4">
-                            <div className="fs-sm text-muted">Toplam Çalışan</div>
-                            <div className="fs-2 fw-bold text-dark">{totals.count}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm p-4">
-                            <div className="fs-sm text-muted">Toplam Brüt</div>
-                            <div className="fs-2 fw-bold text-dark">{formatCurrency(totals.gross)}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm p-4">
-                            <div className="fs-sm text-muted">Toplam Net</div>
-                            <div className="fs-2 fw-bold text-success">{formatCurrency(totals.net)}</div>
+            {/* Özet Kartları */}
+            <div className="row g-3 mb-4">
+                <div className="col-md-4">
+                    <div className="card border-primary">
+                        <div className="card-body text-center">
+                            <i className="ti ti-users fs-2 text-primary mb-2"></i>
+                            <h6 className="text-primary fw-medium">Toplam Çalışan</h6>
+                            <h3 className="fw-bold text-primary">{totals.count}</h3>
                         </div>
                     </div>
+                </div>
+                <div className="col-md-4">
+                    <div className="card border-success">
+                        <div className="card-body text-center">
+                            <i className="ti ti-coin fs-2 text-success mb-2"></i>
+                            <h6 className="text-success fw-medium">Toplam Brüt</h6>
+                            <h4 className="fw-bold text-success">{formatCurrency(totals.gross)}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-4">
+                    <div className="card border-info">
+                        <div className="card-body text-center">
+                            <i className="ti ti-wallet fs-2 text-info mb-2"></i>
+                            <h6 className="text-info fw-medium">Toplam Net</h6>
+                            <h4 className="fw-bold text-info">{formatCurrency(totals.net)}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <div className="d-grid d-grid-cols-1 gap-4">
-                        {/* Çalışan Listesi */}
-                        <div className="bg-white rounded-3 shadow-sm">
-                            <div className="p-4 border-b border-secondary d-flex justify-content-between align-items-center">
-                                <h5 className="fw-semibold">Çalışan Listesi</h5>
-                                <div className="d-flex gap-2">
-                                    <button
-                                        onClick={toggleSelectAll}
-                                        className="fs-sm text-primary hover:text-indigo-800"
-                                    >
-                                        {selectedEmployees.length === employees.length ? 'Tümünü Kaldır' : 'Tümünü Seç'}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="overflow-auto">
-                                <table className="w-100 divide-y divide-gray-200">
+            <div className="row g-4">
+                {/* Çalışan Listesi */}
+                <div className="col-lg-8">
+                    <div className="card">
+                        <div className="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0 fw-bold">
+                                <i className="ti ti-users me-2"></i> Çalışan Listesi
+                            </h5>
+                            <button
+                                onClick={toggleSelectAll}
+                                className="btn btn-outline-secondary btn-sm"
+                            >
+                                {selectedEmployees.length === employees.length ? 'Tümünü Kaldır' : 'Tümünü Seç'}
+                            </button>
+                        </div>
+                        <div className="card-body p-0">
+                            <div className="table-responsive">
+                                <table className="table table-hover mb-0">
                                     <thead className="table-light">
                                         <tr>
-                                            <th className="px-4 py-3 text-left">
+                                            <th>
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedEmployees.length === employees.length && employees.length > 0}
                                                     onChange={toggleSelectAll}
-                                                    className="rounded border-secondary"
+                                                    className="form-check-input"
                                                 />
                                             </th>
-                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                                Çalışan
-                                            </th>
-                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                                Brüt
-                                            </th>
-                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                                Net
-                                            </th>
-                                            <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">
-                                                Durum
-                                            </th>
-                                            <th className="px-4 py-3 text-right fs-xs fw-medium text-muted text-uppercase">
-                                                İşlem
-                                            </th>
+                                            <th>Çalışan</th>
+                                            <th className="text-end">Brüt</th>
+                                            <th className="text-end">Net</th>
+                                            <th className="text-center">Durum</th>
+                                            <th className="text-end">İşlem</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody>
                                         {employees.map((employee) => {
                                             const calc = calculateEmployeePayroll(employee);
                                             return (
-                                                <tr key={employee.id} className="hover:table-light">
-                                                    <td className="px-4 py-3">
+                                                <tr key={employee.id}>
+                                                    <td>
                                                         <input
                                                             type="checkbox"
                                                             checked={selectedEmployees.includes(employee.id)}
                                                             onChange={() => toggleEmployee(employee.id)}
                                                             disabled={employee.approval_status === 'approved'}
-                                                            className="rounded border-secondary"
+                                                            className="form-check-input"
                                                         />
                                                     </td>
-                                                    <td className="px-4 py-3">
-                                                        <div className="fs-sm fw-medium text-dark">
-                                                            {employee.name}
-                                                        </div>
-                                                        <div className="fs-xs text-muted">
-                                                            {employee.position_title}
-                                                        </div>
+                                                    <td>
+                                                        <div className="fw-medium">{employee.name}</div>
+                                                        <small className="text-muted">{employee.position_title}</small>
                                                     </td>
-                                                    <td className="px-4 py-3 fs-sm text-dark">
-                                                        {formatCurrency(calc.gross)}
+                                                    <td className="text-end">{formatCurrency(calc.gross)}</td>
+                                                    <td className="text-end fw-medium">{formatCurrency(calc.net)}</td>
+                                                    <td className="text-center">
+                                                        <span className={`badge ${getApprovalStatusBadgeClass(employee.approval_status)}`}>
+                                                            {getApprovalStatusLabel(employee.approval_status)}
+                                                        </span>
                                                     </td>
-                                                    <td className="px-4 py-3 fs-sm fw-medium text-dark">
-                                                        {formatCurrency(calc.net)}
-                                                    </td>
-                                                    <td className="px-4 py-3">
-                                                        {getApprovalStatusBadge(employee.approval_status)}
-                                                    </td>
-                                                    <td className="px-4 py-3 text-right">
+                                                    <td className="text-end">
                                                         {employee.approval_status === 'pending' && (
                                                             <button
                                                                 onClick={() => handleReject(employee.id)}
-                                                                className="text-danger hover:text-danger fs-sm"
+                                                                className="btn btn-sm btn-outline-danger"
                                                             >
-                                                                Reddet
+                                                                <i className="ti ti-x"></i>
                                                             </button>
                                                         )}
                                                     </td>
@@ -267,117 +239,116 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                                 </table>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        {/* Onay Paneli */}
-                        <div className="mb-3">
-                            {/* Onay Formu */}
-                            <div className="bg-white rounded-3 shadow-sm p-4">
-                                <h5 className="fw-semibold">Onayla</h5>
-                                
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Seçili Çalışan
-                                        </label>
-                                        <div className="fs-2 fw-bold text-primary">
-                                            {selectedEmployees.length} / {employees.length}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Not (Opsiyonel)
-                                        </label>
-                                        <textarea value={approvalNote}
-                                            onChange={(e) => setApprovalNote(e.target.value)}
-                                            rows={3}
-                                            placeholder="Onay notu..."
-                                            className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"
-                                        />
-                                    </div>
-
-                                    <div className="d-flex d-flex-column gap-2">
-                                        <button
-                                            onClick={handleApprove}
-                                            disabled={processing || selectedEmployees.length === 0}
-                                            className="btn btn-success btn-sm w-100 disabled:opacity-50"
-                                        >
-                                            Seçili Onayla ({selectedEmployees.length})
-                                        </button>
-                                        
-                                        <button
-                                            onClick={handleApproveAll}
-                                            disabled={processing}
-                                            className="btn btn-primary btn-sm w-100 disabled:opacity-50"
-                                        >
-                                            Tamamını Onayla
-                                        </button>
-                                    </div>
+                {/* Sağ Panel */}
+                <div className="col-lg-4">
+                    {/* Onay Formu */}
+                    <div className="card border-success mb-4">
+                        <div className="card-header bg-success text-white">
+                            <h6 className="mb-0 fw-bold">
+                                <i className="ti ti-check me-1"></i> Onayla
+                            </h6>
+                        </div>
+                        <div className="card-body">
+                            <div className="mb-3">
+                                <label className="text-muted small">Seçili Çalışan</label>
+                                <div className="fs-3 fw-bold text-primary">
+                                    {selectedEmployees.length} / {employees.length}
                                 </div>
                             </div>
 
-                            {/* Onay Geçmişi */}
-                            <div className="bg-white rounded-3 shadow-sm p-4">
-                                <h5 className="fw-semibold">Onay Geçmişi</h5>
-                                
-                                {approvalHistory?.length > 0 ? (
-                                    <div className="space-y-3">
-                                        {approvalHistory.map((item, index) => (
-                                            <div key={index} className="border-l-2 border-indigo-500 pl-3 py-1">
-                                                <div className="d-flex align-items-center gap-2">
-                                                    <span className="fs-sm fw-medium text-dark">
-                                                        {item.approver_name}
-                                                    </span>
-                                                    <span className={`px-2 py-0.5 fs-xs rounded-pill ${
-                                                        item.action === 'approved' 
-                                                            ? 'bg-success bg-opacity-10 text-success' 
-                                                            : 'bg-danger bg-opacity-10 text-danger'
-                                                    }`}>
-                                                        {item.action === 'approved' ? 'Onaylandı' : 'Reddedildi'}
-                                                    </span>
-                                                </div>
-                                                <div className="fs-xs text-muted">
-                                                    {formatDate(item.created_at)}
-                                                </div>
-                                                {item.note && (
-                                                    <div className="fs-sm text-muted mt-1">
-                                                        {item.note}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="fs-sm text-muted">Henüz onay geçmişi yok.</p>
-                                )}
+                            <div className="mb-3">
+                                <label className="form-label fw-medium">Not (Opsiyonel)</label>
+                                <textarea
+                                    className="form-control"
+                                    rows={3}
+                                    value={approvalNote}
+                                    onChange={(e) => setApprovalNote(e.target.value)}
+                                    placeholder="Onay notu..."
+                                />
                             </div>
 
-                            {/* Onay Yetkilileri */}
-                            <div className="bg-white rounded-3 shadow-sm p-4">
-                                <h5 className="fw-semibold">Onay Sırası</h5>
+                            <div className="d-grid gap-2">
+                                <button
+                                    onClick={handleApprove}
+                                    disabled={processing || selectedEmployees.length === 0}
+                                    className="btn btn-success"
+                                >
+                                    {processing ? (
+                                        <span className="spinner-border spinner-border-sm me-1"></span>
+                                    ) : (
+                                        <i className="ti ti-check me-1"></i>
+                                    )}
+                                    Seçili Onayla ({selectedEmployees.length})
+                                </button>
                                 
-                                <div className="space-y-2">
-                                    {approvers.map((approver, index) => (
-                                        <div key={approver.id} className="d-flex align-items-center gap-2">
-                                            <div className="w-6 h-6 rounded-pill bg-indigo-100 text-primary d-flex align-items-center justify-content-center fs-xs fw-medium">
-                                                {index + 1}
+                                <button
+                                    onClick={handleApproveAll}
+                                    disabled={processing}
+                                    className="btn btn-outline-primary"
+                                >
+                                    <i className="ti ti-checks me-1"></i> Tamamını Onayla
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Onay Geçmişi */}
+                    <div className="card border-info mb-4">
+                        <div className="card-header bg-info text-white">
+                            <h6 className="mb-0 fw-bold">
+                                <i className="ti ti-history me-1"></i> Onay Geçmişi
+                            </h6>
+                        </div>
+                        <div className="card-body">
+                            {approvalHistory?.length > 0 ? (
+                                <div className="list-group list-group-flush">
+                                    {approvalHistory.map((item, index) => (
+                                        <div key={index} className="list-group-item px-0">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <span className="fw-medium">{item.approver_name}</span>
+                                                <span className={`badge ${item.action === 'approved' ? 'bg-success' : 'bg-danger'}`}>
+                                                    {item.action === 'approved' ? 'Onaylandı' : 'Reddedildi'}
+                                                </span>
                                             </div>
-                                            <div>
-                                                <div className="fs-sm fw-medium text-dark">
-                                                    {approver.name}
-                                                </div>
-                                                <div className="fs-xs text-muted">
-                                                    {approver.role}
-                                                </div>
-                                            </div>
-                                            {approver.status === 'approved' && (
-                                                <svg className="w-5 h-5 text-success ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                </svg>
+                                            <small className="text-muted">{formatDate(item.created_at)}</small>
+                                            {item.note && (
+                                                <p className="mb-0 small text-muted mt-1">{item.note}</p>
                                             )}
                                         </div>
                                     ))}
                                 </div>
+                            ) : (
+                                <p className="text-muted mb-0">Henüz onay geçmişi yok.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Onay Sırası */}
+                    <div className="card">
+                        <div className="card-header bg-light">
+                            <h6 className="mb-0 fw-bold">
+                                <i className="ti ti-list-numbers me-1"></i> Onay Sırası
+                            </h6>
+                        </div>
+                        <div className="card-body">
+                            <div className="list-group list-group-flush">
+                                {approvers.map((approver, index) => (
+                                    <div key={approver.id} className="list-group-item px-0 d-flex align-items-center">
+                                        <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style={{ width: '32px', height: '32px' }}>
+                                            <small className="fw-bold">{index + 1}</small>
+                                        </div>
+                                        <div className="flex-grow-1">
+                                            <div className="fw-medium">{approver.name}</div>
+                                            <small className="text-muted">{approver.role}</small>
+                                        </div>
+                                        {approver.status === 'approved' && (
+                                            <i className="ti ti-check text-success fs-5"></i>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>

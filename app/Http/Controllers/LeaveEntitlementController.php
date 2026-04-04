@@ -36,12 +36,25 @@ class LeaveEntitlementController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        $employees = Employee::orderBy('first_name')->get(['id', 'first_name', 'last_name'])->toArray();
+        $leaveTypes = LeaveType::orderBy('name')->get(['id', 'name'])->toArray();
+        $currentYear = date('Y');
+
+        return Inertia::render('Admin/Leave/CreateEntitlement', [
+            'employees' => $employees,
+            'leaveTypes' => $leaveTypes,
+            'currentYear' => $currentYear,
+        ]);
+    }
+
     public function store(StoreLeaveEntitlementRequest $request)
     {
         try {
             $entitlement = $this->leaveEntitlementRepository->create($request->validated());
 
-            return redirect()->back()->with('success', 'İzin hakkı başarıyla oluşturuldu.');
+            return redirect()->route('admin.leave.entitlements.index')->with('success', 'İzin hakkı başarıyla oluşturuldu.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -52,12 +65,24 @@ class LeaveEntitlementController extends Controller
         return response()->json($leaveEntitlement->load('employee', 'leaveType'));
     }
 
+    public function edit(LeaveEntitlement $leaveEntitlement)
+    {
+        $employees = Employee::orderBy('first_name')->get(['id', 'first_name', 'last_name'])->toArray();
+        $leaveTypes = LeaveType::orderBy('name')->get(['id', 'name'])->toArray();
+
+        return Inertia::render('Admin/Leave/EditEntitlement', [
+            'entitlement' => $leaveEntitlement,
+            'employees' => $employees,
+            'leaveTypes' => $leaveTypes,
+        ]);
+    }
+
     public function update(UpdateLeaveEntitlementRequest $request, LeaveEntitlement $leaveEntitlement)
     {
         try {
             $entitlement = $this->leaveEntitlementRepository->update($leaveEntitlement->id, $request->validated());
 
-            return redirect()->back()->with('success', 'İzin hakkı başarıyla güncellendi.');
+            return redirect()->route('admin.leave.entitlements.index')->with('success', 'İzin hakkı başarıyla güncellendi.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

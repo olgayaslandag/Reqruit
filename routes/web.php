@@ -231,8 +231,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Leave Types
         Route::prefix('types')->name('types.')->group(function () {
             Route::get('/', [LeaveTypeController::class, 'index'])->name('index');
+            Route::get('/create', [LeaveTypeController::class, 'create'])->name('create');
             Route::post('/', [LeaveTypeController::class, 'store'])->name('store');
             Route::get('/{leaveType}', [LeaveTypeController::class, 'show'])->name('show');
+            Route::get('/{leaveType}/edit', [LeaveTypeController::class, 'edit'])->name('edit');
             Route::put('/{leaveType}', [LeaveTypeController::class, 'update'])->name('update');
             Route::delete('/{leaveType}', [LeaveTypeController::class, 'destroy'])->name('destroy');
         });
@@ -240,8 +242,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Leave Entitlements
         Route::prefix('entitlements')->name('entitlements.')->group(function () {
             Route::get('/', [LeaveEntitlementController::class, 'index'])->name('index');
+            Route::get('/create', [LeaveEntitlementController::class, 'create'])->name('create');
             Route::post('/', [LeaveEntitlementController::class, 'store'])->name('store');
             Route::get('/{leaveEntitlement}', [LeaveEntitlementController::class, 'show'])->name('show');
+            Route::get('/{leaveEntitlement}/edit', [LeaveEntitlementController::class, 'edit'])->name('edit');
             Route::put('/{leaveEntitlement}', [LeaveEntitlementController::class, 'update'])->name('update');
             Route::delete('/{leaveEntitlement}', [LeaveEntitlementController::class, 'destroy'])->name('destroy');
         });
@@ -267,6 +271,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{attendance}', [AttendanceController::class, 'destroy'])->name('destroy');
         Route::post('/clock-in', [AttendanceController::class, 'clockIn'])->name('clockIn');
         Route::post('/clock-out', [AttendanceController::class, 'clockOut'])->name('clockOut');
+        Route::post('/manual-clock', [AttendanceController::class, 'manualClock'])->name('manual-clock');
         Route::get('/employee/{employeeId}', [AttendanceController::class, 'forEmployee'])->name('employee');
     });
 

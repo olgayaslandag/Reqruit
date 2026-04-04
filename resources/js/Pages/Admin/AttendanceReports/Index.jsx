@@ -19,9 +19,10 @@ export default function Index({ statistics = {}, reportsSummary = {}, filters = 
                 title: 'Devam Raporları',
                 breadcrumbs: [
                     { label: 'Ana Sayfa', url: route('dashboard') },
-                    { label: 'Raporlar', url: '#' },
+                    { label: 'Raporlar', url: route('admin.reports.index') },
                     { label: 'Devam Raporları', url: route('admin.attendance-reports.index') },
                 ],
+                newUrl: route('admin.attendance.index'),
             }}
         >
             <Head title="Devam Raporları" />

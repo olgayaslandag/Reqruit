@@ -1,21 +1,17 @@
-import { useState, useEffect } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showError, showSuccess } from '@/Utils/sweetAlert';
 
 export default function Create({ calendars }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
     const [formData, setFormData] = useState({
+        work_calendar_id: calendars?.[0]?.id || '',
         name: '',
-        local_name: '',
-        description: '',
         date: '',
-        recurring: true,
-        category: 'public_holiday',
-        calendar_ids: []
+        type: 'official',
+        description: '',
+        is_recurring: true,
     });
 
     const [errors, setErrors] = useState({});
@@ -27,7 +23,6 @@ export default function Create({ calendars }) {
             [field]: value
         }));
 
-        // Hata mesajını temizle
         if (errors[field]) {
             setErrors(prev => {
                 const newErrors = { ...prev };
@@ -37,16 +32,10 @@ export default function Create({ calendars }) {
         }
     };
 
-    const handleMultiSelectChange = (event) => {
-        const selectedOptions = Array.from(event.target.selectedOptions);
-        const selectedIds = selectedOptions.map(option => option.value);
-        setFormData(prev => ({ ...prev, calendar_ids: selectedIds }));
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
-        
+
         router.post(route('admin.holidays.store'), formData, {
             onSuccess: () => {
                 showSuccess('Resmi tatil başarıyla oluşturuldu.');
@@ -59,170 +48,205 @@ export default function Create({ calendars }) {
         });
     };
 
+    const holidayTypes = [
+        { value: 'official', label: 'Resmi Tatil', icon: 'ti-flag', color: 'danger' },
+        { value: 'religious_holiday', label: 'Dini Bayram', icon: 'ti-moon', color: 'success' },
+        { value: 'national_holiday', label: 'Ulusal Bayram', icon: 'ti-star', color: 'primary' },
+        { value: 'company', label: 'Şirket Tatili', icon: 'ti-building', color: 'warning' },
+    ];
+
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold">
-                        Yeni Resmi Tatil Tanımla
-                    </h5>
-                    <Link
-                        href={route('admin.holidays.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
-                    >
-                        Geri
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Yeni Resmi Tatil',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Zaman Yönetimi', url: '#' },
+                    { label: 'Resmi Tatiller', url: route('admin.holidays.index') },
+                    { label: 'Yeni Tatil', url: route('admin.holidays.create') },
+                ],
+                backUrl: route('admin.holidays.index'),
+            }}
         >
-            <Head title="Yeni Tatil" />
+            <Head title="Yeni Resmi Tatil" />
 
-            <div className="py-6">
-                <div className="mw-100 mx-auto px-4">
-                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-secondary">
-                            <h5 className="fw-medium">Tatil Bilgileri</h5>
-                            <p className="mt-1 fs-sm text-muted">Yeni bir resmi tatil buradan tanımlanabilir</p>
+            <div className="row">
+                <div className="col-lg-8">
+                    <div className="card">
+                        <div className="card-header bg-light">
+                            <h5 className="mb-0 fw-bold">
+                                <i className="ti ti-calendar-plus me-2"></i> Tatil Bilgileri
+                            </h5>
                         </div>
-
-                        <form onSubmit={handleSubmit} className="p-4">
-                            <div className="mb-3">
-                                {/* Temel Bilgiler */}
-                                <div className="d-grid d-grid-cols-1 gap-4">
-                                    <div className="col-span-2">
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Tatil Adı *
+                        <div className="card-body">
+                            <form onSubmit={handleSubmit}>
+                                <div className="row g-3">
+                                    {/* Takvim Seçimi */}
+                                    <div className="col-12">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-calendar me-1"></i> Çalışma Takvimi <span className="text-danger">*</span>
                                         </label>
-                                        <input className="form-control" type="text"
+                                        <select
+                                            className={`form-select ${errors.work_calendar_id ? 'is-invalid' : ''}`}
+                                            value={formData.work_calendar_id}
+                                            onChange={(e) => handleChange('work_calendar_id', e.target.value)}
+                                        >
+                                            <option value="">Takvim Seçin</option>
+                                            {calendars?.map(calendar => (
+                                                <option key={calendar.id} value={calendar.id}>
+                                                    {calendar.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.work_calendar_id && <div className="invalid-feedback">{errors.work_calendar_id}</div>}
+                                    </div>
+
+                                    {/* Tatil Adı */}
+                                    <div className="col-12">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-tag me-1"></i> Tatil Adı <span className="text-danger">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className={`form-control ${errors.name ? 'is-invalid' : ''}`}
                                             value={formData.name}
                                             onChange={(e) => handleChange('name', e.target.value)}
-                                            placeholder="Örnek: Zafer Bayramı"
+                                            placeholder="Örneğin: Zafer Bayramı"
                                         />
-                                        {errors.name && <p className="mt-1 fs-sm text-danger">{errors.name}</p>}
+                                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                                     </div>
 
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Yerel Adı
+                                    {/* Tarih */}
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-calendar-event me-1"></i> Tarih <span className="text-danger">*</span>
                                         </label>
-                                        <input className="form-control" type="text"
-                                            value={formData.local_name}
-                                            onChange={(e) => handleChange('local_name', e.target.value)}
-                                            placeholder="Yerel olarak bildiğiniz ad"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Tarih *
-                                        </label>
-                                        <input className="form-control" type="date"
+                                        <input
+                                            type="date"
+                                            className={`form-control ${errors.date ? 'is-invalid' : ''}`}
                                             value={formData.date}
                                             onChange={(e) => handleChange('date', e.target.value)}
                                         />
-                                        {errors.date && <p className="mt-1 fs-sm text-danger">{errors.date}</p>}
+                                        {errors.date && <div className="invalid-feedback">{errors.date}</div>}
                                     </div>
 
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Kategori
+                                    {/* Tatil Türü */}
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-category me-1"></i> Tatil Türü <span className="text-danger">*</span>
                                         </label>
-                                        <select className="form-control" value={formData.category}
-                                            onChange={(e) => handleChange('category', e.target.value)}
+                                        <select
+                                            className={`form-select ${errors.type ? 'is-invalid' : ''}`}
+                                            value={formData.type}
+                                            onChange={(e) => handleChange('type', e.target.value)}
                                         >
-                                            <option value="public_holiday">Resmi Tatil</option>
-                                            <option value="religious_holiday">Dini Bayram</option>
-                                            <option value="national_holiday">Ulusal Bayram</option>
-                                            <option value="international_holiday">Uluslararası Günü</option>
+                                            {holidayTypes.map(type => (
+                                                <option key={type.value} value={type.value}>
+                                                    {type.label}
+                                                </option>
+                                            ))}
                                         </select>
+                                        {errors.type && <div className="invalid-feedback">{errors.type}</div>}
                                     </div>
 
-                                    <div className="col-span-2">
-                                        <div className="d-flex align-items-center">
+                                    {/* Açıklama */}
+                                    <div className="col-12">
+                                        <label className="form-label fw-medium">
+                                            <i className="ti ti-file-text me-1"></i> Açıklama
+                                        </label>
+                                        <textarea
+                                            className="form-control"
+                                            rows={3}
+                                            value={formData.description}
+                                            onChange={(e) => handleChange('description', e.target.value)}
+                                            placeholder="Tatil hakkında açıklama..."
+                                        />
+                                    </div>
+
+                                    {/* Yıllık Tekrar */}
+                                    <div className="col-12">
+                                        <div className="form-check">
                                             <input
                                                 type="checkbox"
-                                                id="recurring"
-                                                checked={formData.recurring}
-                                                onChange={(e) => handleChange('recurring', e.target.checked)}
-                                                className="h-4 w-4 text-primary focus: border-secondary rounded"
+                                                className="form-check-input"
+                                                id="is_recurring"
+                                                checked={formData.is_recurring}
+                                                onChange={(e) => handleChange('is_recurring', e.target.checked)}
                                             />
-                                            <label htmlFor="recurring" className="ml-2 d-block fs-sm text-dark">
-                                                Bu tatil yılda bir tekrar edsin (her yıl aynı tarihde uygulanacak)
+                                            <label className="form-check-label" htmlFor="is_recurring">
+                                                <i className="ti ti-repeat me-1"></i> Bu tatil her yıl tekrar eder
                                             </label>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                        Açıklama
-                                    </label>
-                                    <textarea className="form-control" value={formData.description}
-                                        onChange={(e) => handleChange('description', e.target.value)}
-                                        rows={3}
-                                        placeholder="Tatil hakkında açıklama (isteğe bağlı)"
-                                    />
+                                {/* Butonlar */}
+                                <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                    <Link href={route('admin.holidays.index')} className="btn btn-light">
+                                        <i className="ti ti-arrow-left me-1"></i> İptal
+                                    </Link>
+                                    <button type="submit" className="btn btn-primary" disabled={loading}>
+                                        {loading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-1"></span>
+                                                Kaydediliyor...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="ti ti-check me-1"></i> Tatil Oluştur
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
-                                {/* Takvim Seçimi */}
-                                {calendars && calendars.length > 0 && (
-                                    <div>
-                                        <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                            Takvilere Ekle
-                                        </label>
-                                        <select className="form-control" multiple
-                                            value={formData.calendar_ids}
-                                            onChange={handleMultiSelectChange}
-                                        >
-                                            {calendars.map(calendar => (
-                                                <option key={calendar.id} value={calendar.id}>
-                                                    {calendar.name} ({new Date(calendar.start_date).getFullYear()})
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <p className="mt-1 fs-sm text-muted">
-                                            Bu tatili eklemek istediğiniz takvimleri seçin (isteğe bağlı)
-                                        </p>
+                {/* Sağ Panel - Bilgi */}
+                <div className="col-lg-4">
+                    {/* Tatil Türleri Açıklaması */}
+                    <div className="card border-info mb-4">
+                        <div className="card-header bg-info text-white">
+                            <h6 className="mb-0 fw-bold">
+                                <i className="ti ti-info-circle me-1"></i> Tatil Türleri
+                            </h6>
+                        </div>
+                        <div className="card-body p-0">
+                            <div className="list-group list-group-flush">
+                                {holidayTypes.map(type => (
+                                    <div key={type.value} className="list-group-item d-flex align-items-center gap-2">
+                                        <i className={`ti ${type.icon} text-${type.color}`}></i>
+                                        <span className="fw-medium">{type.label}</span>
                                     </div>
-                                )}
+                                ))}
                             </div>
-
-                            {/* Submit Butonu */}
-                            <div className="mt-8 d-flex justify-content-end">
-                                <Link
-                                    href={route('admin.holidays.index')}
-                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                                >
-                                    İptal
-                                </Link>
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className="btn btn-primary disabled:opacity-50"
-                                >
-                                    {loading ? 'Tatil Kaydediliyor...' : 'Tatil Oluştur'}
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
 
-                    {/* Türkiye Resmi Tatilleri Listesi */}
-                    <div className="mt-6 bg-blue-50 border border-blue-200 rounded p-4">
-                        <div className="d-flex align-items-start">
-                            <div className="d-flex-shrink-0">
-                                <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <div className="ml-3">
-                                <h5 className="fw-medium">Türkiye'de Yer Alan Resmi Tatiller</h5>
-                                <div className="mt-2 fs-sm text-info space-y-1">
-                                    <p><strong>Resmi Tatiller:</strong> Yeni Yıl, Ulusal Egemenlik ve Çocuk Bayramı, Emek ve Dayanışma Günü, Gençlik ve Spor Bayramı, Zafer Bayramı</p>
-                                    <p><strong>Dini Bayramlar:</strong> Ramazan Bayramı, Kurban Bayramı (tarihleri Hicriye göre değişir)</p>
-                                    <p><strong>Ulusal Bayramlar:</strong> Nezarethani'nin Açılışı (Atatürk'ün ölümü)</p>
-                                    <p><strong>Uluslararası Günler:</strong> Kadınlar Günü, Uluslararası Kitap Fuarı haftası vb.</p>
-                                </div>
-                            </div>
+                    {/* Bilgi Kutusu */}
+                    <div className="alert alert-info" role="alert">
+                        <h6 className="alert-heading fw-bold">
+                            <i className="ti ti-lightbulb me-1"></i> İpucu
+                        </h6>
+                        <p className="mb-0 small">
+                            Resmi tatiller doğru tanımlandığında personel devam kayıtları, fazla mesai hesaplamaları
+                            ve resmi izin günleri otomatik olarak tanınır.
+                        </p>
+                    </div>
+
+                    {/* Hızlı Linkler */}
+                    <div className="card">
+                        <div className="card-header bg-light">
+                            <h6 className="mb-0 fw-bold">Hızlı Erişim</h6>
+                        </div>
+                        <div className="card-body">
+                            <Link href={route('admin.work-calendars.index')} className="btn btn-outline-info w-100 mb-2">
+                                <i className="ti ti-calendar me-1"></i> Takvimler
+                            </Link>
+                            <Link href={route('admin.holidays.index')} className="btn btn-outline-secondary w-100">
+                                <i className="ti ti-list me-1"></i> Tatil Listesi
+                            </Link>
                         </div>
                     </div>
                 </div>

@@ -73,6 +73,14 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
+        // CSP nonce helper fonksiyonu - eğer spatie/laravel-csp kurulu değilse boş string döndür
+        if (! function_exists('csp_nonce')) {
+            function csp_nonce()
+            {
+                return '';
+            }
+        }
+
         // PayrollPeriod modeli için policy mapping
         Gate::policy(PayrollPeriod::class, PayrollPolicy::class);
 

@@ -131,18 +131,21 @@ class AttendanceService
         $breakEnd = null;
 
         foreach ($attendanceRecords as $record) {
+            $timeStr = is_string($record->time) ? $record->time : $record->time->format('H:i:s');
+            $parsedTime = Carbon::parse('today '.$timeStr);
+
             switch ($record->type) {
                 case AttendanceTypeEnum::CHECK_IN:
-                    $checkIn = Carbon::createFromTime($record->time);
+                    $checkIn = $parsedTime;
                     break;
                 case AttendanceTypeEnum::CHECK_OUT:
-                    $checkOut = Carbon::createFromTime($record->time);
+                    $checkOut = $parsedTime;
                     break;
                 case AttendanceTypeEnum::BREAK_START:
-                    $breakStart = Carbon::createFromTime($record->time);
+                    $breakStart = $parsedTime;
                     break;
                 case AttendanceTypeEnum::BREAK_END:
-                    $breakEnd = Carbon::createFromTime($record->time);
+                    $breakEnd = $parsedTime;
                     break;
             }
         }
@@ -158,8 +161,15 @@ class AttendanceService
             ];
         }
 
-        $scheduledStartTime = $shift ? Carbon::createFromTime($shift->start_time) : null;
-        $scheduledEndTime = $shift ? Carbon::createFromTime($shift->end_time) : null;
+        $scheduledStartTime = null;
+        $scheduledEndTime = null;
+
+        if ($shift) {
+            $startTimeStr = is_string($shift->start_time) ? $shift->start_time : $shift->start_time->format('H:i:s');
+            $endTimeStr = is_string($shift->end_time) ? $shift->end_time : $shift->end_time->format('H:i:s');
+            $scheduledStartTime = Carbon::parse('today '.$startTimeStr);
+            $scheduledEndTime = Carbon::parse('today '.$endTimeStr);
+        }
 
         // Calculate working duration
         $actualWorkingDuration = 0;
@@ -257,6 +267,74 @@ class AttendanceService
         return true;
     }
 
+    public function manualClockIn(int $employeeId, Carbon $timestamp)
+    {
+        $employee = Employee::findOrFail($employeeId);
+
+        // Parse the timestamp to extract date and time
+        $date = $timestamp->copy()->startOfDay();  // Only date part
+        $time = $timestamp; // Time part as-is
+
+        $metadata = [];
+
+        \DB::beginTransaction();
+        try {
+            // Record the attendance with manually provided time
+            $attendance = $this->recordAttendance(
+                $employeeId,  // Ensuring we pass integer explicitly
+                $date,        // Carbon object for date
+                $time,        // Carbon object for time
+                AttendanceTypeEnum::CHECK_IN,
+                AttendanceSourceEnum::MANUAL,
+                $metadata
+            );
+
+            \DB::commit();
+
+            // Update summary for that date
+            $this->updateAttendanceSummary($employeeId, $date);
+
+            return $attendance;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function manualClockOut(int $employeeId, Carbon $timestamp)
+    {
+        $employee = Employee::findOrFail($employeeId);
+
+        // Parse the timestamp to extract date and time
+        $date = $timestamp->copy()->startOfDay();  // Only date part
+        $time = $timestamp; // Time part as-is
+
+        $metadata = [];
+
+        \DB::beginTransaction();
+        try {
+            // Record the attendance with manually provided time
+            $attendance = $this->recordAttendance(
+                $employeeId,  // Ensuring we pass integer explicitly
+                $date,        // Carbon object for date
+                $time,        // Carbon object for time
+                AttendanceTypeEnum::CHECK_OUT,
+                AttendanceSourceEnum::MANUAL,
+                $metadata
+            );
+
+            \DB::commit();
+
+            // Update summary for that date
+            $this->updateAttendanceSummary($employeeId, $date);
+
+            return $attendance;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw $e;
+        }
+    }
+
     public function getFilteredAttendances($filters = [])
     {
         $query = AttendanceRecord::with(['employee.department']);
@@ -347,7 +425,8 @@ class AttendanceService
             // If successful, also try to determine if this is late arrival
             $shift = $this->getEmployeeShiftForDate($employee->id, $date);
             if ($shift) {
-                $scheduledStart = Carbon::createFromTime($shift->start_time);
+                $startTimeStr = is_string($shift->start_time) ? $shift->start_time : $shift->start_time->format('H:i:s');
+                $scheduledStart = Carbon::parse('today '.$startTimeStr);
                 if ($time->gt($scheduledStart->addMinutes($shift->tolerance_minutes ?? 15))) {
                     $attendance->status = AttendanceStatusEnum::LATE;
                     $attendance->save();
@@ -393,7 +472,8 @@ class AttendanceService
             // If successful, also try to determine if this is early departure
             $shift = $this->getEmployeeShiftForDate($employee->id, $date);
             if ($shift) {
-                $scheduledEnd = Carbon::createFromTime($shift->end_time);
+                $endTimeStr = is_string($shift->end_time) ? $shift->end_time : $shift->end_time->format('H:i:s');
+                $scheduledEnd = Carbon::parse('today '.$endTimeStr);
                 if ($time->lt($scheduledEnd->subMinutes($shift->tolerance_minutes ?? 15))) {
                     $attendance->status = AttendanceStatusEnum::EARLY_LEAVE;
                     $attendance->save();

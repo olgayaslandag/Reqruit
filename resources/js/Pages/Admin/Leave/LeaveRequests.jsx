@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import { showSuccess, showError, confirmDelete } from '@/Utils/sweetAlert';
 
-export default function LeaveRequests({ leaveRequests: initialLeaveRequests, employees: initialEmployees, leaveTypes: initialLeaveTypes, filters: initialFilters }) {
-    // usePage props fallback - server-side rendering için
+export default function LeaveRequests({ leaveRequests, employees, leaveTypes, filters }) {
     const { props } = usePage();
-    const pageProps = props || {};
-    const [leaveRequests, setLeaveRequests] = useState(initialLeaveRequests || []);
-    const [employees, setEmployees] = useState(initialEmployees || []);
-    const [leaveTypes, setLeaveTypes] = useState(initialLeaveTypes || []);
-    const [filters, setFilters] = useState(initialFilters || { employee_id: '', status: '', year: new Date().getFullYear() });
+    const flash = props.flash;
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [localFilters, setLocalFilters] = useState({
+        employee_id: filters?.employee_id || '',
+        status: filters?.status || '',
+        year: filters?.year || new Date().getFullYear(),
+    });
     const [showModal, setShowModal] = useState(false);
     const [showApproveModal, setShowApproveModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
@@ -26,48 +29,35 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
     });
     const [editingId, setEditingId] = useState(null);
 
-    useEffect(() => {
-        if (initialLeaveRequests) setLeaveRequests(initialLeaveRequests);
-        if (initialEmployees) setEmployees(initialEmployees);
-        if (initialLeaveTypes) setLeaveTypes(initialLeaveTypes);
-        if (initialFilters) setFilters(initialFilters);
-
-        // Listen for custom event to open modal
-        const handleOpenModal = () => {
-            setFormData({
-                employee_id: '',
-                leave_type_id: '',
-                start_date: '',
-                end_date: '',
-                is_half_day: false,
-                reason: '',
-                requires_hr_approval: false
-            });
-            setEditingId(null);
-            setShowModal(true);
-        };
-
-        document.addEventListener('openLeaveRequestModal', handleOpenModal);
-
-        return () => {
-            document.removeEventListener('openLeaveRequestModal', handleOpenModal);
-        };
-    }, [initialLeaveRequests, initialEmployees, initialLeaveTypes, initialFilters]);
-
-    const handleFilterChange = (field, value) => {
-        setFilters(prev => ({ ...prev, [field]: value }));
+    const handleFilterChange = (key, value) => {
+        const newFilters = { ...localFilters, [key]: value };
+        setLocalFilters(newFilters);
+        router.get(route('admin.leave.requests.index'), {
+            ...newFilters,
+            search: searchTerm,
+        }, { replace: true });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (editingId) {
-            router.put(`/admin/leave/requests/${editingId}`, formData);
+            router.put(route('admin.leave.requests.update', editingId), formData, {
+                onSuccess: () => {
+                    showSuccess('İzin talebi güncellendi.');
+                    resetForm();
+                },
+                onError: () => showError('Güncelleme başarısız.')
+            });
         } else {
-            router.post('/admin/leave/requests', formData);
+            router.post(route('admin.leave.requests.store'), formData, {
+                onSuccess: () => {
+                    showSuccess('İzin talebi oluşturuldu.');
+                    resetForm();
+                },
+                onError: () => showError('Oluşturma başarısız.')
+            });
         }
-
-        resetForm();
     };
 
     const handleEdit = (request) => {
@@ -85,9 +75,11 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
     };
 
     const handleDelete = (id) => {
-        if (confirm('Bu izin talebini silmek istediğinize emin misiniz?')) {
-            router.delete(`/admin/leave/requests/${id}`);
-        }
+        confirmDelete('Bu izin talebini silmek istediğinize emin misiniz?', () => {
+            router.delete(route('admin.leave.requests.destroy', id), {
+                onSuccess: () => showSuccess('İzin talebi silindi.')
+            });
+        });
     };
 
     const handleApprove = (request) => {
@@ -96,23 +88,27 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
     };
 
     const confirmApprove = () => {
-        router.put(`/admin/leave/requests/${selectedRequest.id}`, {
-            ...selectedRequest,
+        router.put(route('admin.leave.requests.update', selectedRequest.id), {
             status: 'approved',
             approval_comment: approverComment
+        }, {
+            onSuccess: () => {
+                showSuccess('İzin talebi onaylandı.');
+                setShowApproveModal(false);
+                setApproverComment('');
+                setSelectedRequest(null);
+            }
         });
-        setShowApproveModal(false);
-        setApproverComment('');
-        setSelectedRequest(null);
     };
 
     const handleReject = (request) => {
         const rejectionReason = prompt('Reddetme gerekçesini belirtin:');
         if (rejectionReason) {
-            router.put(`/admin/leave/requests/${request.id}`, {
-                ...request,
+            router.put(route('admin.leave.requests.update', request.id), {
                 status: 'rejected',
                 rejection_reason: rejectionReason
+            }, {
+                onSuccess: () => showSuccess('İzin talebi reddedildi.')
             });
         }
     };
@@ -131,43 +127,74 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
         setShowModal(false);
     };
 
-    const handleApplyFilters = () => {
-        router.get('/admin/leave/requests', filters, {
-            preserveState: true,
-            replace: true
-        });
-    };
-
     const getEmployeeName = (employeeId) => {
-        const employee = employees.find(emp => emp.id === employeeId);
+        const employee = employees?.find(emp => emp.id === employeeId);
         return employee ? `${employee.first_name} ${employee.last_name}` : 'Bulunamadı';
     };
 
     const getLeaveTypeName = (typeId) => {
-        const type = leaveTypes.find(t => t.id === typeId);
+        const type = leaveTypes?.find(t => t.id === typeId);
         return type ? type.name : 'Bulunamadı';
     };
 
-    const getStatusColor = (status) => {
-        switch(status) {
-            case 'pending': return 'bg-warning bg-opacity-10 text-warning';
-            case 'approved': return 'bg-success bg-opacity-10 text-success';
-            case 'rejected': return 'bg-danger bg-opacity-10 text-danger';
-            case 'cancelled': return 'bg-light text-dark';
+    const getStatusBadgeClass = (status) => {
+        switch (status) {
+            case 'pending': return 'bg-warning text-dark';
+            case 'approved': return 'bg-success';
+            case 'rejected': return 'bg-danger';
+            case 'cancelled': return 'bg-secondary';
             default: return 'bg-light text-dark';
         }
     };
 
-    return (
-        <div className="py-12">
-            <div className="mw-100 mx-auto">
-                <div className="bg-white rounded-3 shadow-sm">
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'pending': return 'Beklemede';
+            case 'approved': return 'Onaylandı';
+            case 'rejected': return 'Reddedildi';
+            case 'cancelled': return 'İptal Edildi';
+            default: return status;
+        }
+    };
 
-                    <div className="bg-white rounded-3 shadow-sm mb-5 p-4">
-                        <form onSubmit={(e) => { e.preventDefault(); handleApplyFilters(); }} className="d-flex d-flex-wrap gap-3 align-items-end">
-                            <div className="d-flex-1 min-w-[200px]">
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">Çalışan</label>
-                                <select className="form-control" value={filters.employee_id} onChange={(e) => handleFilterChange('employee_id', e.target.value)}>
+    // İstatistikler - leaveRequests array kontrolü
+    const leaveRequestsArray = Array.isArray(leaveRequests) ? leaveRequests : (leaveRequests?.data || []);
+    
+    const stats = {
+        total: leaveRequestsArray.length || 0,
+        pending: leaveRequestsArray.filter(r => r.status === 'pending').length || 0,
+        approved: leaveRequestsArray.filter(r => r.status === 'approved').length || 0,
+    };
+
+    return (
+        <AuthenticatedLayout
+            pageHeader={{
+                title: 'İzin Talepleri',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'İzin Yönetimi', url: '#' },
+                    { label: 'İzin Talepleri', url: route('admin.leave.requests.index') },
+                ],
+                newUrl: '#',
+                filterCollapse: true,
+            }}
+        >
+            <Head title="İzin Talepleri" />
+
+            {/* Collapse Filtre Paneli */}
+            <div className="collapse mb-4" id="filterCollapse">
+                <div className="card">
+                    <div className="card-body">
+                        <div className="row g-3">
+                            <div className="col-md-4">
+                                <label className="form-label fw-medium">
+                                    <i className="ti ti-user me-1"></i> Çalışan
+                                </label>
+                                <select
+                                    className="form-select"
+                                    value={localFilters.employee_id}
+                                    onChange={(e) => handleFilterChange('employee_id', e.target.value)}
+                                >
                                     <option value="">Tümü</option>
                                     {(employees || []).map(emp => (
                                         <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
@@ -175,269 +202,334 @@ export default function LeaveRequests({ leaveRequests: initialLeaveRequests, emp
                                 </select>
                             </div>
 
-                            <div className="w-40">
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">Durum</label>
-                                <select className="form-control" value={filters.status} onChange={(e) => handleFilterChange('status', e.target.value)}>
+                            <div className="col-md-3">
+                                <label className="form-label fw-medium">
+                                    <i className="ti ti-toggle-right me-1"></i> Durum
+                                </label>
+                                <select
+                                    className="form-select"
+                                    value={localFilters.status}
+                                    onChange={(e) => handleFilterChange('status', e.target.value)}
+                                >
                                     <option value="">Tümü</option>
                                     <option value="pending">Beklemede</option>
-                                    <option value="approved">Onaylı</option>
-                                    <option value="rejected">Reddedilmiş</option>
-                                    <option value="cancelled">İptal Edilmiş</option>
+                                    <option value="approved">Onaylandı</option>
+                                    <option value="rejected">Reddedildi</option>
+                                    <option value="cancelled">İptal Edildi</option>
                                 </select>
                             </div>
 
-                            <div className="w-32">
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">Yıl</label>
-                                <select className="form-control" value={filters.year} onChange={(e) => handleFilterChange('year', e.target.value)}>
+                            <div className="col-md-3">
+                                <label className="form-label fw-medium">
+                                    <i className="ti ti-calendar me-1"></i> Yıl
+                                </label>
+                                <select
+                                    className="form-select"
+                                    value={localFilters.year}
+                                    onChange={(e) => handleFilterChange('year', e.target.value)}
+                                >
                                     <option value={2024}>2024</option>
                                     <option value={2025}>2025</option>
                                     <option value={2026}>2026</option>
                                 </select>
                             </div>
 
-                            <div>
+                            <div className="col-md-2 d-flex align-items-end">
                                 <button
-                                    type="submit"
-                                    className="btn btn-success btn-sm"
+                                    onClick={() => setShowModal(true)}
+                                    className="btn btn-primary w-100"
                                 >
-                                    Filtrele
+                                    <i className="ti ti-plus me-1"></i> Yeni Talep
                                 </button>
                             </div>
-                        </form>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <div className="overflow-hidden">
-                        <table className="w-100 divide-y divide-gray-200">
+            {/* Stats Cards */}
+            <div className="row g-3 mb-4">
+                <div className="col-md-4">
+                    <div className="card border-primary">
+                        <div className="card-body text-center">
+                            <i className="ti ti-calendar fs-2 text-primary mb-2"></i>
+                            <h6 className="text-primary fw-medium">Toplam Talep</h6>
+                            <h3 className="fw-bold text-primary">{stats.total}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-4">
+                    <div className="card border-warning">
+                        <div className="card-body text-center">
+                            <i className="ti ti-clock fs-2 text-warning mb-2"></i>
+                            <h6 className="text-warning fw-medium">Bekleyen</h6>
+                            <h3 className="fw-bold text-warning">{stats.pending}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-4">
+                    <div className="card border-success">
+                        <div className="card-body text-center">
+                            <i className="ti ti-check fs-2 text-success mb-2"></i>
+                            <h6 className="text-success fw-medium">Onaylanan</h6>
+                            <h3 className="fw-bold text-success">{stats.approved}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Talepler Tablosu */}
+            <div className="card">
+                <div className="card-header bg-light">
+                    <h5 className="mb-0 fw-bold">
+                        <i className="ti ti-calendar-event me-2"></i> İzin Talepleri Listesi
+                    </h5>
+                </div>
+                <div className="card-body p-0">
+                    <div className="table-responsive">
+                        <table className="table table-hover mb-0">
                             <thead className="table-light">
                                 <tr>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Çalışan</th>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">İzin Türü</th>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Başlangıç</th>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Bitiş</th>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Yarım Gün</th>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Durum</th>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">Açıklama</th>
-                                    <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">İşlemler</th>
+                                    <th className="fw-medium">Çalışan</th>
+                                    <th className="fw-medium">İzin Türü</th>
+                                    <th className="fw-medium">Başlangıç</th>
+                                    <th className="fw-medium">Bitiş</th>
+                                    <th className="fw-medium text-center">Yarım Gün</th>
+                                    <th className="fw-medium text-center">Durum</th>
+                                    <th className="fw-medium text-end">İşlemler</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {(leaveRequests || []).map((request) => (
-                                    <tr key={request.id} className="hover:table-light">
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-dark">{getEmployeeName(request.employee_id)}</td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-dark">{getLeaveTypeName(request.leave_type_id)}</td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-muted">{new Date(request.start_date).toLocaleDateString('tr-TR')}</td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-muted">{new Date(request.end_date).toLocaleDateString('tr-TR')}</td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm">
-                                            <span className={`px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill ${request.is_half_day ? 'bg-primary bg-opacity-10 text-info' : 'bg-light text-dark'}`}>
-                                                {request.is_half_day ? 'Evet' : 'Hayır'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm">
-                                            <span className={`px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill ${getStatusColor(request.status)}`}>
-                                                {request.status === 'pending' && 'Beklemede'}
-                                                {request.status === 'approved' && 'Onaylandı'}
-                                                {request.status === 'rejected' && 'Reddedildi'}
-                                                {request.status === 'cancelled' && 'İptal Edildi'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 fs-sm text-muted">{request.reason}</td>
-                                        <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
-                                            {(request.status === 'pending') && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleApprove(request)}
-                                                        className="text-success hover:text-green-900 mr-4"
-                                                    >
-                                                        Onayla
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleReject(request)}
-                                                        className="text-danger hover:text-red-900 mr-4"
-                                                    >
-                                                        Reddet
-                                                    </button>
-                                                </>
-                                            )}
-                                            {(request.status === 'pending' || request.status === 'cancelled') && (
-                                                <>
-                                                    <button
-                                                        onClick={() => handleEdit(request)}
-                                                        className="text-primary hover:text-indigo-900 mr-4"
-                                                    >
-                                                        Güncelle
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(request.id)}
-                                                        className="text-danger hover:text-red-900"
-                                                    >
-                                                        Sil
-                                                    </button>
-                                                </>
-                                            )}
+                            <tbody>
+                                {(leaveRequestsArray || []).length > 0 ? (
+                                    leaveRequestsArray.map((request) => (
+                                        <tr key={request.id}>
+                                            <td>
+                                                <div className="fw-medium">{getEmployeeName(request.employee_id)}</div>
+                                            </td>
+                                            <td>
+                                                <div className="fw-medium">{getLeaveTypeName(request.leave_type_id)}</div>
+                                            </td>
+                                            <td>
+                                                <div className="fw-medium">{new Date(request.start_date).toLocaleDateString('tr-TR')}</div>
+                                            </td>
+                                            <td>
+                                                <div className="fw-medium">{new Date(request.end_date).toLocaleDateString('tr-TR')}</div>
+                                            </td>
+                                            <td className="text-center">
+                                                <span className={`badge ${request.is_half_day ? 'bg-primary' : 'bg-light text-dark'}`}>
+                                                    {request.is_half_day ? 'Evet' : 'Hayır'}
+                                                </span>
+                                            </td>
+                                            <td className="text-center">
+                                                <span className={`badge ${getStatusBadgeClass(request.status)}`}>
+                                                    {getStatusLabel(request.status)}
+                                                </span>
+                                            </td>
+                                            <td className="text-end">
+                                                <div className="d-flex justify-content-end gap-1">
+                                                    {request.status === 'pending' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleApprove(request)}
+                                                                className="btn btn-sm btn-outline-success"
+                                                                title="Onayla"
+                                                            >
+                                                                <i className="ti ti-check"></i>
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleReject(request)}
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                title="Reddet"
+                                                            >
+                                                                <i className="ti ti-x"></i>
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    {(request.status === 'pending' || request.status === 'cancelled') && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleEdit(request)}
+                                                                className="btn btn-sm btn-outline-primary"
+                                                                title="Düzenle"
+                                                            >
+                                                                <i className="ti ti-edit"></i>
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(request.id)}
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                title="Sil"
+                                                            >
+                                                                <i className="ti ti-trash"></i>
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="7" className="text-center py-4 text-muted">
+                                            <i className="ti ti-calendar-off fs-1 d-block mb-2"></i>
+                                            İzin talebi bulunamadı.
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
                 </div>
-
-                {/* Add/Edit Modal */}
-                {showModal && (
-                    <div className="position-fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-100 w-100 d-flex align-items-center justify-content-center">
-                        <div className="position-relative p-5 bg-white rounded-3 shadow-sm-xl w-100 mw-100">
-                            <h5 className="fw-medium">{editingId ? 'İzin Talebi Düzenle' : 'Yeni İzin Talebi Ekle'}</h5>
-
-                            <form onSubmit={handleSubmit}>
-                                <div className="d-grid d-grid-cols-1 gap-3">
-                                    <div className="mb-4">
-                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Çalışan</label>
-                                        <select className="form-control" value={formData.employee_id} onChange={(e) => setFormData({...formData, employee_id: parseInt(e.target.value)})} required>
-                                            <option value="">Seçin...</option>
-                                            {(employees || []).map(emp => (
-                                                <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="mb-4">
-                                        <label className="d-block text-dark fs-sm fw-medium mb-1">İzin Türü</label>
-                                        <select className="form-control" value={formData.leave_type_id} onChange={(e) => setFormData({...formData, leave_type_id: parseInt(e.target.value)})} required>
-                                            <option value="">Seçin...</option>
-                                            {(leaveTypes || []).map(type => (
-                                                <option key={type.id} value={type.id}>{type.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="mb-4">
-                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Başlangıç Tarihi</label>
-                                        <input type="date" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"  
-                                            value={formData.start_date}
-                                            onChange={(e) => setFormData({...formData, start_date: e.target.value})}
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="mb-4">
-                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Bitiş Tarihi</label>
-                                        <input type="date" className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500"  
-                                            value={formData.end_date}
-                                            onChange={(e) => setFormData({...formData, end_date: e.target.value})}
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="mb-4 col-span-2">
-                                        <label className="d-flex align-items-center">
-                                            <input
-                                                type="checkbox"
-                                                className="rounded border-secondary text-primary shadow-sm-sm focus:border-indigo-300 focus:ring focus: focus:"
-                                                checked={formData.is_half_day}
-                                                onChange={(e) => setFormData({...formData, is_half_day: e.target.checked})}
-                                            />
-                                            <span className="ml-2 fs-sm fw-medium text-dark">Yarım Gün</span>
-                                        </label>
-                                    </div>
-
-                                    <div className="mb-4 col-span-2">
-                                        <label className="d-flex align-items-center">
-                                            <input
-                                                type="checkbox"
-                                                className="rounded border-secondary text-primary shadow-sm-sm focus:border-indigo-300 focus:ring focus: focus:"
-                                                checked={formData.requires_hr_approval}
-                                                onChange={(e) => setFormData({...formData, requires_hr_approval: e.target.checked})}
-                                            />
-                                            <span className="ml-2 fs-sm fw-medium text-dark">İK Onayı Gerekiyor</span>
-                                        </label>
-                                    </div>
-
-                                    <div className="mb-4 col-span-2">
-                                        <label className="d-block text-dark fs-sm fw-medium mb-1">Açıklama</label>
-                                        <textarea className="form-control"
-                                            value={formData.reason}
-                                            onChange={(e) => setFormData({...formData, reason: e.target.value})}
-                                            rows="3"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="d-flex justify-content-end space-x-2 mt-6">
-                                    <button
-                                        type="button"
-                                        onClick={resetForm}
-                                        className="px-4 py-2 bg-gray-500 border border-transparent rounded fw-semibold fs-xs text-white text-uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus: focus:  -out"
-                                    >
-                                        İptal
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary btn-sm"
-                                    >
-                                        {editingId ? 'Güncelle' : 'Oluştur'}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}
-
-                {/* Approve Modal */}
-                {showApproveModal && (
-                    <div className="position-fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-100 w-100 d-flex align-items-center justify-content-center">
-                        <div className="position-relative p-5 bg-white rounded-3 shadow-sm-xl w-100 mw-100">
-                            <h5 className="fw-medium">İzin Talebini Onayla</h5>
-
-                            <p className="mb-4 text-dark">
-                                <strong>{getEmployeeName(selectedRequest?.employee_id)}</strong> çalışanının{' '}
-                                <strong>{getLeaveTypeName(selectedRequest?.leave_type_id)}</strong> iznine {' '}
-                                <strong>{new Date(selectedRequest?.start_date).toLocaleDateString('tr-TR')}</strong> - {' '}
-                                <strong>{new Date(selectedRequest?.end_date).toLocaleDateString('tr-TR')}</strong> tarihleri arasında izin talebini onaylamak istiyor musunuz?
-                            </p>
-
-                            <div className="mb-4">
-                                <label className="d-block text-dark fs-sm fw-medium mb-1">Yorum (İsteğe Bağlı)</label>
-                                <textarea className="form-control"
-                                    value={approverComment}
-                                    onChange={(e) => setApproverComment(e.target.value)}
-                                    rows="3"
-                                />
-                            </div>
-
-                            <div className="d-flex justify-content-end space-x-2 mt-6">
-                                <button
-                                    onClick={() => {
-                                        setShowApproveModal(false);
-                                        setSelectedRequest(null);
-                                    }}
-                                    className="px-4 py-2 bg-gray-500 border border-transparent rounded fw-semibold fs-xs text-white text-uppercase tracking-widest hover:bg-gray-400 active:bg-gray-600 focus:outline-none focus: focus:  -out"
-                                >
-                                    İptal
-                                </button>
-                                <button
-                                    onClick={confirmApprove}
-                                    className="btn btn-success btn-sm"
-                                >
-                                    Onayla
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
-        </div>
+
+            {/* Add/Edit Modal */}
+            {showModal && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title fw-bold">
+                                    {editingId ? 'İzin Talebi Düzenle' : 'Yeni İzin Talebi'}
+                                </h5>
+                                <button type="button" className="btn-close" onClick={resetForm}></button>
+                            </div>
+                            <div className="modal-body">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-medium">Çalışan <span className="text-danger">*</span></label>
+                                            <select
+                                                className="form-select"
+                                                value={formData.employee_id}
+                                                onChange={(e) => setFormData({ ...formData, employee_id: parseInt(e.target.value) })}
+                                                required
+                                            >
+                                                <option value="">Seçin...</option>
+                                                {(employees || []).map(emp => (
+                                                    <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-medium">İzin Türü <span className="text-danger">*</span></label>
+                                            <select
+                                                className="form-select"
+                                                value={formData.leave_type_id}
+                                                onChange={(e) => setFormData({ ...formData, leave_type_id: parseInt(e.target.value) })}
+                                                required
+                                            >
+                                                <option value="">Seçin...</option>
+                                                {(leaveTypes || []).map(type => (
+                                                    <option key={type.id} value={type.id}>{type.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-medium">Başlangıç Tarihi <span className="text-danger">*</span></label>
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={formData.start_date}
+                                                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-medium">Bitiş Tarihi <span className="text-danger">*</span></label>
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={formData.end_date}
+                                                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="col-12">
+                                            <label className="form-label fw-medium">Açıklama</label>
+                                            <textarea
+                                                className="form-control"
+                                                rows={3}
+                                                value={formData.reason}
+                                                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <div className="form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    id="is_half_day"
+                                                    checked={formData.is_half_day}
+                                                    onChange={(e) => setFormData({ ...formData, is_half_day: e.target.checked })}
+                                                />
+                                                <label className="form-check-label" htmlFor="is_half_day">Yarım Gün</label>
+                                            </div>
+                                        </div>
+
+                                        <div className="col-md-6">
+                                            <div className="form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    id="requires_hr_approval"
+                                                    checked={formData.requires_hr_approval}
+                                                    onChange={(e) => setFormData({ ...formData, requires_hr_approval: e.target.checked })}
+                                                />
+                                                <label className="form-check-label" htmlFor="requires_hr_approval">İK Onayı Gerekiyor</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-light" onClick={resetForm}>İptal</button>
+                                <button type="button" className="btn btn-primary" onClick={handleSubmit}>
+                                    {editingId ? 'Güncelle' : 'Oluştur'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Approve Modal */}
+            {showApproveModal && selectedRequest && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title fw-bold">İzin Talebini Onayla</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowApproveModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>
+                                    <strong>{getEmployeeName(selectedRequest.employee_id)}</strong> çalışanının{' '}
+                                    <strong>{getLeaveTypeName(selectedRequest.leave_type_id)}</strong> izni talebini{' '}
+                                    <strong>{new Date(selectedRequest.start_date).toLocaleDateString('tr-TR')}</strong> - {' '}
+                                    <strong>{new Date(selectedRequest.end_date).toLocaleDateString('tr-TR')}</strong> tarihleri arasında onaylamak istiyor musunuz?
+                                </p>
+                                <div className="mb-3">
+                                    <label className="form-label fw-medium">Yorum (İsteğe Bağlı)</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows={3}
+                                        value={approverComment}
+                                        onChange={(e) => setApproverComment(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-light" onClick={() => setShowApproveModal(false)}>İptal</button>
+                                <button type="button" className="btn btn-success" onClick={confirmApprove}>Onayla</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </AuthenticatedLayout>
     );
 }
-
-LeaveRequests.layout = page =>
-    <AuthenticatedLayout
-        children={page}
-        pageHeader={{
-            title: 'İzin Talepleri',
-            breadcrumbs: [
-                { label: 'Ana Sayfa', url: route('dashboard') },
-                { label: 'İzin Yönetimi', url: '#' },
-                { label: 'İzin Talepleri', url: route('admin.leave.requests.index') },
-            ],
-        }}
-    />;

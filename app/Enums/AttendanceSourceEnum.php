@@ -10,6 +10,7 @@ enum AttendanceSourceEnum: string implements HasLabel
     case MOBILE = 'mobile';
     case WEB = 'web';
     case API = 'api';
+    case MANUAL = 'manual';
 
     public function getLabel(): ?string
     {
@@ -18,6 +19,7 @@ enum AttendanceSourceEnum: string implements HasLabel
             self::MOBILE => 'Mobil Uygulama',
             self::WEB => 'Web Paneli',
             self::API => 'API Entegrasyonu',
+            self::MANUAL => 'Manuel Girdi',
         };
     }
 }
