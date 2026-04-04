@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Interfaces\ILeaveTypeRepository;
@@ -15,6 +16,13 @@ class LeaveTypeRepository extends BaseRepository implements ILeaveTypeRepository
 
     public function getAll(array $filters = [], array $with = []): Collection
     {
+        if (empty($filters) && empty($with)) {
+            // Cache frequently accessed leave types list - TTL: 1 hour
+            return \Cache::remember('leave_types.list', 3600, function () {
+                return $this->model->select('id', 'name')->orderBy('name')->get();
+            });
+        }
+
         $query = $this->model->query();
 
         if (! empty($with)) {

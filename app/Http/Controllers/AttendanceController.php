@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\AttendanceSourceEnum;
@@ -25,6 +26,7 @@ class AttendanceController extends Controller
     ) {
         $this->attendanceService = $attendanceService;
         $this->calculationService = $calculationService;
+        $this->authorizeResource(\App\Models\AttendanceRecord::class, 'attendance');
     }
 
     public function index(Request $request)
@@ -116,20 +118,14 @@ class AttendanceController extends Controller
         return redirect()->back()->with('success', 'Attendance record deleted successfully.');
     }
 
-    public function clockIn(Request $request)
+    public function clockIn(ClockAttendanceRequest $request)
     {
-        $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'date' => 'nullable|date',
-            'time' => 'nullable',
-            'source' => 'required|in:device,mobile,web,api',
-            'geolocation' => 'nullable|array',
-            'ip_address' => 'nullable|string|max:45',
-            'device_id' => 'nullable|string|max:255',
-            'notes' => 'nullable|string',
-        ]);
-
         try {
+            $employee = Employee::findOrFail($request->employee_id);
+
+            // Authorization check
+            $this->authorize('clock', $employee);
+
             $attendance = $this->attendanceService->clockIn(
                 $request->employee_id,
                 $request->date,
@@ -143,27 +139,28 @@ class AttendanceController extends Controller
                 'attendance' => $attendance,
             ]);
         } catch (\Exception $e) {
+            \Log::error('Clock in failed', [
+                'message' => $e->getMessage(),
+                'employee_id' => $request->employee_id ?? null,
+                'user_id' => auth()->id() ?? null,
+                'ip' => $request->ip(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to record clock in: '.$e->getMessage(),
+                'message' => 'Failed to record clock in',
             ], 500);
         }
     }
 
-    public function clockOut(Request $request)
+    public function clockOut(ClockAttendanceRequest $request)
     {
-        $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'date' => 'nullable|date',
-            'time' => 'nullable',
-            'source' => 'required|in:device,mobile,web,api',
-            'geolocation' => 'nullable|array',
-            'ip_address' => 'nullable|string|max:45',
-            'device_id' => 'nullable|string|max:255',
-            'notes' => 'nullable|string',
-        ]);
-
         try {
+            $employee = Employee::findOrFail($request->employee_id);
+
+            // Authorization check
+            $this->authorize('clock', $employee);
+
             $attendance = $this->attendanceService->clockOut(
                 $request->employee_id,
                 $request->date,
@@ -177,9 +174,16 @@ class AttendanceController extends Controller
                 'attendance' => $attendance,
             ]);
         } catch (\Exception $e) {
+            \Log::error('Clock out failed', [
+                'message' => $e->getMessage(),
+                'employee_id' => $request->employee_id ?? null,
+                'user_id' => auth()->id() ?? null,
+                'ip' => $request->ip(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to record clock out: '.$e->getMessage(),
+                'message' => 'Failed to record clock out',
             ], 500);
         }
     }
@@ -202,17 +206,16 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function manualClock(Request $request)
+    public function manualClock(ManualClockRequest $request)
     {
-        $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'timestamp' => 'required|date',
-            'type' => 'required|in:clock_in,clock_out',
-        ]);
-
         try {
             $employeeId = (int) $request->employee_id;
             $timestamp = Carbon::parse($request->timestamp);
+
+            $employee = Employee::findOrFail($employeeId);
+
+            // Authorization check
+            $this->authorize('clock', $employee);
 
             if ($request->type === 'clock_in') {
                 $result = $this->attendanceService->manualClockIn(
@@ -228,7 +231,14 @@ class AttendanceController extends Controller
 
             return redirect()->back()->with('success', $request->type === 'clock_in' ? 'Giriş kaydı başarıyla oluşturuldu.' : 'Çıkış kaydı başarıyla oluşturuldu.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Kayıt başarısız: '.$e->getMessage());
+            \Log::error('Manual attendance failed', [
+                'message' => $e->getMessage(),
+                'employee_id' => $request->employee_id ?? null,
+                'user_id' => auth()->id() ?? null,
+                'ip' => request()->ip(),
+            ]);
+
+            return redirect()->back()->with('error', 'Kayıt başarısız: Lütfen tekrar deneyin veya sistem yöneticinizle iletişime geçin.');
         }
     }
 
@@ -241,7 +251,7 @@ class AttendanceController extends Controller
 
         $employees->load('department');
 
-        $recentAttendances = AttendanceRecord::with('employee:id,first_name,last_name,identity_no')
+        $recentAttendances = AttendanceRecord::with('employee:id,first_name,last_name')
             ->orderByDesc('created_at')
             ->limit(10)
             ->get()
@@ -260,7 +270,7 @@ class AttendanceController extends Controller
                     'employee' => [
                         'first_name' => $record->employee->first_name,
                         'last_name' => $record->employee->last_name,
-                        'identity_no' => $record->employee->identity_no,
+                        'identity_no' => $this->maskIdentityNumber($record->employee->identity_no),
                     ],
                     'timestamp' => $timestamp?->toISOString(),
                     'timestamp_formatted' => $timestamp?->format('d.m.Y H:i'),
@@ -273,6 +283,16 @@ class AttendanceController extends Controller
             'employees' => $employees,
             'recentAttendances' => $recentAttendances,
         ]);
+    }
+
+    private function maskIdentityNumber(?string $identityNo): ?string
+    {
+        if (! $identityNo || strlen($identityNo) !== 11) {
+            return $identityNo;
+        }
+
+        // Show only last 4 digits, mask others with X
+        return 'XXXXX'.substr($identityNo, -4);
     }
 
     public function create()

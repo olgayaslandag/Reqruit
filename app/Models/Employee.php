@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,6 +49,66 @@ class Employee extends Model
         'deleted_at',
         'position_history',
     ];
+
+    protected $casts = [
+        'birth_date' => 'date',
+        'hire_date' => 'date',
+        'termination_date' => 'date',
+        'children_count' => 'integer',
+    ];
+
+    protected $hidden = [
+        'deleted_at',
+        'position_history',
+    ];
+
+    // Accessor for identity_no with masking
+    public function getIdentityNoAttribute(?string $value): ?string
+    {
+        if (! $this->hasPermissionToViewFullIdentityNo()) {
+            // Mask identity number for unauthorized access
+            return $this->maskIdentityNumber($value);
+        }
+
+        return $value; // Return full number for authorized access
+    }
+
+    // Method to mask identity number
+    private function maskIdentityNumber(?string $identityNo): ?string
+    {
+        if (! $identityNo || strlen($identityNo) !== 11) {
+            return $identityNo;
+        }
+
+        // Show only last 4 digits, mask others with X
+        return 'XXXXX'.substr($identityNo, -4);
+    }
+
+    // Check if authenticated user has permission to view full identity number
+    private function hasPermissionToViewFullIdentityNo(): bool
+    {
+        // Currently authenticated user can view full identity only for themselves
+        // Or if they have broader permissions (managers, HR, admins)
+        $user = auth()->user();
+        if (! $user) {
+            return false;
+        }
+
+        // If the employee belongs to the logged in user
+        if ($this->user_id && $user->id === $this->user_id) {
+            return true;
+        }
+
+        // You can customize this based on role/permission system
+        // This is a basic check assuming certain roles can see full identity
+        $authorizedRolesOrPermissions = ['admin', 'hr_manager', 'hr']; // customize based on your app
+
+        // Return true if user has one of these roles
+        // Note: This needs to connect to your permission system
+        // The following is a simplified version, you may need to adjust it
+        return in_array($user->role ?? '', $authorizedRolesOrPermissions) ||
+               ($user->permissions ?? collect([]))->contains('view-full-identity-info');
+    }
 
     /**
      * İlişkiler

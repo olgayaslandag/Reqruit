@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\SalaryComponent;
@@ -50,23 +51,10 @@ class SalaryComponentController extends Controller
     /**
      * Maaş kalemi kaydeder.
      */
-    public function store(Request $request)
+    public function store(StoreSalaryComponentRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:200'],
-            'code' => ['required', 'string', 'max:50', 'unique:salary_components,code'],
-            'type' => ['required', 'in:earning,deduction'],
-            'category' => ['required', 'in:fixed,variable'],
-            'description' => ['nullable', 'string'],
-            'is_active' => ['boolean'],
-            'is_taxable' => ['boolean'],
-            'is_sgk_applicable' => ['boolean'],
-            'default_amount' => ['nullable', 'numeric', 'min:0'],
-            'sort_order' => ['integer', 'min:0'],
-        ]);
-
         try {
-            $component = $this->salaryComponentService->create($validated);
+            $component = $this->salaryComponentService->create($request->validated());
 
             return redirect()->route('admin.salary-components.index')
                 ->with('success', 'Maaş kalemi başarıyla oluşturuldu.');
@@ -102,23 +90,10 @@ class SalaryComponentController extends Controller
     /**
      * Maaş kalemi günceller.
      */
-    public function update(Request $request, SalaryComponent $salaryComponent)
+    public function update(UpdateSalaryComponentRequest $request, SalaryComponent $salaryComponent)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:200'],
-            'code' => ['required', 'string', 'max:50', 'unique:salary_components,code,'.$salaryComponent->id],
-            'type' => ['required', 'in:earning,deduction'],
-            'category' => ['required', 'in:fixed,variable'],
-            'description' => ['nullable', 'string'],
-            'is_active' => ['boolean'],
-            'is_taxable' => ['boolean'],
-            'is_sgk_applicable' => ['boolean'],
-            'default_amount' => ['nullable', 'numeric', 'min:0'],
-            'sort_order' => ['integer', 'min:0'],
-        ]);
-
         try {
-            $this->salaryComponentService->update($salaryComponent->id, $validated);
+            $this->salaryComponentService->update($salaryComponent->id, $request->validated());
 
             return redirect()->route('admin.salary-components.index')
                 ->with('success', 'Maaş kalemi başarıyla güncellendi.');

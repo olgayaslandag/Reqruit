@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\PayrollPeriod;
@@ -54,19 +55,10 @@ class PayrollController extends Controller
     /**
      * Bordro kaydeder.
      */
-    public function store(Request $request)
+    public function store(StorePayrollRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:200'],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after:start_date'],
-            'payment_frequency' => ['required', 'in:monthly,biweekly,weekly'],
-            'payment_date' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
         try {
-            $period = $this->payrollService->create($validated);
+            $period = $this->payrollService->create($request->validated());
 
             return redirect()->route('admin.payrolls.index')
                 ->with('success', 'Bordro dönemi başarıyla oluşturuldu.');
@@ -94,7 +86,7 @@ class PayrollController extends Controller
             return [
                 'id' => $employee->id,
                 'name' => $employee->first_name.' '.$employee->last_name,
-                'identity_no' => $employee->identity_no,
+                'identity_no' => $this->maskIdentityNumber($employee->identity_no),
                 'gross_salary' => $employee->gross_salary,
                 'marital_status' => $employee->marital_status,
                 'children_count' => $employee->children_count,
@@ -140,19 +132,10 @@ class PayrollController extends Controller
     /**
      * Bordro günceller.
      */
-    public function update(Request $request, PayrollPeriod $payroll)
+    public function update(UpdatePayrollRequest $request, PayrollPeriod $payroll)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:200'],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after:start_date'],
-            'payment_frequency' => ['required', 'in:monthly,biweekly,weekly'],
-            'payment_date' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
         try {
-            $this->payrollService->update($payroll->id, $validated);
+            $this->payrollService->update($payroll->id, $request->validated());
 
             return redirect()->route('admin.payrolls.index')
                 ->with('success', 'Bordro dönemi başarıyla güncellendi.');
@@ -195,19 +178,14 @@ class PayrollController extends Controller
     /**
      * Bordro onaylar.
      */
-    public function approve(Request $request, PayrollPeriod $payroll)
+    public function approve(ApprovePayrollRequest $request, PayrollPeriod $payroll)
     {
-        $validated = $request->validate([
-            'role' => ['required', 'in:manager,hr,accounting'],
-            'comment' => ['nullable', 'string'],
-        ]);
-
         try {
             $this->payrollService->approve(
                 $payroll->id,
                 Auth::id(),
-                $validated['role'],
-                $validated['comment'] ?? null
+                $request->validated()['role'],
+                $request->validated()['comment'] ?? null
             );
 
             return back()->with('success', 'Bordro başarıyla onaylandı.');
@@ -228,5 +206,15 @@ class PayrollController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    private function maskIdentityNumber(?string $identityNo): ?string
+    {
+        if (! $identityNo || strlen($identityNo) !== 11) {
+            return $identityNo;
+        }
+
+        // Show only last 4 digits, mask others with X
+        return 'XXXXX'.substr($identityNo, -4);
     }
 }

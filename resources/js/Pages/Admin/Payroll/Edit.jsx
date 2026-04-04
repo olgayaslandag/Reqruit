@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatDate } from '@/Utils/formatters';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
 
 export default function Edit({ period }) {
     const { flash } = usePage().props;
@@ -27,16 +28,7 @@ export default function Edit({ period }) {
         });
     };
 
-    const getStatusBadgeClass = (status) => {
-        switch (status) {
-            case 'draft': return 'bg-light text-dark border';
-            case 'pending': return 'bg-warning text-dark';
-            case 'approved': return 'bg-success';
-            case 'paid': return 'bg-primary';
-            case 'locked': return 'bg-danger';
-            default: return 'bg-secondary';
-        }
-    };
+
 
     const getStatusLabel = (status) => {
         const labels = {
@@ -71,7 +63,7 @@ export default function Edit({ period }) {
                             <h5 className="mb-0 fw-bold">
                                 <i className="ti ti-calendar-edit me-2"></i> Dönem Bilgileri
                             </h5>
-                            <span className={`badge ${getStatusBadgeClass(period.status)}`}>
+                            <span className={`badge ${getStatusBadgeClass(period.status, 'payroll')}`}>
                                 {getStatusLabel(period.status)}
                             </span>
                         </div>

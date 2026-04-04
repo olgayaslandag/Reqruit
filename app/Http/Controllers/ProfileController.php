@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\UserService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +15,8 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function __construct(private UserService $userService) {}
+
     /**
      * Display the user's profile form.
      */
@@ -71,13 +75,13 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $this->userService->update($user->id, $request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+            $user->save();  // Save this directly since update above won't touch unvalidated fields
         }
-
-        $request->user()->save();
 
         return Redirect::route('profile.edit');
     }
@@ -95,7 +99,7 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        $user->delete();
+        $this->userService->delete($user->id);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

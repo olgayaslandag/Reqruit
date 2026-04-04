@@ -32,14 +32,13 @@
   </div>
 @inertia
 
-<!-- Bootstrap JS -->
+<!-- Scripts needed for admin template (jQuery may still be used by some plugins) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="/assets/js/plugins/popper.min.js"></script>
-  <script src="/assets/js/plugins/simplebar.min.js"></script>
-  <script src="/assets/js/plugins/bootstrap.min.js"></script>
-  <script src="/assets/js/fonts/custom-font.js"></script>
-  <script src="/assets/js/fonts/custom-ant-icon.js"></script>
-  <script src="/assets/js/pcoded.js"></script>
-  <script src="/assets/js/plugins/feather.min.js"></script>
+<script src="/assets/js/plugins/simplebar.min.js"></script>
+<script src="/assets/js/fonts/custom-font.js"></script>
+<script src="/assets/js/fonts/custom-ant-icon.js"></script>
+<script src="/assets/js/pcoded.js"></script>
+<script src="/assets/js/plugins/feather.min.js"></script>
 </body>
 </html>

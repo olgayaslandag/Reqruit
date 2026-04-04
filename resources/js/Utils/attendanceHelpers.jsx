@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import moment from 'moment';
+import { format, parseISO, isValid, addHours } from 'date-fns';
+import { tr } from 'date-fns/locale';
 
 export const getAttendanceStatusBadge = (status, clock_in = null, clock_out = null) => {
     let colorClass = '';
@@ -33,20 +34,22 @@ export const getAttendanceStatusBadge = (status, clock_in = null, clock_out = nu
 
     // Geç kalma/erken çıkma kontrollerini manuel yapalım
     if (clock_in && status === 'present') {
-        const clockInTime = moment(clock_in, 'YYYY-MM-DD HH:mm:ss');
-        const shiftStartTime = moment().set({ hour: 9, minute: 0, second: 0 }); // varsayılan 9:00
+        const clockInTime = parseISO(clock_in);
+        const shiftStartTime = new Date();
+        shiftStartTime.setHours(9, 0, 0, 0); // varsayılan 9:00
 
-        if (clockInTime.isAfter(shiftStartTime)) {
+        if (isValid(clockInTime) && clockInTime > shiftStartTime) {
             colorClass = 'bg-warning text-dark';
             label = 'Geç Giriş';
         }
     }
 
     if (clock_out && status === 'present') {
-        const clockOutTime = moment(clock_out, 'YYYY-MM-DD HH:mm:ss');
-        const shiftEndTime = moment().set({ hour: 18, minute: 0, second: 0 }); // varsayılan 18:00
+        const clockOutTime = parseISO(clock_out);
+        const shiftEndTime = new Date();
+        shiftEndTime.setHours(18, 0, 0, 0); // varsayılan 18:00
 
-        if (clockOutTime.isBefore(shiftEndTime)) {
+        if (isValid(clockOutTime) && clockOutTime < shiftEndTime) {
             colorClass = 'bg-orange text-white';
             label = 'Erken Çıkış';
         }
@@ -61,28 +64,46 @@ export const getAttendanceStatusBadge = (status, clock_in = null, clock_out = nu
 
 export const formatTime = (timeString) => {
     if (!timeString) return '-';
-    return moment(timeString).format('HH:mm');
+    try {
+        const date = parseISO(timeString);
+        if (!isValid(date)) return '-';
+        return format(date, 'HH:mm');
+    } catch {
+        return '-';
+    }
 };
 
 export const formatDate = (dateString) => {
     if (!dateString) return '';
-    return moment(dateString).locale('tr').format('DD MMM YYYY');
+    try {
+        const date = parseISO(dateString);
+        if (!isValid(date)) return '';
+        return format(date, 'dd MMM yyyy', { locale: tr });
+    } catch {
+        return '';
+    }
 };
 
 export const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return '';
-    return moment(dateTimeString).locale('tr').format('DD MMM YYYY HH:mm');
+    try {
+        const date = parseISO(dateTimeString);
+        if (!isValid(date)) return '';
+        return format(date, 'dd MMM yyyy HH:mm', { locale: tr });
+    } catch {
+        return '';
+    }
 };
 
 export const calculateWorkingHours = (clockIn, clockOut, breakDuration = 0) => {
     if (!clockIn || !clockOut) return 0;
     
-    const startTime = moment(clockIn);
-    const endTime = moment(clockOut);
+    const startTime = parseISO(clockIn);
+    const endTime = parseISO(clockOut);
     
-    if (!endTime.isValid() || !startTime.isValid()) return 0;
+    if (!isValid(endTime) || !isValid(startTime)) return 0;
     
-    let diffMinutes = endTime.diff(startTime, 'minutes');
+    let diffMinutes = Math.floor((endTime - startTime) / 1000 / 60);
     diffMinutes -= breakDuration;
     
     if (diffMinutes < 0) return 0;
@@ -96,13 +117,14 @@ export const calculateWorkingHours = (clockIn, clockOut, breakDuration = 0) => {
 export const getOvertimeHours = (clockIn, clockOut) => {
     if (!clockIn || !clockOut) return 0;
     
-    const startTime = moment(clockIn);
-    const endTime = moment(clockOut);
+    const startTime = parseISO(clockIn);
+    const endTime = parseISO(clockOut);
     const standardWorkHours = 8; // varsayılan 8 saat
     
-    if (!endTime.isValid() || !startTime.isValid()) return 0;
+    if (!isValid(endTime) || !isValid(startTime)) return 0;
     
-    const totalHours = endTime.diff(startTime, 'hours');
+    const diffMs = endTime - startTime;
+    const totalHours = Math.floor(diffMs / (1000 * 60 * 60));
     const overtime = Math.max(0, totalHours - standardWorkHours);
     
     return overtime.toFixed(1);

@@ -1,20 +1,23 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLeaveEntitlementRequest;
 use App\Http\Requests\UpdateLeaveEntitlementRequest;
+use App\Interfaces\IEmployeeRepository;
 use App\Interfaces\ILeaveEntitlementRepository;
-use App\Models\Employee;
+use App\Interfaces\ILeaveTypeRepository;
 use App\Models\LeaveEntitlement;
-use App\Models\LeaveType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class LeaveEntitlementController extends Controller
 {
     public function __construct(
-        protected ILeaveEntitlementRepository $leaveEntitlementRepository
+        protected ILeaveEntitlementRepository $leaveEntitlementRepository,
+        protected IEmployeeRepository $employeeRepository,
+        protected ILeaveTypeRepository $leaveTypeRepository
     ) {
         $this->authorizeResource(LeaveEntitlement::class, 'leaveEntitlement');
     }
@@ -25,8 +28,8 @@ class LeaveEntitlementController extends Controller
 
         $entitlements = $this->leaveEntitlementRepository->getPaginated($filters, [], 15);
 
-        $employees = Employee::orderBy('first_name')->get(['id', 'first_name', 'last_name'])->toArray();
-        $leaveTypes = LeaveType::orderBy('name')->get(['id', 'name'])->toArray();
+        $employees = $this->employeeRepository->getActiveForDropdown()->toArray();
+        $leaveTypes = $this->leaveTypeRepository->getAll()->toArray();
 
         return Inertia::render('Admin/Leave/LeaveEntitlements', [
             'entitlements' => $entitlements,
@@ -38,8 +41,8 @@ class LeaveEntitlementController extends Controller
 
     public function create()
     {
-        $employees = Employee::orderBy('first_name')->get(['id', 'first_name', 'last_name'])->toArray();
-        $leaveTypes = LeaveType::orderBy('name')->get(['id', 'name'])->toArray();
+        $employees = $this->employeeRepository->getActiveForDropdown()->toArray();
+        $leaveTypes = $this->leaveTypeRepository->getAll()->toArray();
         $currentYear = date('Y');
 
         return Inertia::render('Admin/Leave/CreateEntitlement', [
@@ -67,8 +70,8 @@ class LeaveEntitlementController extends Controller
 
     public function edit(LeaveEntitlement $leaveEntitlement)
     {
-        $employees = Employee::orderBy('first_name')->get(['id', 'first_name', 'last_name'])->toArray();
-        $leaveTypes = LeaveType::orderBy('name')->get(['id', 'name'])->toArray();
+        $employees = $this->employeeRepository->getActiveForDropdown()->toArray();
+        $leaveTypes = $this->leaveTypeRepository->getAll()->toArray();
 
         return Inertia::render('Admin/Leave/EditEntitlement', [
             'entitlement' => $leaveEntitlement,

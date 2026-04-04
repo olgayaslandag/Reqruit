@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCalendarRequest;
@@ -13,9 +14,13 @@ class CalendarController extends Controller
 {
     protected CalendarService $calendarService;
 
-    public function __construct(CalendarService $calendarService)
+    protected \App\Services\HolidayService $holidayService;
+
+    public function __construct(CalendarService $calendarService, \App\Services\HolidayService $holidayService)
     {
         $this->calendarService = $calendarService;
+        $this->holidayService = $holidayService;
+        $this->authorizeResource(\App\Models\WorkCalendar::class, 'calendar');
     }
 
     public function index(Request $request)
@@ -122,9 +127,16 @@ class CalendarController extends Controller
                 'message' => 'Holiday added successfully',
             ]);
         } catch (\Exception $e) {
+            \Log::error('Holiday addition failed', [
+                'message' => $e->getMessage(),
+                'calendar_id' => $request->calendar_id ?? null,
+                'user_id' => auth()->id() ?? null,
+                'ip' => $request->ip(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to add holiday: '.$e->getMessage(),
+                'message' => 'Failed to add holiday',
             ], 500);
         }
     }
@@ -225,7 +237,7 @@ class CalendarController extends Controller
             'is_recurring' => 'boolean',
         ]);
 
-        $holiday = \App\Models\Holiday::create([
+        $holiday = $this->holidayService->create([
             'work_calendar_id' => $request->work_calendar_id,
             'name' => $request->name,
             'date' => $request->date,
@@ -258,7 +270,7 @@ class CalendarController extends Controller
             'is_recurring' => 'boolean',
         ]);
 
-        $holiday->update([
+        $updatedHoliday = $this->holidayService->update($holiday->id, [
             'work_calendar_id' => $request->work_calendar_id,
             'name' => $request->name,
             'date' => $request->date,
@@ -272,7 +284,7 @@ class CalendarController extends Controller
 
     public function holidayDestroy(\App\Models\Holiday $holiday)
     {
-        $holiday->delete();
+        $deleted = $this->holidayService->delete($holiday->id);
 
         return redirect()->route('admin.holidays.index')->with('success', 'Tatil başarıyla silindi.');
     }

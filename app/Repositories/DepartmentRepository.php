@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Interfaces\IDepartmentRepository;
@@ -14,10 +15,17 @@ class DepartmentRepository extends BaseRepository implements IDepartmentReposito
     }
 
     /**
-     * Get all departments.
+     * Get all departments (cached version for common usage).
      */
     public function getAll(array $filters = []): Collection
     {
+        if (empty($filters)) {
+            // Cache frequently accessed department list - TTL: 1 hour
+            return \Cache::remember('departments.list', 3600, function () {
+                return Department::select('id', 'title')->orderBy('title')->get();
+            });
+        }
+
         $query = Department::query()->select('id', 'title');
 
         if (isset($filters['parent_id'])) {

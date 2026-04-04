@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Employee;
@@ -88,7 +89,7 @@ class PayrollReportService
     public function comparePeriods(array $periodIds): array
     {
         $periods = PayrollPeriod::whereIn('id', $periodIds)
-            ->with('payrollItems')
+            ->with('payrollItems.salaryComponent')
             ->get()
             ->sortBy('start_date');
 
@@ -97,11 +98,27 @@ class PayrollReportService
         foreach ($periods as $period) {
             $items = $period->payrollItems;
 
+            $earnings = 0;
+            $deductions = 0;
+            $employeeCount = 0;
+
+            foreach ($items as $item) {
+                if ($item->salaryComponent->type === 'earning') {
+                    $earnings += $item->amount;
+                } else {
+                    $deductions += $item->amount;
+                }
+                $employeeCount = max($employeeCount, $item->employee_id);
+            }
+
+            // Alternative approach to get unique employee count
+            $employeeCount = $items->pluck('employee_id')->unique()->count();
+
             $comparison[] = [
                 'period' => $period,
-                'total_gross' => $items->whereHas('salaryComponent', fn ($q) => $q->where('type', 'earning'))->sum('amount'),
-                'total_deductions' => $items->whereHas('salaryComponent', fn ($q) => $q->where('type', 'deduction'))->sum('amount'),
-                'employee_count' => $items->pluck('employee_id')->unique()->count(),
+                'total_gross' => $earnings,
+                'total_deductions' => $deductions,
+                'employee_count' => $employeeCount,
             ];
         }
 
@@ -115,7 +132,7 @@ class PayrollReportService
     {
         $periods = PayrollPeriod::whereYear('start_date', $year)
             ->where('status', 'published')
-            ->with('payrollItems')
+            ->with('payrollItems.salaryComponent')
             ->get();
 
         $monthlyData = [];
@@ -125,20 +142,31 @@ class PayrollReportService
         foreach ($periods as $period) {
             $items = $period->payrollItems;
 
-            $gross = $items->whereHas('salaryComponent', fn ($q) => $q->where('type', 'earning'))->sum('amount');
-            $deductions = $items->whereHas('salaryComponent', fn ($q) => $q->where('type', 'deduction'))->sum('amount');
+            $gross = 0;
+            $deductions = 0;
+
+            foreach ($items as $item) {
+                if ($item->salaryComponent->type === 'earning') {
+                    $gross += $item->amount;
+                } else {
+                    $deductions += $item->amount;
+                }
+            }
+
+            $employeeCount = $items->pluck('employee_id')->unique()->count();
+            $net = $gross - $deductions;
 
             $monthlyData[] = [
                 'period' => $period->name,
                 'month' => $period->start_date->format('m'),
                 'gross' => $gross,
                 'deductions' => $deductions,
-                'net' => $gross - $deductions,
-                'employee_count' => $items->pluck('employee_id')->unique()->count(),
+                'net' => $net,
+                'employee_count' => $employeeCount,
             ];
 
             $totalGross += $gross;
-            $totalNet += ($gross - $deductions);
+            $totalNet += $net;
         }
 
         return [
@@ -146,7 +174,7 @@ class PayrollReportService
             'monthly_data' => $monthlyData,
             'total_gross' => $totalGross,
             'total_net' => $totalNet,
-            'average_monthly' => $totalGross / count($periods),
+            'average_monthly' => $totalGross / max(1, count($periods)),
         ];
     }
 
@@ -157,24 +185,77 @@ class PayrollReportService
     {
         $employees = $period->employeesInPeriod()->get();
 
+        $calculationsBatch = [];
+        foreach ($employees as $employee) {
+            $calculations = $this->salaryCalculationService->calculateAllDeductions($employee, $period->start_date);
+            $calculationsBatch[$employee->id] = $calculations;
+        }
+
         $totalSgkEmployee = 0;
         $totalSgkEmployer = 0;
         $totalIncomeTax = 0;
         $totalStampTax = 0;
         $totalGross = 0;
 
-        foreach ($employees as $employee) {
-            $calculations = $this->salaryCalculationService->calculateAllDeductions($employee, $period->start_date);
-
-            $totalGross += $calculations['gross_salary'];
-            $totalSgkEmployee += $calculations['sgk_employee']['total'];
-            $totalIncomeTax += $calculations['income_tax'];
-            $totalStampTax += $calculations['stamp_tax'];
+        foreach ($calculationsBatch as $calculation) {
+            $totalGross += $calculation['gross_salary'];
+            $totalSgkEmployee += $calculation['sgk_employee']['total'];
+            $totalIncomeTax += $calculation['income_tax'];
+            $totalStampTax += $calculation['stamp_tax'];
 
             // İşveren payı (ayrı hesaplanır)
-            $employerCost = $this->salaryCalculationService->calculateEmployerCost($calculations['gross_salary']);
+            $employerCost = $this->salaryCalculationService->calculateEmployerCost($calculation['gross_salary']);
             $totalSgkEmployer += $employerCost['sgk_employer']['total'];
         }
+
+        return [
+            'period' => $period,
+            'total_gross' => $totalGross,
+            'sgk' => [
+                'employee_share' => $totalSgkEmployee,
+                'employer_share' => $totalSgkEmployer,
+                'total' => $totalSgkEmployee + $totalSgkEmployer,
+            ],
+            'income_tax' => $totalIncomeTax,
+            'stamp_tax' => $totalStampTax,
+            'total_deductions' => $totalSgkEmployee + $totalIncomeTax + $totalStampTax,
+            'total_net' => $totalGross - ($totalSgkEmployee + $totalIncomeTax + $totalStampTax),
+            'total_employer_cost' => $totalGross + $totalSgkEmployer,
+        ];
+    }
+
+        $totalSgkEmployee = 0;
+        $totalSgkEmployer = 0;
+        $totalIncomeTax = 0;
+        $totalStampTax = 0;
+        $totalGross = 0;
+
+        foreach ($calculationsBatch as $calculation) {
+            $totalGross += $calculation['gross_salary'];
+            $totalSgkEmployee += $calculation['sgk_employee']['total'];
+            $totalIncomeTax += $calculation['income_tax'];
+            $totalStampTax += $calculation['stamp_tax'];
+
+            // İşveren payı (ayrı hesaplanır)
+            $employerCost = $this->salaryCalculationService->calculateEmployerCost($calculation['gross_salary']);
+            $totalSgkEmployer += $employerCost['sgk_employer']['total'];
+        }
+
+        return [
+            'period' => $period,
+            'total_gross' => $totalGross,
+            'sgk' => [
+                'employee_share' => $totalSgkEmployee,
+                'employer_share' => $totalSgkEmployer,
+                'total' => $totalSgkEmployee + $totalSgkEmployer,
+            ],
+            'income_tax' => $totalIncomeTax,
+            'stamp_tax' => $totalStampTax,
+            'total_deductions' => $totalSgkEmployee + $totalIncomeTax + $totalStampTax,
+            'total_net' => $totalGross - ($totalSgkEmployee + $totalIncomeTax + $totalStampTax),
+            'total_employer_cost' => $totalGross + $totalSgkEmployer,
+        ];
+    }
 
         return [
             'period' => $period,

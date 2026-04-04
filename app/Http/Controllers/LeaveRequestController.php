@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLeaveRequestRequest;
@@ -43,25 +44,34 @@ class LeaveRequestController extends Controller
         try {
             $data = $request->validated();
 
-            // Izin hakkı kontrolü
-            $entitlement = LeaveEntitlement::where('employee_id', $data['employee_id'])
-                ->where('leave_type_id', $data['leave_type_id'])
-                ->whereYear('calculation_year_start', date('Y', strtotime($data['start_date'])))
-                ->first();
+            // Start a database transaction to prevent race conditions
+            $leaveRequest = DB::transaction(function () use ($data) {
+                // Lock the entitlement record to prevent concurrent updates
+                $entitlement = LeaveEntitlement::where('employee_id', $data['employee_id'])
+                    ->where('leave_type_id', $data['leave_type_id'])
+                    ->whereYear('calculation_year_start', date('Y', strtotime($data['start_date'])))
+                    ->lockForUpdate() // This ensures atomicity by locking the row during transaction
+                    ->first();
 
-            if (! $entitlement) {
-                return redirect()->back()->with('error', 'İzin hakkı bulunamadı.');
-            }
+                if (! $entitlement) {
+                    throw new \Exception('İzin hakkı bulunamadı.');
+                }
 
-            // Izin kullanılabilir mi kontrolü
-            $requestedDays = $this->calculateBusinessDays($data['start_date'], $data['end_date'], $data['is_half_day']);
-            if ($entitlement->remaining_days < $requestedDays) {
-                return redirect()->back()->with('error', 'Yeterli izin hakkınız bulunmamaktadır.');
-            }
+                // Calculate requested days
+                $requestedDays = $this->calculateBusinessDays($data['start_date'], $data['end_date'], $data['is_half_day']);
 
-            $leaveRequest = $this->leaveRequestRepository->create(array_merge($data, [
-                'status' => 'pending',
-            ]));
+                // Check if enough leave balance remains
+                if ($entitlement->remaining_days < $requestedDays) {
+                    throw new \Exception('Yeterli izin hakkınız bulunmamaktadır.');
+                }
+
+                // Create the leave request
+                $leaveRequest = $this->leaveRequestRepository->create(array_merge($data, [
+                    'status' => 'pending',
+                ]));
+
+                return $leaveRequest;
+            });
 
             return redirect()->back()->with('success', 'İzin talebiniz başarıyla oluşturuldu.');
         } catch (\Exception $e) {
@@ -123,22 +133,33 @@ class LeaveRequestController extends Controller
 
     private function approveLeaveRequest(LeaveRequest $leaveRequest, array $data)
     {
-        // Kalan izin hakkını güncelle
-        $entitlement = LeaveEntitlement::where('employee_id', $leaveRequest->employee_id)
-            ->where('leave_type_id', $leaveRequest->leave_type_id)
-            ->whereYear('calculation_year_start', date('Y', strtotime($leaveRequest->start_date)))
-            ->first();
+        // Start transaction with row locking to prevent race conditions
+        DB::transaction(function () use ($leaveRequest, $data) {
+            // Lock the entitlement record to ensure atomic operations
+            $entitlement = LeaveEntitlement::where('employee_id', $leaveRequest->employee_id)
+                ->where('leave_type_id', $leaveRequest->leave_type_id)
+                ->whereYear('calculation_year_start', date('Y', strtotime($leaveRequest->start_date)))
+                ->lockForUpdate()
+                ->first();
 
-        if ($entitlement) {
-            $usedDays = $this->calculateBusinessDays($leaveRequest->start_date, $leaveRequest->end_date, $leaveRequest->is_half_day);
-            $entitlement->used_days += $usedDays;
-            $entitlement->save();
-        }
+            if ($entitlement) {
+                $usedDays = $this->calculateBusinessDays($leaveRequest->start_date, $leaveRequest->end_date, $leaveRequest->is_half_day);
 
-        $updated = $this->leaveRequestRepository->update($leaveRequest->id, array_merge($data, [
-            'approved_at' => now(),
-            'approver_id' => Auth::id(),
-        ]));
+                // Verify remaining days again during approval in case they changed since submission
+                if ($entitlement->remaining_days < $usedDays) {
+                    throw new \Exception('İzninizin kullanıldığı süre boyunca izin bakiyeniz değişmiş olabilir. Lütfen tekrar kontrol edin.');
+                }
+
+                $entitlement->used_days += $usedDays;
+                $entitlement->remaining_days -= $usedDays;  // Update remaining days
+                $entitlement->save();
+            }
+
+            $this->leaveRequestRepository->update($leaveRequest->id, array_merge($data, [
+                'approved_at' => now(),
+                'approver_id' => Auth::id(),
+            ]));
+        });
 
         return redirect()->back()->with('success', 'İzin talebi başarıyla onaylandı.');
     }

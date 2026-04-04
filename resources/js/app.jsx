@@ -1,30 +1,25 @@
 import './bootstrap';
 import '../css/app.css';
 
-import { createInertiaApp, router } from '@inertiajs/react';
+import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-
-import i18n from './i18n';
+import ErrorBoundary from './Components/ErrorBoundary';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Reqruit';
 
-// Global olarak scroll davranışını ayarla - sayfa geçişlerinde scroll pozisyonunu koru
-router.on('before', (event) => {
-    event.detail.visit.preserveScroll = true;
-});
-
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.jsx`,
-            import.meta.glob('./Pages/**/*.jsx'),
-        ),
+    // Vite's glob import with lazy loading enables automatic code splitting
+    resolve: (name) => resolvePageComponent(`./Pages/${name}.jsx`, import.meta.glob('./Pages/**/*.jsx', { eager: false })),
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<App {...props} />);
+        root.render(
+            <ErrorBoundary>
+                <App {...props} />
+            </ErrorBoundary>
+        );
     },
     progress: {
         color: '#0d6efd',

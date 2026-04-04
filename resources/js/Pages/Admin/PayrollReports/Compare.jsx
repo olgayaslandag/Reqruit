@@ -1,139 +1,115 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { formatCurrency, formatNumber } from '@/Utils/formatters';
 
 export default function Compare({ comparison }) {
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold text-dark">
-                        Dönemsel Karşılaştırmlar
-                    </h5>
-                    <Link
-                        href={route('admin.payroll-reports.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
-                    >
-                        Geri Dön
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: 'Dönem Karşılaştırma',
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro Raporları', url: route('admin.payroll-reports.index') },
+                    { label: 'Karşılaştırma', url: '#' },
+                ],
+                backUrl: route('admin.payroll-reports.index'),
+            }}
         >
-            <Head title="Dönemsel Karşılaştırmalar" />
+            <Head title="Dönem Karşılaştırma" />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    <div className="mb-5 d-flex justify-content-between align-items-center">
-                        <h5 className="fw-medium">
-                            Seçilen Dönemler Arasý Deðiþim
-                        </h5>
+            <div className="container-fluid py-4">
+                <div className="card mb-4">
+                    <div className="card-header">
+                        <h5 className="mb-0"><i className="ti ti-arrows-left-right me-2"></i>Dönemler Arası Karşılaştırma</h5>
                     </div>
-
-                    <div className="bg-white rounded-3 shadow-sm overflow-auto">
-                        <table className="w-100 divide-y divide-gray-200">
-                            <thead className="table-light">
-                                <tr>
-                                    <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                        Dönem
-                                    </th>
-                                    <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                        Çaliþan Sayýsý
-                                    </th>
-                                    <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                        Toplam Brüt
-                                    </th>
-                                    <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                        Toplam Kesinti
-                                    </th>
-                                    <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                        Net Toplam
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {comparison.map((item, index) => (
-                                    <tr key={index} className="hover:table-light">
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-dark fw-medium">
-                                            {item.period.name}
-                                        </td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
-                                            {formatNumber(item.employee_count)}
-                                        </td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-right text-success fw-medium">
-                                            {formatCurrency(item.total_gross)}
-                                        </td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-right text-danger">
-                                            {formatCurrency(item.total_deductions)}
-                                        </td>
-                                        <td className="px-6 py-4 text-nowrap fs-sm text-right text-info fw-medium">
-                                            {formatCurrency(item.total_net)}
-                                        </td>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover mb-0">
+                                <thead className="table-light">
+                                    <tr>
+                                        <th>Dönem</th>
+                                        <th className="text-end">Çalışan</th>
+                                        <th className="text-end">Toplam Brüt</th>
+                                        <th className="text-end">Toplam Kesinti</th>
+                                        <th className="text-end">Net Toplam</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {(comparison || []).map((item, idx) => (
+                                        <tr key={idx}>
+                                            <td className="fw-medium">{item.period?.name}</td>
+                                            <td className="text-end">{formatNumber(item.employee_count)}</td>
+                                            <td className="text-end text-success fw-semibold">{formatCurrency(item.total_gross)}</td>
+                                            <td className="text-end text-danger">{formatCurrency(item.total_deductions)}</td>
+                                            <td className="text-end text-info fw-semibold">{formatCurrency(item.total_net)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+                </div>
 
-                    {/* Trend Grafik (Optional) */}
-                    {comparison.length > 1 && (
-                        <div className="mt-8 bg-white rounded-3 shadow-sm p-4">
-                            <h5 className="fw-medium">
-                                Brüt Ücret Trendi
-                            </h5>
-                            <div className="mb-3">
-                                {comparison.map((item, index) => (
-                                    <div key={index}>
-                                        <div className="d-flex justify-content-between fs-sm text-muted mb-1">
-                                            <span>{item.period.name}</span>
-                                            <span>{formatCurrency(item.total_gross)}</span>
+                {/* Trend Grafik */}
+                {(comparison || []).length > 1 && (
+                    <div className="card mb-4">
+                        <div className="card-header">
+                            <h5 className="mb-0"><i className="ti ti-trending-up me-2"></i>Brüt Ücret Trendi</h5>
+                        </div>
+                        <div className="card-body">
+                            {(comparison || []).map((item, idx) => {
+                                const maxGross = Math.max(...(comparison || []).map(c => c.total_gross), 1);
+                                const percent = (item.total_gross / maxGross) * 100;
+                                return (
+                                    <div key={idx} className="mb-3">
+                                        <div className="d-flex justify-content-between mb-1">
+                                            <span className="fw-medium">{item.period?.name}</span>
+                                            <span className="text-muted">{formatCurrency(item.total_gross)}</span>
                                         </div>
-                                        <div className="w-100 bg-gray-200 rounded-pill h-3">
-                                            <div
-                                                className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-pill"
-                                                style={{
-                                                    width: `${Math.min(
-                                                        (item.total_gross / Math.max(...comparison.map(c => c.total_gross), 1)) * 100,
-                                                        100
-                                                    )}%`
-                                                }}
-                                            ></div>
+                                        <div className="progress" style={{ height: '20px' }}>
+                                            <div className="progress-bar" style={{ width: `${percent}%` }}></div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                );
+                            })}
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {/* Artýþ Yüzdesi Analizi */}
-                    {comparison.length > 1 && (
-                        <div className="mt-8 bg-white rounded-3 shadow-sm p-4">
-                            <h5 className="fw-medium">
-                                Ay Deðiþim Oranlarý (Artýþlar Pozitif, Azalmalar Negatif)
-                            </h5>
-                            <div className="d-grid d-grid-cols-1 gap-3">
-                                {comparison.slice(1).map((item, index) => {
-                                    const prevItem = comparison[index];
+                {/* Değişim Oranları */}
+                {(comparison || []).length > 1 && (
+                    <div className="card">
+                        <div className="card-header">
+                            <h5 className="mb-0"><i className="ti ti-chart-line me-2"></i>Değişim Oranları</h5>
+                        </div>
+                        <div className="card-body">
+                            <div className="row g-3">
+                                {(comparison || []).slice(1).map((item, idx) => {
+                                    const prevItem = comparison[idx];
                                     if (!prevItem) return null;
-                                    
-                                    const grossChange = ((item.total_gross - prevItem.total_gross) / prevItem.total_gross) * 100;
-                                    const netChange = ((item.total_net - prevItem.total_net) / prevItem.total_net) * 100;
-                                    const employeeCountChange = ((item.employee_count - prevItem.employee_count) / prevItem.employee_count) * 100;
-                                    
+                                    const grossChange = prevItem.total_gross > 0 
+                                        ? ((item.total_gross - prevItem.total_gross) / prevItem.total_gross) * 100 
+                                        : 0;
+                                    const netChange = prevItem.total_net > 0 
+                                        ? ((item.total_net - prevItem.total_net) / prevItem.total_net) * 100 
+                                        : 0;
                                     return (
-                                        <div key={index} className="border rounded p-4">
-                                            <h5 className="fw-medium text-dark mb-2">{item.period.name} (vs {prevItem.period.name})</h5>
-                                            <div className="space-y-2 fs-sm">
-                                                <div className={`d-flex justify-content-between ${grossChange >= 0 ? 'text-success' : 'text-danger'}`}>
-                                                    <span>Brüt Değişim:</span>
-                                                    <span>{grossChange.toFixed(2)}%</span>
-                                                </div>
-                                                <div className={`d-flex justify-content-between ${netChange >= 0 ? 'text-success' : 'text-danger'}`}>
-                                                    <span>Net Değişim:</span>
-                                                    <span>{netChange.toFixed(2)}%</span>
-                                                </div>
-                                                <div className={`d-flex justify-content-between ${employeeCountChange >= 0 ? 'text-success' : 'text-danger'}`}>
-                                                    <span>Personel Değişim:</span>
-                                                    <span>{employeeCountChange.toFixed(2)}%</span>
+                                        <div key={idx} className="col-md-4">
+                                            <div className="card bg-light">
+                                                <div className="card-body">
+                                                    <h6 className="mb-3">{item.period?.name} vs {prevItem.period?.name}</h6>
+                                                    <div className="d-flex justify-content-between mb-2">
+                                                        <span>Brüt:</span>
+                                                        <span className={grossChange >= 0 ? 'text-success' : 'text-danger'}>
+                                                            {grossChange >= 0 ? '+' : ''}{grossChange.toFixed(2)}%
+                                                        </span>
+                                                    </div>
+                                                    <div className="d-flex justify-content-between">
+                                                        <span>Net:</span>
+                                                        <span className={netChange >= 0 ? 'text-success' : 'text-danger'}>
+                                                            {netChange >= 0 ? '+' : ''}{netChange.toFixed(2)}%
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -141,8 +117,8 @@ export default function Compare({ comparison }) {
                                 })}
                             </div>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         </AuthenticatedLayout>
     );

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Interfaces\IEmployeeRepository;
@@ -27,6 +28,42 @@ class EmployeeRepository extends BaseRepository implements IEmployeeRepository
         $this->applyFilters($query, $filters);
 
         return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    /**
+     * Get all active employees (cached version for dropdowns).
+     */
+    public function getActiveForDropdown(): Collection
+    {
+        // Cache employee list for dropdowns - TTL: 30 minutes
+        return \Cache::remember('employees.dropdown.active', 1800, function () {
+            return $this->model
+                ->select('id', 'first_name', 'last_name')
+                ->whereNull('deleted_at')
+                ->orderBy('first_name')
+                ->get();
+        });
+    }
+
+    /**
+     * Get all active employees excluding specific IDs (cached version for dropdowns).
+     */
+    public function getActiveForDropdownExcluding(array $excludeIds = []): Collection
+    {
+        $cacheKey = 'employees.dropdown.active.exclude.'.md5(serialize($excludeIds));
+
+        return \Cache::remember($cacheKey, 1800, function () use ($excludeIds) {
+            $query = $this->model
+                ->select('id', 'first_name', 'last_name')
+                ->whereNull('deleted_at')
+                ->orderBy('first_name');
+
+            if (! empty($excludeIds)) {
+                $query->whereNotIn('id', $excludeIds);
+            }
+
+            return $query->get();
+        });
     }
 
     /**

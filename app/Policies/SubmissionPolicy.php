@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Policies;
 
 use App\Models\Submission;
@@ -11,11 +12,15 @@ class SubmissionPolicy
     use HandlesAuthorization;
 
     /**
-     * Allow all actions for authenticated users.
+     * Grant all abilities to admin and ik_manager roles.
      */
     public function before(User $user, string $ability): ?bool
     {
-        return $user ? true : null;
+        if ($user->hasRole(['admin', 'ik_manager'])) {
+            return true;
+        }
+
+        return null;
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Policies;
 
 use App\Enums\UserRoleEnum;
@@ -136,5 +137,26 @@ class EmployeePolicy
             UserRoleEnum::ADMIN->value,
             UserRoleEnum::IK_MANAGER->value,
         ]);
+    }
+
+    /**
+     * Determine whether the user can clock for an employee.
+     */
+    public function clock(User $user, Employee $employee): bool
+    {
+        // If the user is the employee themselves, they can clock in/out
+        if ($user->employee && $user->employee->id === $employee->id) {
+            return true;
+        }
+
+        // Admin and IK Manager can clock for any employee
+        if (in_array($user->rank_id?->value, [
+            UserRoleEnum::ADMIN->value,
+            UserRoleEnum::IK_MANAGER->value,
+        ])) {
+            return true;
+        }
+
+        return false;
     }
 }

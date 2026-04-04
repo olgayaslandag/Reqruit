@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Enums\PayrollStatusEnum;
@@ -91,8 +93,26 @@ class PayrollService
             throw new \Exception('Sadece taslak durumundaki bordro dönemleri için kalem oluşturulabilir.');
         }
 
-        // Dönem içindeki aktif çalışanları al
+        // Dönem içindeki aktif çalışanları al (tek seferde hepsini yükle)
         $employees = $period->employeesInPeriod()->get();
+        $employeeIds = $employees->pluck('id')->toArray();
+
+        // Tüm çalışanların maaş yapılandırmasını toplu olarak al
+        $employeeSalaries = DB::table('employee_salaries')
+            ->whereIn('employee_id', $employeeIds)
+            ->where('valid_from', '<=', $period->start_date)
+            ->where(function ($query) {
+                $query->whereNull('valid_until')
+                    ->orWhere('valid_until', '>=', $period->start_date);
+            })
+            ->join('salary_components', 'employee_salaries.salary_component_id', '=', 'salary_components.id')
+            ->select([
+                'employee_salaries.employee_id',
+                'employee_salaries.salary_component_id',
+                'employee_salaries.amount',
+                'salary_components.name as component_name',
+            ])
+            ->get();
 
         $items = [];
 
@@ -101,24 +121,17 @@ class PayrollService
             // Mevcut kalemleri sil
             $period->payrollItems()->delete();
 
-            foreach ($employees as $employee) {
-                // Çalışanın maaş yapılandırmasını al
-                $salaries = $employee->employeeSalaries()
-                    ->activeOn($period->start_date)
-                    ->with('salaryComponent')
-                    ->get();
-
-                foreach ($salaries as $salary) {
-                    $items[] = PayrollItem::create([
-                        'payroll_period_id' => $periodId,
-                        'employee_id' => $employee->id,
-                        'salary_component_id' => $salary->salary_component_id,
-                        'amount' => $salary->amount,
-                        'calculated_amount' => $salary->amount,
-                        'quantity' => 1,
-                        'unit_price' => $salary->amount,
-                    ]);
-                }
+            // Her bir maaş yapılandırması için payroll item oluştur
+            foreach ($employeeSalaries as $salary) {
+                $items[] = PayrollItem::create([
+                    'payroll_period_id' => $periodId,
+                    'employee_id' => $salary->employee_id,
+                    'salary_component_id' => $salary->salary_component_id,
+                    'amount' => $salary->amount,
+                    'calculated_amount' => $salary->amount,
+                    'quantity' => 1,
+                    'unit_price' => $salary->amount,
+                ]);
             }
 
             DB::commit();

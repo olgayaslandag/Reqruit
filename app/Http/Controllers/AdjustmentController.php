@@ -1,24 +1,33 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\AdjustmentStatusEnum;
+use App\Http\Requests\ApproveAdjustmentRequest;
+use App\Http\Requests\RejectAdjustmentRequest;
+use App\Http\Requests\RequestAdjustmentRequest;
 use App\Http\Requests\StoreAdjustmentRequest;
 use App\Http\Requests\UpdateAdjustmentRequest;
+use App\Http\Requests\UpdateAdjustmentStatusRequest;
 use App\Models\AttendanceAdjustment;
 use App\Models\Employee;
+use App\Services\AttendanceAdjustmentService;
 use App\Services\AttendanceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class AdjustmentController extends Controller
 {
     protected AttendanceService $attendanceService;
 
-    public function __construct(AttendanceService $attendanceService)
+    protected AttendanceAdjustmentService $attendanceAdjustmentService;
+
+    public function __construct(AttendanceService $attendanceService, AttendanceAdjustmentService $attendanceAdjustmentService)
     {
         $this->attendanceService = $attendanceService;
+        $this->attendanceAdjustmentService = $attendanceAdjustmentService;
+        $this->authorizeResource(\App\Models\AttendanceAdjustment::class, 'adjustment');
     }
 
     public function index(Request $request)
@@ -74,11 +83,8 @@ class AdjustmentController extends Controller
         $data = $request->validated();
 
         $data['employee_id'] = $data['employee_id'];
-        $data['request_date'] = now();
-        $data['requested_by'] = Auth::id();
-        $data['status'] = AdjustmentStatusEnum::PENDING;
 
-        $adjustment = AttendanceAdjustment::create($data);
+        $adjustment = $this->attendanceAdjustmentService->create($data);
 
         return redirect()->route('admin.adjustments.index')->with('success', 'Düzeltme talebi başarıyla oluşturuldu.');
     }
@@ -99,24 +105,20 @@ class AdjustmentController extends Controller
     {
         $data = $request->validated();
 
-        $adjustment->update($data);
+        $updatedAdjustment = $this->attendanceAdjustmentService->update($adjustment->id, $data);
 
         return redirect()->route('admin.adjustments.index')->with('success', 'Düzeltme başarıyla güncellendi.');
     }
 
     public function destroy(AttendanceAdjustment $adjustment)
     {
-        $adjustment->delete();
+        $deleted = $this->attendanceAdjustmentService->delete($adjustment->id);
 
         return redirect()->route('admin.adjustments.index')->with('success', 'Düzeltme başarıyla silindi.');
     }
 
-    public function approve(Request $request, AttendanceAdjustment $adjustment)
+    public function approve(ApproveAdjustmentRequest $request, AttendanceAdjustment $adjustment)
     {
-        $request->validate([
-            'approval_notes' => 'nullable|string|max:1000',
-        ]);
-
         if ($adjustment->status !== AdjustmentStatusEnum::PENDING) {
             return response()->json([
                 'success' => false,
@@ -124,45 +126,31 @@ class AdjustmentController extends Controller
             ], 400);
         }
 
-        DB::beginTransaction();
-
         try {
-            $adjustment->update([
-                'status' => AdjustmentStatusEnum::APPROVED,
-                'approved_by' => Auth::id(),
-                'approved_at' => now(),
-                'rejection_reason' => null,
-            ]);
-
-            // Recalculate the attendance summary for the affected date
-            $this->attendanceService->updateAttendanceSummary(
-                $adjustment->employee_id,
-                $adjustment->adjustment_date
-            );
-
-            DB::commit();
+            $updatedAdjustment = $this->attendanceAdjustmentService->approve($adjustment->id);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Adjustment approved successfully',
-                'adjustment' => $adjustment->refresh(),
+                'adjustment' => $updatedAdjustment,
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
+            \Log::error('Adjustment approval failed', [
+                'message' => $e->getMessage(),
+                'adjustment_id' => $adjustment->id ?? null,
+                'user_id' => auth()->id() ?? null,
+                'ip' => request()->ip(),
+            ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to approve adjustment: '.$e->getMessage(),
+                'message' => 'Failed to approve adjustment',
             ], 500);
         }
     }
 
-    public function reject(Request $request, AttendanceAdjustment $adjustment)
+    public function reject(RejectAdjustmentRequest $request, AttendanceAdjustment $adjustment)
     {
-        $request->validate([
-            'rejection_reason' => 'required|string|max:1000',
-        ]);
-
         if ($adjustment->status !== AdjustmentStatusEnum::PENDING) {
             return response()->json([
                 'success' => false,
@@ -170,51 +158,30 @@ class AdjustmentController extends Controller
             ], 400);
         }
 
-        $adjustment->update([
-            'status' => AdjustmentStatusEnum::REJECTED,
-            'rejection_reason' => $request->rejection_reason,
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
-        ]);
+        $rejectReason = $request->validated()['rejection_reason'];
+
+        $updatedAdjustment = $this->attendanceAdjustmentService->reject($adjustment->id, $rejectReason);
 
         return response()->json([
             'success' => true,
             'message' => 'Adjustment rejected successfully',
-            'adjustment' => $adjustment->refresh(),
+            'adjustment' => $updatedAdjustment,
         ]);
     }
 
-    public function updateStatus(Request $request, AttendanceAdjustment $adjustment)
+    public function updateStatus(UpdateAdjustmentStatusRequest $request, AttendanceAdjustment $adjustment)
     {
-        $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
-        ]);
+        $validated = $request->validated();
 
-        $updateData = ['status' => AdjustmentStatusEnum::from($request->status)];
+        $status = $validated['status'];
+        $reason = $validated['status'] === 'rejected' && isset($validated['reason']) ? $validated['reason'] : null;
 
-        if ($request->status === 'approved') {
-            $updateData['approved_by'] = Auth::id();
-            $updateData['approved_at'] = now();
-            $updateData['rejection_reason'] = null;
-        } elseif ($request->status === 'rejected' && $request->has('reason')) {
-            $updateData['rejection_reason'] = $request->reason;
-            $updateData['approved_by'] = Auth::id();
-            $updateData['approved_at'] = now();
-        }
-
-        $adjustment->update($updateData);
-
-        if ($request->status === 'approved') {
-            $this->attendanceService->updateAttendanceSummary(
-                $adjustment->employee_id,
-                $adjustment->adjustment_date
-            );
-        }
+        $updatedAdjustment = $this->attendanceAdjustmentService->updateStatus($adjustment->id, $status, $reason);
 
         return response()->json([
             'success' => true,
             'message' => 'Status updated successfully',
-            'adjustment' => $adjustment->refresh(),
+            'adjustment' => $updatedAdjustment,
         ]);
     }
 
@@ -238,17 +205,8 @@ class AdjustmentController extends Controller
         ]);
     }
 
-    public function requestAdjustment(Request $request)
+    public function requestAdjustment(RequestAdjustmentRequest $request)
     {
-        $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'adjustment_date' => 'required|date',
-            'from_time' => 'required_without:to_time|nullable|date_format:H:i',
-            'to_time' => 'required_without:from_time|nullable|date_format:H:i',
-            'type' => 'required|in:missing,wrong,overtime_request',
-            'reason' => 'required|string|max:1000',
-        ]);
-
         $requester = Auth::user();
         $employee = Employee::findOrFail($request->employee_id);
 
@@ -271,22 +229,26 @@ class AdjustmentController extends Controller
             ], 400);
         }
 
-        $adjustment = AttendanceAdjustment::create([
-            'employee_id' => $request->employee_id,
-            'request_date' => now(),
-            'adjustment_date' => $request->adjustment_date,
-            'from_time' => $request->from_time,
-            'to_time' => $request->to_time,
-            'reason' => $request->reason,
-            'type' => $request->type,
-            'status' => AdjustmentStatusEnum::PENDING,
-            'requested_by' => Auth::id(),
-        ]);
+        try {
+            $adjustment = $this->attendanceAdjustmentService->requestAdjustment([
+                'employee_id' => $request->employee_id,
+                'adjustment_date' => $request->adjustment_date,
+                'from_time' => $request->from_time,
+                'to_time' => $request->to_time,
+                'reason' => $request->reason,
+                'type' => $request->type,
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Adjustment request submitted successfully',
-            'adjustment' => $adjustment,
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Adjustment request submitted successfully',
+                'adjustment' => $adjustment,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
 }

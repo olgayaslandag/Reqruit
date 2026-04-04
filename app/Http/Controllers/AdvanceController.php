@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RejectAdvanceRequest;
+use App\Http\Requests\StoreAdvanceRequest;
+use App\Http\Requests\UpdateAdvanceRequest;
 use App\Models\AdvanceRequest;
 use App\Services\AdvanceService;
 use Illuminate\Http\Request;
@@ -64,18 +68,10 @@ class AdvanceController extends Controller
     /**
      * Avans talebi kaydeder.
      */
-    public function store(Request $request)
+    public function store(StoreAdvanceRequest $request)
     {
-        $validated = $request->validate([
-            'employee_id' => ['required', 'exists:employees,id'],
-            'amount' => ['required', 'numeric', 'min:1'],
-            'reason' => ['nullable', 'string'],
-            'requested_date' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
         try {
-            $advance = $this->advanceService->create($validated);
+            $advance = $this->advanceService->create($request->validated());
 
             return redirect()->route('admin.advances.index')
                 ->with('success', 'Avans talebi başarıyla oluşturuldu.');
@@ -114,18 +110,10 @@ class AdvanceController extends Controller
     /**
      * Avans talebi günceller.
      */
-    public function update(Request $request, AdvanceRequest $advance)
+    public function update(UpdateAdvanceRequest $request, AdvanceRequest $advance)
     {
-        $validated = $request->validate([
-            'employee_id' => ['required', 'exists:employees,id'],
-            'amount' => ['required', 'numeric', 'min:1'],
-            'reason' => ['nullable', 'string'],
-            'requested_date' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
         try {
-            $this->advanceService->update($advance->id, $validated);
+            $this->advanceService->update($advance->id, $request->validated());
 
             return redirect()->route('admin.advances.index')
                 ->with('success', 'Avans talebi başarıyla güncellendi.');
@@ -152,7 +140,7 @@ class AdvanceController extends Controller
     /**
      * Avans talebini onaylar.
      */
-    public function approve(Request $request, AdvanceRequest $advance)
+    public function approve(ApproveAdvanceRequest $request, AdvanceRequest $advance)
     {
         $this->authorize('approve', $advance);
 
@@ -168,13 +156,11 @@ class AdvanceController extends Controller
     /**
      * Avans talebini reddeder.
      */
-    public function reject(Request $request, AdvanceRequest $advance)
+    public function reject(RejectAdvanceRequest $request, AdvanceRequest $advance)
     {
         $this->authorize('reject', $advance);
 
-        $validated = $request->validate([
-            'reason' => ['required', 'string'],
-        ]);
+        $validated = $request->validated();
 
         try {
             $this->advanceService->reject($advance->id, auth()->id(), $validated['reason']);

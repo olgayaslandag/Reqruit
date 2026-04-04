@@ -38,3 +38,6 @@
 38. LeaveTypes için route'lar eklendi: admin.leave.types.create, admin.leave.types.edit; Controller create() ve edit() metodları eklendi; Create.jsx ve Edit.jsx sayfaları oluşturuldu
 39. LeaveEntitlements için route'lar eklendi: admin.leave.entitlements.create, admin.leave.entitlements.edit; Controller create() ve edit() metodları eklendi; CreateEntitlement.jsx ve EditEntitlement.jsx sayfaları oluşturuldu; modal kaldırıldı
 40. Tüm sayfalarda array kontrolü eklendi (filter işlemlerinde undefined hatası önlendi)
+41. PayrollReports sayfaları Bootstrap uyumlu yapıldı (Index, Summary, TaxSummary, Compare, Annual, DepartmentSummary); filtre sistemi eklendi, exportUrl kaldırıldı
+42. AttendanceReports sayfaları Bootstrap uyumlu yapıldı (Index, Daily, Monthly, Overtime); kartlar, tablolar, grafikler, filtreler eklendi
+43. Sidebar ikon düzeltildi: 'journal' → 'calendar-event' (Günlük Rapor menüsü)

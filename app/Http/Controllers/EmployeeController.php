@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use App\Interfaces\IDepartmentRepository;
+use App\Interfaces\IEmployeeRepository;
 use App\Models\Employee;
 use App\Services\EmployeeService;
 use Illuminate\Http\JsonResponse;
@@ -13,7 +16,9 @@ use Inertia\Inertia;
 class EmployeeController extends Controller
 {
     public function __construct(
-        protected EmployeeService $employeeService
+        protected EmployeeService $employeeService,
+        protected IDepartmentRepository $departmentRepository,
+        protected IEmployeeRepository $employeeRepository
     ) {
         $this->authorizeResource(Employee::class, 'employee');
     }
@@ -41,11 +46,10 @@ class EmployeeController extends Controller
             $request->get('per_page', 15)
         );
 
-
         return Inertia::render('Admin/Employees/Index', [
             'employees' => $employees,
             'filters' => $filters,
-            'departments' => \App\Models\Department::orderBy('title')->get(['id', 'title']),
+            'departments' => $this->departmentRepository->getAll(),
             'employeeTree' => $this->employeeService->getTree(),
         ]);
     }
@@ -56,10 +60,8 @@ class EmployeeController extends Controller
     public function create()
     {
         return Inertia::render('Admin/Employees/Create', [
-            'departments' => \App\Models\Department::orderBy('title')->get(['id', 'title']),
-            'managers' => Employee::whereNull('deleted_at')
-                ->orderBy('first_name')
-                ->get(['id', 'first_name', 'last_name']),
+            'departments' => $this->departmentRepository->getAll(),
+            'managers' => $this->employeeRepository->getActiveForDropdown(),
             'allowedMimeTypes' => $this->employeeService->getAllowedMimeTypes(),
             'maxFileSize' => $this->employeeService->getMaxFileSize(),
         ]);
@@ -96,7 +98,7 @@ class EmployeeController extends Controller
 
         return Inertia::render('Admin/Employees/Show', [
             'employee' => $employee,
-            'all_departments' => \App\Models\Department::orderBy('title')->get(['id', 'title']),
+            'all_departments' => $this->departmentRepository->getAll(),
         ]);
     }
 
@@ -109,11 +111,8 @@ class EmployeeController extends Controller
 
         return Inertia::render('Admin/Employees/Edit', [
             'employee' => $employee,
-            'departments' => \App\Models\Department::orderBy('title')->get(['id', 'title']),
-            'managers' => Employee::whereNull('deleted_at')
-                ->where('id', '!=', $employee->id)
-                ->orderBy('first_name')
-                ->get(['id', 'first_name', 'last_name']),
+            'departments' => $this->departmentRepository->getAll(),
+            'managers' => $this->employeeRepository->getActiveForDropdownExcluding([$employee->id]),
             'allowedMimeTypes' => $this->employeeService->getAllowedMimeTypes(),
             'maxFileSize' => $this->employeeService->getMaxFileSize(),
         ]);
@@ -264,9 +263,108 @@ class EmployeeController extends Controller
         ]);
 
         $employees = $this->employeeService->search($request->input('keyword'));
+        
+        // Mask sensitive data before sending to client
+        $maskedEmployees = $employees->map(function ($employee) {
+            $empArray = $employee->toArray();
+            if (isset($empArray['identity_no'])) {
+                $empArray['identity_no'] = $this->maskIdentityNumber($empArray['identity_no']);
+            }
+            return $empArray;
+        });
 
         return response()->json([
-            'employees' => $employees,
+            'employees' => $maskedEmployees,
         ]);
+    }
+
+    private function maskIdentityNumber(?string $identityNo): ?string
+    {
+        if (!$identityNo || strlen($identityNo) !== 11) {
+            return $identityNo;
+        }
+        
+        // Show only last 4 digits, mask others with X
+        return 'XXXXX' . substr($identityNo, -4);
+    }
+}
+            return $empArray;
+        });
+
+        return response()->json([
+            'employees' => $maskedEmployees,
+        ]);
+    }
+
+    private function maskIdentityNumber(?string $identityNo): ?string
+    {
+        if (!$identityNo || strlen($identityNo) !== 11) {
+            return $identityNo;
+        }
+        
+        // Show only last 4 digits, mask others with X
+        return 'XXXXX' . substr($identityNo, -4);
+    }
+    
+    /**
+     * Return employee tree structure with masked identity numbers
+     */
+    public function getTree(): JsonResponse
+    {
+        $tree = $this->employeeService->getTree();
+        
+        // Mask identity_no in tree if present
+        $maskedTree = $this->maskTreeIdentityNos($tree);
+        
+        return response()->json($maskedTree);
+    }
+    
+    private function maskTreeIdentityNos($node)
+    {
+        if (is_array($node)) {
+            foreach ($node as $key => $value) {
+                if ($key === 'identity_no' && isset($node[$key])) {
+                    $node[$key] = $this->maskIdentityNumber($node[$key]);
+                } elseif (is_array($value) || is_object($value)) {
+                    $node[$key] = $this->maskTreeIdentityNos($value);
+                }
+            }
+        }
+        return $node;
+    }
+    
+    /**
+     * Get employee for dropdowns with masked identity_no
+     */
+    public function getForDropdown(): JsonResponse
+    {
+        $employees = $this->employeeRepository->getActiveForDropdown();
+        
+        $maskedEmployees = collect($employees)->map(function ($employee) {
+            if (isset($employee['identity_no'])) {
+                $employee['identity_no'] = $this->maskIdentityNumber($employee['identity_no']);
+            }
+            return $employee;
+        });
+
+        return response()->json($maskedEmployees);
+    }
+
+            return $empArray;
+        });
+
+        return response()->json([
+            'employees' => $maskedEmployees,
+        ]);
+    }
+
+    private function maskIdentityNumber(?string $identityNo): ?string
+    {
+        if (! $identityNo || strlen($identityNo) !== 11) {
+            return $identityNo;
+        }
+
+        // Show only last 4 digits, mask others with X
+        return 'XXXXX'.substr($identityNo, -4);
     }
 }

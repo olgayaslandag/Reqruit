@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\AttendanceController;

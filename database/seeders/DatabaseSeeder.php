@@ -1,5 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
+
 namespace Database\Seeders;
 
 use App\Enums\UserRoleEnum;
@@ -42,6 +45,9 @@ class DatabaseSeeder extends Seeder
             ImportAllDataSeeder::class,
             UserSeeder::class,
             EmployeeSeeder::class,
+            LeaveTypesTableSeeder::class,
+            LeaveEntitlementsSeeder::class,
+            LeaveRequestsSeeder::class,
             SubmissionSeeder::class,
             PayrollSeeder::class,
             AdvanceRequestSeeder::class,

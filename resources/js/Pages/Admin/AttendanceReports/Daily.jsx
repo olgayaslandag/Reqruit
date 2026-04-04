@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { formatTime, formatDate } from '@/Utils/attendanceHelpers.jsx';
-import { formatDateTime } from '@/Utils/formatters.jsx';
 
 export default function Daily({ dailyReport = {}, filters = {}, employees = [] }) {
     const { props } = usePage();
@@ -13,24 +11,21 @@ export default function Daily({ dailyReport = {}, filters = {}, employees = [] }
         employee_id: filters?.employee_id || ''
     });
 
-    // Filtre değiştirme
     const handleFilterChange = (key, value) => {
         const newFilters = { ...localFilters, [key]: value };
         setLocalFilters(newFilters);
-        
-        // Inertia ile filtrelenmiş verileri yükle
-        router.get(route('admin.attendance-reports.daily'), newFilters, {
-            replace: true
-        });
+        router.get(route('admin.attendance-reports.daily'), newFilters, { replace: true });
     };
 
-    // Excel/PDF dışa aktarma fonksiyonu
-    const handleExport = (format) => {
-        const params = new URLSearchParams({
-            ...localFilters,
-            format: format
-        });
-        window.open(`${route('admin.attendance-reports.daily.export')}?${params}`, '_blank');
+    const getStatusBadge = (status) => {
+        const statusMap = {
+            present: { class: 'bg-success', label: 'Devrede' },
+            absent: { class: 'bg-danger', label: 'Devre Dışı' },
+            late: { class: 'bg-warning', label: 'Geç Giriş' },
+            leave: { class: 'bg-info', label: 'İzinli' },
+        };
+        const s = statusMap[status] || { class: 'bg-secondary', label: 'Diğer' };
+        return `<span class="badge ${s.class}">${s.label}</span>`;
     };
 
     return (
@@ -39,35 +34,28 @@ export default function Daily({ dailyReport = {}, filters = {}, employees = [] }
                 title: 'Günlük Devam Raporu',
                 breadcrumbs: [
                     { label: 'Ana Sayfa', url: route('dashboard') },
-                    { label: 'Raporlar', url: route('admin.reports.index') },
                     { label: 'Devam Raporları', url: route('admin.attendance-reports.index') },
-                    { label: 'Günlük Rapor', url: route('admin.attendance-reports.daily') },
+                    { label: 'Günlük Rapor', url: '#' },
                 ],
+                backUrl: route('admin.attendance-reports.index'),
             }}
         >
             <Head title="Günlük Devam Raporu" />
 
-            <div className="py-6">
-                <div className="mw-100 mx-auto px-4">
-                    {/* Filtreleme Paneli */}
-                    <div className="bg-white rounded-3 shadow-sm-md mb-5 p-4">
-                        <div className="d-grid d-grid-cols-1 gap-3">
-                            <div>
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                    Tarih Seçimi
-                                </label>
-                                <input className="form-control w-100" type="date"
-                                    value={localFilters.date}
-                                    onChange={(e) => handleFilterChange('date', e.target.value)}
-                                />
+            <div className="container-fluid py-4">
+                {/* Filtreleme */}
+                <div className="card mb-4">
+                    <div className="card-body">
+                        <div className="row g-3">
+                            <div className="col-md-4">
+                                <label className="form-label">Tarih</label>
+                                <input type="date" className="form-control" value={localFilters.date}
+                                    onChange={(e) => handleFilterChange('date', e.target.value)} />
                             </div>
-                            <div>
-                                <label className="d-block fs-sm fw-medium text-dark mb-1">
-                                    Personel
-                                </label>
-                                <select className="form-control w-100" value={localFilters.employee_id}
-                                    onChange={(e) => handleFilterChange('employee_id', e.target.value)}
-                                >
+                            <div className="col-md-4">
+                                <label className="form-label">Personel</label>
+                                <select className="form-select" value={localFilters.employee_id}
+                                    onChange={(e) => handleFilterChange('employee_id', e.target.value)}>
                                     <option value="">Tümü</option>
                                     {employees?.map((employee) => (
                                         <option key={employee.id} value={employee.id}>
@@ -78,139 +66,103 @@ export default function Daily({ dailyReport = {}, filters = {}, employees = [] }
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Günlük Rapor Kartı */}
-                    <div className="d-grid d-grid-cols-1 gap-3 mb-5">
-                        <div className="bg-white rounded-3 shadow-sm-md p-4">
-                            <div className="fs-sm text-muted">Toplam Personel</div>
-                            <div className="fs-2 fw-bold text-dark">{dailyReport.total_employees || 0}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm-md p-4">
-                            <div className="fs-sm text-muted">Devam Eden</div>
-                            <div className="fs-2 fw-bold text-success">{dailyReport.present_count || 0}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm-md p-4">
-                            <div className="fs-sm text-muted">Devam Dışı</div>
-                            <div className="fs-2 fw-bold text-danger">{dailyReport.absent_count || 0}</div>
-                        </div>
-                        <div className="bg-white rounded-3 shadow-sm-md p-4">
-                            <div className="fs-sm text-muted">Ortalama</div>
-                            <div className="fs-2 fw-bold text-info">{dailyReport.average_attendance_rate || '0%'}%</div>
+                {/* Özet Kartlar */}
+                <div className="row mb-4">
+                    <div className="col-md-3">
+                        <div className="card">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Toplam Personel</h6>
+                                <h3 className="mb-0 fw-bold">{dailyReport.total_employees || 0}</h3>
+                            </div>
                         </div>
                     </div>
-
-                    {/* Devam Tablosu */}
-                    <div className="bg-white rounded-3 shadow-sm-md">
-                        <div className="px-6 py-4 border-b border-secondary">
-                            <h5 className="fw-medium">Tüm Personel Devam Kayıtları</h5>
+                    <div className="col-md-3">
+                        <div className="card border-success">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Devam Eden</h6>
+                                <h3 className="mb-0 fw-bold text-success">{dailyReport.present_count || 0}</h3>
+                            </div>
                         </div>
-                        
-                        <div className="overflow-auto">
-                            <table className="w-100 divide-y divide-gray-200">
+                    </div>
+                    <div className="col-md-3">
+                        <div className="card border-danger">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Devam Dışı</h6>
+                                <h3 className="mb-0 fw-bold text-danger">{dailyReport.absent_count || 0}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="card border-info">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Ortalama</h6>
+                                <h3 className="mb-0 fw-bold text-info">{dailyReport.average_attendance_rate || 0}%</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tablo */}
+                <div className="card">
+                    <div className="card-header">
+                        <h5 className="mb-0"><i className="ti ti-users me-2"></i>Personel Devam Kayıtları</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover mb-0">
                                 <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Personel
-                                        </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Durum
-                                        </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Giriş Saati
-                                        </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Çıkış Saati
-                                        </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Toplam Saat
-                                        </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Fazla Mesai
-                                        </th>
+                                        <th>Personel</th>
+                                        <th>Durum</th>
+                                        <th>Giriş</th>
+                                        <th>Çıkış</th>
+                                        <th className="text-end">Toplam Saat</th>
+                                        <th className="text-end">Fazla Mesai</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody>
                                     {dailyReport.daily_data && dailyReport.daily_data.length > 0 ? (
-                                        dailyReport.daily_data.map((entry, index) => (
-                                            <tr key={index} className="hover:table-light">
-                                                <td className="px-6 py-4 text-nowrap">
-                                                    <div className="d-flex align-items-center">
-                                                        <div className="d-flex-shrink-0 h-10 w-10">
-                                                            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-10 h-10" />
-                                                        </div>
-                                                        <div className="ml-4">
-                                                            <div className="fs-sm fw-medium text-dark">
-                                                                {entry.employee?.first_name} {entry.employee?.last_name}
-                                                            </div>
-                                                            <div className="fs-sm text-muted">
-                                                                {entry.employee?.position_title} | {entry.employee?.identity_no}
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                        dailyReport.daily_data.map((entry, idx) => (
+                                            <tr key={idx}>
+                                                <td>
+                                                    <div className="fw-semibold">{entry.employee?.first_name} {entry.employee?.last_name}</div>
+                                                    <div className="small text-muted">{entry.employee?.position_title}</div>
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap">
-                                                    <span className={`d-inline-d-flex align-items-center px-2.5 py-0.5 rounded-pill fs-xs fw-medium ${
-                                                        entry.status === 'present' 
-                                                            ? 'bg-success bg-opacity-10 text-success' 
-                                                            : entry.status === 'absent' 
-                                                                ? 'bg-danger bg-opacity-10 text-danger'
-                                                                : entry.status === 'late'
-                                                                    ? 'bg-warning bg-opacity-10 text-warning'
-                                                                    : 'bg-light text-dark'
+                                                <td>
+                                                    <span className={`badge ${
+                                                        entry.status === 'present' ? 'bg-success' :
+                                                        entry.status === 'absent' ? 'bg-danger' :
+                                                        entry.status === 'late' ? 'bg-warning' : 'bg-secondary'
                                                     }`}>
-                                                        {entry.status === 'present' ? 'Devrede' : 
+                                                        {entry.status === 'present' ? 'Devrede' :
                                                          entry.status === 'absent' ? 'Devre Dışı' :
                                                          entry.status === 'late' ? 'Geç Giriş' : 'Diğer'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
-                                                    {entry.clock_in ? formatTime(entry.clock_in) : '-'}
-                                                </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
-                                                    {entry.clock_out ? formatTime(entry.clock_out) : '-'}
-                                                </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
-                                                    {entry.working_hours || '00:00'}
-                                                </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
-                                                    <span className={`${entry.overtime > 0 ? 'text-danger fw-semibold' : 'text-muted'}`}>
-                                                        {entry.overtime || '0.0'} sa
-                                                    </span>
+                                                <td>{entry.clock_in ? entry.clock_in.substring(0, 5) : '-'}</td>
+                                                <td>{entry.clock_out ? entry.clock_out.substring(0, 5) : '-'}</td>
+                                                <td className="text-end">{entry.working_hours || '00:00'}</td>
+                                                <td className={`text-end ${entry.overtime > 0 ? 'text-danger fw-semibold' : 'text-muted'}`}>
+                                                    {entry.overtime || '0.0'} sa
                                                 </td>
                                             </tr>
                                         ))
                                     ) : (
-                                        <tr>
-                                            <td colSpan="6" className="px-6 py-12 text-center fs-sm text-muted">
-                                                Bu tarih için herhangi bir devam kaydı bulunamadı.
-                                            </td>
-                                        </tr>
+                                        <tr><td colSpan={6} className="text-center text-muted py-4">Kayıt bulunamadı</td></tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
 
-                    {/* Özet Notlar */}
-                    <div className="mt-6 bg-blue-50 border border-blue-200 rounded p-4">
-                        <div className="d-flex">
-                            <div className="d-flex-shrink-0">
-                                <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <div className="ml-3">
-                                <h5 className="fw-medium">Günlük Rapor Notları</h5>
-                                <div className="mt-2 fs-sm text-info">
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        <li>Bugün {dailyReport.present_count || 0} personel devredeydi.</li>
-                                        <li>{dailyReport.late_count || 0} personel geç geldi.</li>
-                                        <li>Günlük ortalama iş başı süresi {(dailyReport.avg_working_hours || 0).toFixed(2)} saattir.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* Notlar */}
+                <div className="alert alert-info mt-4">
+                    <i className="ti ti-info-circle me-2"></i>
+                    <strong>Özet:</strong> {dailyReport.present_count || 0} personel devrede, {dailyReport.late_count || 0} geç geldi.
+                    Ortalama çalışma: {(dailyReport.avg_working_hours || 0).toFixed(2)} saat.
                 </div>
             </div>
         </AuthenticatedLayout>

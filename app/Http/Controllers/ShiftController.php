@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreShiftRequest;
@@ -15,6 +16,7 @@ class ShiftController extends Controller
     public function __construct(ShiftService $shiftService)
     {
         $this->shiftService = $shiftService;
+        $this->authorizeResource(\App\Models\Shift::class, 'shift');
     }
 
     public function index(Request $request)
@@ -99,9 +101,17 @@ class ShiftController extends Controller
                 'assignment' => $shiftAssignment,
             ]);
         } catch (\Exception $e) {
+            \Log::error('Shift assignment failed', [
+                'message' => $e->getMessage(),
+                'employee_id' => $request->employee_id ?? null,
+                'shift_id' => $request->shift_id ?? null,
+                'user_id' => auth()->id() ?? null,
+                'ip' => request()->ip(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to assign shift: '.$e->getMessage(),
+                'message' => 'Failed to assign shift',
             ], 500);
         }
     }
@@ -132,9 +142,17 @@ class ShiftController extends Controller
                 'assignments' => $assignments,
             ]);
         } catch (\Exception $e) {
+            \Log::error('Bulk shift assignment failed', [
+                'message' => $e->getMessage(),
+                'employee_ids' => $request->employee_ids ?? null,
+                'shift_id' => $request->shift_id ?? null,
+                'user_id' => auth()->id() ?? null,
+                'ip' => request()->ip(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to assign shifts: '.$e->getMessage(),
+                'message' => 'Failed to assign shifts',
             ], 500);
         }
     }

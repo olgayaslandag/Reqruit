@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { formatCurrency, formatNumber } from '@/Utils/formatters';
 
 export default function Annual({ summary }) {
@@ -9,159 +9,127 @@ export default function Annual({ summary }) {
         'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
     ];
 
+    const totalEmployees = (monthly_data || []).reduce((sum, m) => sum + (m.employee_count || 0), 0);
+
     return (
         <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="fw-semibold text-dark">
-                        {year} Yılı Maaş ve Bordro Özeti
-                    </h5>
-                    <Link
-                        href={route('admin.payroll-reports.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
-                    >
-                        Geri Dön
-                    </Link>
-                </div>
-            }
+            pageHeader={{
+                title: `${year} Yılı Maaş ve Bordro Özeti`,
+                breadcrumbs: [
+                    { label: 'Ana Sayfa', url: route('dashboard') },
+                    { label: 'Bordro Raporları', url: route('admin.payroll-reports.index') },
+                    { label: 'Yıllık Özet', url: '#' },
+                ],
+                backUrl: route('admin.payroll-reports.index'),
+            }}
         >
             <Head title={`${year} Yılı Maaş Özeti`} />
 
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    {/* Genel Özet */}
-                    <div className="d-grid d-grid-cols-1 gap-4 mb-8">
-                        <div className="bg-white p-4 rounded-3 shadow-sm">
-                            <h5 className="fw-medium">Toplam Brüt</h5>
-                            <p className="h2 fw-semibold text-success">{formatCurrency(total_gross)}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-3 shadow-sm">
-                            <h5 className="fw-medium">Toplam Net</h5>
-                            <p className="h2 fw-semibold text-info">{formatCurrency(total_net)}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-3 shadow-sm">
-                            <h5 className="fw-medium">Ortalama Aylık</h5>
-                            <p className="h2 fw-semibold text-primary">{formatCurrency(average_monthly)}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-3 shadow-sm">
-                            <h5 className="fw-medium">Toplam Çalışan</h5>
-                            <p className="h2 fw-semibold text-muted">
-                                {monthly_data.reduce((sum, month) => sum + month.employee_count, 0)}
-                            </p>
+            <div className="container-fluid py-4">
+                {/* Özet Kartlar */}
+                <div className="row mb-4">
+                    <div className="col-md-3">
+                        <div className="card border-success">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Toplam Brüt</h6>
+                                <h4 className="mb-0 fw-bold text-success">{formatCurrency(total_gross)}</h4>
+                            </div>
                         </div>
                     </div>
-
-                    {/* Aylık Detaylar */}
-                    <div className="bg-white rounded-3 shadow-sm overflow-hidden mb-8">
-                        <div className="px-6 py-4 table-light border-b border-secondary">
-                            <h5 className="fw-medium">
-                                {year} Yılı Aylık Maaş Detayları
-                            </h5>
+                    <div className="col-md-3">
+                        <div className="card border-info">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Toplam Net</h6>
+                                <h4 className="mb-0 fw-bold text-info">{formatCurrency(total_net)}</h4>
+                            </div>
                         </div>
-                        
-                        <div className="overflow-auto">
-                            <table className="w-100 divide-y divide-gray-200">
+                    </div>
+                    <div className="col-md-3">
+                        <div className="card border-primary">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Ortalama Aylık</h6>
+                                <h4 className="mb-0 fw-bold text-primary">{formatCurrency(average_monthly)}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-3">
+                        <div className="card">
+                            <div className="card-body text-center">
+                                <h6 className="text-muted mb-2">Toplam Çalışan</h6>
+                                <h4 className="mb-0 fw-bold">{formatNumber(totalEmployees)}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Aylık Detaylar */}
+                <div className="card mb-4">
+                    <div className="card-header">
+                        <h5 className="mb-0"><i className="ti ti-calendar me-2"></i>{year} Yılı Aylık Maaş Detayları</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover mb-0">
                                 <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Ay
-                                        </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Çalışan Sayısı
-                                        </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Toplam Brüt
-                                        </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Toplam Kesinti
-                                        </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Net Toplam
-                                        </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
-                                            Kişibaşı Ort. (Brüt)
-                                        </th>
+                                        <th>Ay</th>
+                                        <th className="text-end">Çalışan</th>
+                                        <th className="text-end">Toplam Brüt</th>
+                                        <th className="text-end">Kesinti</th>
+                                        <th className="text-end">Net</th>
+                                        <th className="text-end">Kişi Başı</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {monthly_data.map((month, index) => (
-                                        <tr key={index} className="hover:table-light">
-                                            <td className="px-6 py-4 text-nowrap fs-sm text-dark fw-medium">
-                                                {months[parseInt(month.month) - 1]}
-                                            </td>
-                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-muted">
-                                                {formatNumber(month.employee_count)}
-                                            </td>
-                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-dark fw-medium">
-                                                {formatCurrency(month.gross)}
-                                            </td>
-                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-danger">
-                                                {formatCurrency(month.deductions)}
-                                            </td>
-                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-dark fw-medium">
-                                                {formatCurrency(month.net)}
-                                            </td>
-                                            <td className="px-6 py-4 text-nowrap fs-sm text-right text-dark">
+                                <tbody>
+                                    {(monthly_data || []).map((month, idx) => (
+                                        <tr key={idx}>
+                                            <td className="fw-medium">{months[parseInt(month.month) - 1] || month.month}</td>
+                                            <td className="text-end">{formatNumber(month.employee_count)}</td>
+                                            <td className="text-end">{formatCurrency(month.gross)}</td>
+                                            <td className="text-end text-danger">{formatCurrency(month.deductions)}</td>
+                                            <td className="text-end fw-semibold">{formatCurrency(month.net)}</td>
+                                            <td className="text-end text-muted">
                                                 {formatCurrency(month.gross / Math.max(month.employee_count, 1))}
                                             </td>
                                         </tr>
                                     ))}
-                                    {/* Yıllık Toplam */}
                                     <tr className="table-light fw-bold">
-                                        <td className="px-6 py-4 fs-sm text-dark">
-                                            TOPLAM
-                                        </td>
-                                        <td className="px-6 py-4 text-right fs-sm text-dark">
-                                            {formatNumber(monthly_data.reduce((sum, month) => sum + month.employee_count, 0))}
-                                        </td>
-                                        <td className="px-6 py-4 text-right fs-sm text-dark">
-                                            {formatCurrency(monthly_data.reduce((sum, month) => sum + month.gross, 0))}
-                                        </td>
-                                        <td className="px-6 py-4 text-right fs-sm text-danger">
-                                            {formatCurrency(monthly_data.reduce((sum, month) => sum + month.deductions, 0))}
-                                        </td>
-                                        <td className="px-6 py-4 text-right fs-sm text-dark">
-                                            {formatCurrency(monthly_data.reduce((sum, month) => sum + month.net, 0))}
-                                        </td>
-                                        <td className="px-6 py-4 text-right fs-sm text-dark">
-                                            {formatCurrency(total_gross / Math.max(12, 1))}
-                                        </td>
+                                        <td>TOPLAM</td>
+                                        <td className="text-end">{formatNumber(totalEmployees)}</td>
+                                        <td className="text-end">{formatCurrency((monthly_data || []).reduce((s, m) => s + m.gross, 0))}</td>
+                                        <td className="text-end text-danger">{formatCurrency((monthly_data || []).reduce((s, m) => s + m.deductions, 0))}</td>
+                                        <td className="text-end">{formatCurrency((monthly_data || []).reduce((s, m) => s + m.net, 0))}</td>
+                                        <td className="text-end">{formatCurrency(total_gross / 12)}</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
 
-                    {/* Trend Grafik */}
-                    <div className="bg-white rounded-3 shadow-sm p-4">
-                        <h5 className="fw-medium">
-                            {year} Yılı Brüt Maaş Trendi
-                        </h5>
-                        
-                        {/* Grafik yer tutucusu */}
-                        <div className="space-y-4">
-                            {monthly_data.map((month, index) => (
-                                <div key={index} className="mb-5">
-                                    <div className="d-flex justify-content-between fs-sm text-muted mb-2">
-                                        <span className="fw-medium">{months[parseInt(month.month) - 1]}</span>
-                                        <span>{formatCurrency(month.gross)}</span>
+                {/* Trend Grafik */}
+                <div className="card">
+                    <div className="card-header">
+                        <h5 className="mb-0"><i className="ti ti-chart-bar me-2"></i>{year} Yılı Brüt Maaş Trendi</h5>
+                    </div>
+                    <div className="card-body">
+                        {(monthly_data || []).map((month, idx) => {
+                            const maxGross = Math.max(...(monthly_data || []).map(m => m.gross), 1);
+                            const percent = (month.gross / maxGross) * 100;
+                            return (
+                                <div key={idx} className="mb-3">
+                                    <div className="d-flex justify-content-between mb-1">
+                                        <span className="fw-medium">{months[parseInt(month.month) - 1] || month.month}</span>
+                                        <span className="text-muted">{formatCurrency(month.gross)}</span>
                                     </div>
-                                    <div className="w-100 bg-gray-200 rounded-pill h-8">
-                                        <div
-                                            className="bg-gradient-to-r from-green-400 to-blue-500 h-8 rounded-pill d-flex align-items-center justify-content-end pr-2 text-white fs-xs fw-medium"
-                                            style={{
-                                                width: `${Math.min(
-                                                    (month.gross / Math.max(...monthly_data.map(m => m.gross), 1)) * 100,
-                                                    100
-                                                )}%`
-                                            }}
-                                        >
+                                    <div className="progress" style={{ height: '24px' }}>
+                                        <div className="progress-bar bg-success" style={{ width: `${percent}%` }}>
                                             {formatCurrency(month.gross)}
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

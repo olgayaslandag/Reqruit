@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Services;
 
 use App\Interfaces\IAdvanceRepository;
 use App\Models\AdvanceDeduction;
 use App\Models\AdvanceRequest;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class AdvanceService
@@ -49,9 +51,21 @@ class AdvanceService
             'status' => 'approved',
         ]);
 
-        $totalUnpaid = $existingAdvance->sum('amount') - $existingAdvance->sum(function ($advance) {
-            return $advance->deductions()->where('status', 'deducted')->sum('deduction_amount');
-        });
+        // Calculate unpaid advance deductions in a single query per existing advances
+        $advanceIds = $existingAdvance->pluck('id')->toArray();
+        $advanceDeductions = DB::table('advance_deductions')
+            ->whereIn('advance_request_id', $advanceIds)
+            ->where('status', 'deducted')
+            ->groupBy('advance_request_id')
+            ->selectRaw('advance_request_id, SUM(deduction_amount) as total_deducted')
+            ->pluck('total_deducted', 'advance_request_id')
+            ->toArray();
+
+        $totalUnpaid = 0;
+        foreach ($existingAdvance as $advance) {
+            $deductedAmount = $advanceDeductions[$advance->id] ?? 0;
+            $totalUnpaid += $advance->amount - $deductedAmount;
+        }
 
         // Yeni talep + ödenmemiş toplam, brüt maaşın 3 katını geçemez
         // Bu kontrol SalaryCalculationService ile entegre edilebilir

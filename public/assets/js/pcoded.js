@@ -254,18 +254,8 @@ function remove_overlay_menu() {
 }
 
 window.addEventListener('load', function () {
-  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
-  var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-  var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-    return new bootstrap.Popover(popoverTriggerEl);
-  });
-  var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-  var toastList = toastElList.map(function (toastEl) {
-    return new bootstrap.Toast(toastEl);
-  });
+  // Bootstrap-related functionality has been removed for Tailwind compatibility
+  // Any tooltips, popovers, or toasts would need to be replaced with Tailwind-compatible alternatives
 });
 
 // active menu item list start

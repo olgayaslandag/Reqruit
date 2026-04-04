@@ -1,22 +1,25 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRoleEnum;
 use App\Enums\UserStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(private UserService $userService) {}
+
     /**
      * Display the registration view.
      */
@@ -38,10 +41,10 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = User::create([
+        $user = $this->userService->create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'rank_id' => UserRoleEnum::RECRUITER->value,
             'status_id' => UserStatusEnum::PENDING->value, // Yeni kayıtlar beklemede
         ]);

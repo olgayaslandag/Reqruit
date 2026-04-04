@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -13,6 +14,17 @@ class FileController extends Controller
      */
     public function generateSignedUrl(Request $request, string $path): array
     {
+        // Prevent path traversal attacks
+        if (str_contains($path, '../') || str_contains($path, '..\\')) {
+            abort(403, 'Invalid path');
+        }
+
+        $realPath = realpath(storage_path('app/'.$path));
+        $basePath = realpath(storage_path('app'));
+        if (! $realPath || ! str_starts_with($realPath, $basePath)) {
+            abort(403, 'Invalid path');
+        }
+
         // Only authenticated users can generate signed URLs
         if (! auth()->check()) {
             abort(401, 'Unauthorized');
@@ -40,6 +52,17 @@ class FileController extends Controller
      */
     public function download(Request $request, string $path): Response
     {
+        // Prevent path traversal attacks
+        if (str_contains($path, '../') || str_contains($path, '..\\')) {
+            abort(403, 'Invalid path');
+        }
+
+        $realPath = realpath(storage_path('app/'.$path));
+        $basePath = realpath(storage_path('app'));
+        if (! $realPath || ! str_starts_with($realPath, $basePath)) {
+            abort(403, 'Invalid path');
+        }
+
         // Only authenticated users can download files
         if (! auth()->check()) {
             abort(401, 'Unauthorized');
@@ -61,6 +84,17 @@ class FileController extends Controller
      */
     public function show(Request $request, string $path): Response
     {
+        // Prevent path traversal attacks
+        if (str_contains($path, '../') || str_contains($path, '..\\')) {
+            abort(403, 'Invalid path');
+        }
+
+        $realPath = realpath(storage_path('app/'.$path));
+        $basePath = realpath(storage_path('app'));
+        if (! $realPath || ! str_starts_with($realPath, $basePath)) {
+            abort(403, 'Invalid path');
+        }
+
         // Only authenticated users can view files
         if (! auth()->check()) {
             abort(401, 'Unauthorized');
