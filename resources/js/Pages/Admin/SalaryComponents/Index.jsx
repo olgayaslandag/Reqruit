@@ -4,6 +4,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import { formatCurrency, formatPercentage } from '@/Utils/formatters';
+import { format } from 'date-fns';
+import { tr } from 'date-fns/locale';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
 
 export default function Index({ components, filters }) {
     const { props } = usePage();
@@ -42,9 +45,7 @@ export default function Index({ components, filters }) {
         return type === 'allowance' ? 'Ek Ödeme' : 'Kesinti';
     };
 
-    const getStatusBadgeClass = (status) => {
-        return status === 'active' ? 'bg-success' : 'bg-secondary';
-    };
+
 
     // Array kontrolü
     const componentsArray = Array.isArray(components) ? components : (components?.data || []);
@@ -214,12 +215,12 @@ export default function Index({ components, filters }) {
                                                 </span>
                                             </td>
                                             <td className="text-center">
-                                                <span className={`badge ${component.sgk_applicable ? 'bg-success' : 'bg-secondary'}`}>
+                                                 <span className={`badge ${component.sgk_applicable ? 'bg-success' : 'bg-secondary'}`}>
                                                     {component.sgk_applicable ? 'Dahil' : 'Dışı'}
                                                 </span>
                                             </td>
                                             <td className="text-center">
-                                                <span className={`badge ${getStatusBadgeClass(component.status)}`}>
+                                                <span className={`badge ${getStatusBadgeClass(component.status, 'shift')}`}>
                                                     {component.status === 'active' ? 'Aktif' : 'Pasif'}
                                                 </span>
                                             </td>
@@ -296,10 +297,10 @@ export default function Index({ components, filters }) {
                                             <td className="text-center">
                                                 <span className={`badge ${component.is_mandatory ? 'bg-danger' : 'bg-secondary'}`}>
                                                     {component.is_mandatory ? 'Zorunlu' : 'Opsiyonel'}
-                                                </span>
+                                                 </span>
                                             </td>
                                             <td className="text-center">
-                                                <span className={`badge ${getStatusBadgeClass(component.status)}`}>
+                                                <span className={`badge ${getStatusBadgeClass(component.status, 'shift')}`}>
                                                     {component.status === 'active' ? 'Aktif' : 'Pasif'}
                                                 </span>
                                             </td>

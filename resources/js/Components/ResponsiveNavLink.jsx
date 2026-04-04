@@ -1,3 +1,5 @@
+// This is a duplicate of NavLink and exists only for legacy usage
+// Both components were identical - this is maintained for backward compatibility
 import { Link } from '@inertiajs/react';
 
 export default function ResponsiveNavLink({

@@ -4,6 +4,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatDate, formatCurrency } from '@/Utils/formatters';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
 
 export default function Index({ advances, filters, pendingCount, approvedCount, rejectedCount }) {
     const { props } = usePage();
@@ -58,16 +59,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
         });
     };
 
-    const getStatusBadgeClass = (status) => {
-        switch (status) {
-            case 'pending': return 'bg-warning text-dark';
-            case 'approved': return 'bg-success';
-            case 'rejected': return 'bg-danger';
-            case 'cancelled': return 'bg-secondary';
-            case 'paid': return 'bg-primary';
-            default: return 'bg-light text-dark';
-        }
-    };
+
 
     const getStatusLabel = (status) => {
         const labels = {
@@ -249,7 +241,7 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                                 <span className="text-dark">{formatDate(advance.request_date)}</span>
                                             </td>
                                             <td className="text-center">
-                                                <span className={`badge ${getStatusBadgeClass(advance.status)}`}>
+                                                <span className={`badge ${getStatusBadgeClass(advance.status, 'advanced_request')}`}>
                                                     {getStatusLabel(advance.status)}
                                                 </span>
                                             </td>

@@ -2,19 +2,9 @@ import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showSuccess } from '@/Utils/toast';
+import { flattenDepartments } from '@/Utils/commonUtils';
 
 export default function Edit({ department, departments }) {
-    const flattenDepartments = (depts, level = 0) => {
-        let result = [];
-        depts.forEach(dept => {
-            result.push({ ...dept, level });
-            if (dept.children && dept.children.length > 0) {
-                result = result.concat(flattenDepartments(dept.children, level + 1));
-            }
-        });
-        return result;
-    };
-
     const flatDepartments = flattenDepartments(departments || []);
 
     const { data, setData, put, processing, errors } = useForm({
@@ -131,24 +121,24 @@ export default function Edit({ department, departments }) {
                                 <p className="mt-1 small text-danger">{errors.emails}</p>
                             )}
                         </div>
+
+                        <div className="d-flex justify-content-end gap-2">
+                            <a
+                                href={route('admin.departments.index')}
+                                className="btn btn-secondary"
+                            >
+                                İptal
+                            </a>
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="btn btn-primary"
+                            >
+                                Güncelle
+                            </button>
+                        </div>
                     </form>
                 </div>
-            </div>
-
-            <div className="d-flex justify-content-end gap-2">
-                <a
-                    href={route('admin.departments.index')}
-                    className="btn btn-secondary"
-                >
-                    İptal
-                </a>
-                <button
-                    type="submit"
-                    disabled={processing}
-                    className="btn btn-primary"
-                >
-                    Güncelle
-                </button>
             </div>
         </AuthenticatedLayout>
     );

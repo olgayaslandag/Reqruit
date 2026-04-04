@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { formatDate, formatCurrency } from '@/Utils/formatters';
 import { showSuccess, showError, confirmDelete } from '@/Utils/sweetAlert';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
 
 export default function Show({ advance }) {
     const handleApprove = () => {
@@ -42,16 +43,7 @@ export default function Show({ advance }) {
         });
     };
 
-    const getStatusBadgeClass = (status) => {
-        switch (status) {
-            case 'pending': return 'bg-warning text-dark';
-            case 'approved': return 'bg-success';
-            case 'rejected': return 'bg-danger';
-            case 'paid': return 'bg-primary';
-            case 'cancelled': return 'bg-secondary';
-            default: return 'bg-light text-dark';
-        }
-    };
+
 
     const getStatusLabel = (status) => {
         const labels = {
@@ -85,7 +77,7 @@ export default function Show({ advance }) {
                     <div className="card border-primary mb-4">
                         <div className="card-body d-flex justify-content-between align-items-center">
                             <div>
-                                <span className={`badge ${getStatusBadgeClass(advance.status)} fs-6`}>
+                                <span className={`badge ${getStatusBadgeClass(advance.status, 'advanced_request')} fs-6`}>
                                     {getStatusLabel(advance.status)}
                                 </span>
                                 <small className="text-muted ms-3">
@@ -113,7 +105,7 @@ export default function Show({ advance }) {
                                             <tr>
                                                 <td className="text-muted">Durum:</td>
                                                 <td className="text-end">
-                                                    <span className={`badge ${getStatusBadgeClass(advance.status)}`}>
+                                                    <span className={`badge ${getStatusBadgeClass(advance.status, 'advanced_request')}`}>
                                                         {getStatusLabel(advance.status)}
                                                     </span>
                                                 </td>

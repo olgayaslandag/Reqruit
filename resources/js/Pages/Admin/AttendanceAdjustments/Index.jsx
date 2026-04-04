@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { showError, showSuccess } from '@/Utils/sweetAlert';
+import { showError, showSuccess, confirmAction } from '@/Utils/sweetAlert';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
+import { formatDate, formatTime } from '@/Utils/attendanceHelpers';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
+import { confirmAction } from '@/Utils/sweetAlert';
 
 export default function Index({ adjustments, filters = {} }) {
     const { props } = usePage();
@@ -49,19 +54,7 @@ export default function Index({ adjustments, filters = {} }) {
         router.get(route('admin.adjustments.create'));
     };
 
-    // Helper function for badge colors
-    const getTypeBadgeClass = (type) => {
-        switch (type) {
-            case 'clock_in':
-                return 'bg-info';
-            case 'clock_out':
-                return 'bg-success';
-            case 'both':
-                return 'bg-purple text-white';
-            default:
-                return 'bg-warning';
-        }
-    };
+
 
     const getTypeLabel = (type) => {
         switch (type) {
@@ -276,7 +269,7 @@ export default function Index({ adjustments, filters = {} }) {
                                                 </div>
                                             </td>
                                             <td>
-                                                <span className={`badge ${getStatusBadgeClass(adjustment.status)}`}>
+                                                <span className={`badge ${getStatusBadgeClass(adjustment.status, 'advanced_request')}`}>
                                                     {getStatusLabel(adjustment.status)}
                                                 </span>
                                             </td>

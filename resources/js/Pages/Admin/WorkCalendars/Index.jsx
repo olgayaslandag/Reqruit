@@ -3,6 +3,9 @@ import { router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
+import { formatDate } from '@/Utils/attendanceHelpers';
+import { getWorkCalendarStatusBadgeClass } from '@/Utils/commonUtils';
+
 
 export default function Index({ calendars, filters = {} }) {
     const { props } = usePage();
@@ -41,16 +44,7 @@ export default function Index({ calendars, filters = {} }) {
         });
     };
 
-    // Helper functions
-    const getStatusBadgeClass = (isActive) => {
-        return isActive === true || isActive === 1
-            ? 'bg-success'
-            : 'bg-secondary';
-    };
 
-    const getStatusLabel = (isActive) => {
-        return isActive === true || isActive === 1 ? 'Aktif' : 'Pasif';
-    };
 
     // İstatistikler
     const stats = {
@@ -219,8 +213,8 @@ export default function Index({ calendars, filters = {} }) {
                                                 </span>
                                             </td>
                                             <td className="text-center">
-                                                <span className={`badge ${getStatusBadgeClass(calendar.is_active)}`}>
-                                                    {getStatusLabel(calendar.is_active)}
+                                                <span className={`badge ${getWorkCalendarStatusBadgeClass(calendar.is_active)}`}>
+                                                    {calendar.is_active ? 'Aktif' : 'Pasif'}
                                                 </span>
                                             </td>
                                             <td className="text-end">

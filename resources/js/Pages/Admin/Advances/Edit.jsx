@@ -3,6 +3,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatDate } from '@/Utils/formatters';
+import { getStatusBadgeClass } from '@/Utils/commonUtils';
+import { format } from 'date-fns';
 
 export default function Edit({ advance }) {
     const { data, setData, put, processing, errors, recentlySuccessful } = useForm({
@@ -26,16 +28,7 @@ export default function Edit({ advance }) {
         });
     };
 
-    const getStatusBadgeClass = (status) => {
-        switch (status) {
-            case 'pending': return 'bg-warning text-dark';
-            case 'approved': return 'bg-success';
-            case 'rejected': return 'bg-danger';
-            case 'paid': return 'bg-primary';
-            case 'cancelled': return 'bg-secondary';
-            default: return 'bg-light text-dark';
-        }
-    };
+
 
     const getStatusLabel = (status) => {
         const labels = {
@@ -71,7 +64,7 @@ export default function Edit({ advance }) {
                             <h5 className="mb-0 fw-bold">
                                 <i className="ti ti-hand-finger me-2"></i> Talep Bilgileri
                             </h5>
-                            <span className={`badge ${getStatusBadgeClass(advance.status)}`}>
+                            <span className={`badge ${getStatusBadgeClass(advance.status, 'advanced_request')}`}>
                                 {getStatusLabel(advance.status)}
                             </span>
                         </div>

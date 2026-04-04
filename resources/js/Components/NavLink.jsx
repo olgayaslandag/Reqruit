@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import NavBase from './NavBase';
 
 export default function NavLink({
     active = false,
@@ -7,11 +7,12 @@ export default function NavLink({
     ...props
 }) {
     return (
-        <Link
+        <NavBase
             {...props}
-            className={`nav-link ${active ? 'active' : ''} ${className}`}
+            active={active}
+            className={className}
         >
             {children}
-        </Link>
+        </NavBase>
     );
 }

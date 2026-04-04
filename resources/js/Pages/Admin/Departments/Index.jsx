@@ -2,6 +2,7 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
+import { flattenDepartments } from '@/Utils/commonUtils';
 
 export default function Index({ departments }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,17 +13,6 @@ export default function Index({ departments }) {
         emails: [],
         parent_id: '',
     });
-
-    const flattenDepartments = (depts, level = 0) => {
-        let result = [];
-        depts.forEach(dept => {
-            result.push({ ...dept, level });
-            if (dept.children && dept.children.length > 0) {
-                result = result.concat(flattenDepartments(dept.children, level + 1));
-            }
-        });
-        return result;
-    };
 
     const flatDepartments = flattenDepartments(departments || []);
 
