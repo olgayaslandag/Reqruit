@@ -8,6 +8,7 @@ namespace Database\Seeders;
 use App\Enums\UserRoleEnum;
 use App\Enums\UserStatusEnum;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -16,6 +17,7 @@ class UserSeeder extends Seeder
     {
         $roles = UserRoleEnum::cases();
         $statuses = UserStatusEnum::cases();
+        $hashedPassword = Hash::make('123123123'); // Pre-compute once
 
         $firstNames = [
             'Ahmet', 'Ayşe', 'Mehmet', 'Fatma', 'Ali', 'Ayşe', 'Burak', 'Cem', 'Deniz', 'Elif',
@@ -54,7 +56,7 @@ class UserSeeder extends Seeder
             $users[] = [
                 'name' => "$firstName $lastName",
                 'email' => strtolower("$firstName.$lastName".($i > 0 ? $i : '')).'@company.com',
-                'password' => Hash::make('123123123'),
+                'password' => $hashedPassword,
                 'rank_id' => UserRoleEnum::ADMIN->value,
                 'status_id' => UserStatusEnum::ACTIVE->value,
                 'email_verified_at' => $now,
@@ -71,7 +73,7 @@ class UserSeeder extends Seeder
             $users[] = [
                 'name' => "$firstName $lastName",
                 'email' => strtolower("ik.$firstName.$lastName".($i > 0 ? $i : '')).'@company.com',
-                'password' => Hash::make('123123123'),
+                'password' => $hashedPassword,
                 'rank_id' => UserRoleEnum::IK_MANAGER->value,
                 'status_id' => UserStatusEnum::ACTIVE->value,
                 'email_verified_at' => $now,
@@ -88,7 +90,7 @@ class UserSeeder extends Seeder
             $users[] = [
                 'name' => "$firstName $lastName",
                 'email' => strtolower("recruiter.$firstName.$lastName".($i > 0 ? $i : '')).'@company.com',
-                'password' => Hash::make('123123123'),
+                'password' => $hashedPassword,
                 'rank_id' => UserRoleEnum::RECRUITER->value,
                 'status_id' => $status->value,
                 'email_verified_at' => $now,
@@ -104,7 +106,7 @@ class UserSeeder extends Seeder
             $users[] = [
                 'name' => "$firstName $lastName",
                 'email' => strtolower("dh.$firstName.$lastName".($i > 0 ? $i : '')).'@company.com',
-                'password' => Hash::make('123123123'),
+                'password' => $hashedPassword,
                 'rank_id' => UserRoleEnum::DEPARTMENT_HEAD->value,
                 'status_id' => UserStatusEnum::ACTIVE->value,
                 'email_verified_at' => $now,
@@ -121,7 +123,7 @@ class UserSeeder extends Seeder
             $users[] = [
                 'name' => "$firstName $lastName",
                 'email' => strtolower("observer.$firstName.$lastName".($i > 0 ? $i : '')).'@company.com',
-                'password' => Hash::make('123123123'),
+                'password' => $hashedPassword,
                 'rank_id' => UserRoleEnum::OBSERVER->value,
                 'status_id' => $status->value,
                 'email_verified_at' => $now,
@@ -132,7 +134,7 @@ class UserSeeder extends Seeder
 
         // Bulk insert
         foreach (array_chunk($users, 50) as $chunk) {
-            \DB::table('users')->insertOrIgnore($chunk);
+            DB::table('users')->insertOrIgnore($chunk);
         }
 
         $this->command->info('Created '.count($users).' users');

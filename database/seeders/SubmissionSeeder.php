@@ -7,6 +7,7 @@ namespace Database\Seeders;
 
 use App\Models\Submission;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class SubmissionSeeder extends Seeder
@@ -18,7 +19,7 @@ class SubmissionSeeder extends Seeder
 
     private function seedSubmissions(): void
     {
-        $forms = \DB::table('forms')->pluck('id')->toArray();
+        $forms = DB::table('forms')->pluck('id')->toArray();
 
         if (empty($forms)) {
             $this->command->warn('No forms found. Run ImportAllDataSeeder first.');
@@ -63,7 +64,7 @@ class SubmissionSeeder extends Seeder
 
         // Bulk insert
         foreach (array_chunk($submissionsData, 50) as $chunk) {
-            \DB::table('submissions')->insert($chunk);
+            DB::table('submissions')->insert($chunk);
         }
 
         $this->command->info('Created '.count($submissionsData).' submissions');
@@ -77,10 +78,10 @@ class SubmissionSeeder extends Seeder
 
     private function seedSubmissionDetails(): void
     {
-        $submissions = \DB::table('submissions')->get();
+        $submissions = DB::table('submissions')->get();
 
         // Clear existing details to avoid duplicates
-        \DB::table('submission_details')->truncate();
+        DB::table('submission_details')->truncate();
 
         $detailsData = [];
 
@@ -101,7 +102,7 @@ class SubmissionSeeder extends Seeder
         $lastNames = ['Yılmaz', 'Demir', 'Kaya', 'Şahin', 'Öztürk', 'Çelik', 'Erdoğan', 'Kurt', 'Özkan', 'Aydın'];
 
         $fieldGenerators = [
-            'tc_kimlik' => fn () => str_pad(rand(10000000000, 99999999999), 11, '0', STR_PAD_LEFT),
+            'tc_kimlik' => fn () => str_pad((string) rand(10000000000, 99999999999), 11, '0', STR_PAD_LEFT),
             'telefon' => fn () => '+90 5'.rand(30, 39).' '.rand(100, 999).' '.rand(1000, 9999),
             'eposta' => fn () => strtolower($firstNames[array_rand($firstNames)].'.'.$lastNames[array_rand($lastNames)].'@mail.com'),
             'e-posta' => fn () => strtolower($firstNames[array_rand($firstNames)].'.'.$lastNames[array_rand($lastNames)].'@mail.com'),
@@ -120,7 +121,7 @@ class SubmissionSeeder extends Seeder
             'surucu_belgesi' => fn () => ['B Sınıfı', 'A Sınıfı', 'Yok'][array_rand(['B Sınıfı', 'A Sınıfı', 'Yok'])],
             'dogum_yeri' => fn () => ['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya'][array_rand(['İstanbul', 'Ankara', 'İzmir', 'Bursa', 'Antalya'])],
             'egitim_durumu' => fn () => ['Lise', 'Ön Lisans', 'Lisans', 'Yüksek Lisans', 'Doktora'][array_rand(['Lise', 'Ön Lisans', 'Lisans', 'Yüksek Lisans', 'Doktora'])],
-            'mezuniyet_derecesi' => fn () => (string) rand(2.0, 4.0),
+            'mezuniyet_derecesi' => fn () => (string) rand(2, 4),
             'yabanci_dil' => fn () => ['İngilizce', 'Almanca', 'Fransızca', 'İspanyolca'][array_rand(['İngilizce', 'Almanca', 'Fransızca', 'İspanyolca'])],
             'ise_baslayabileceginiz_tarih' => fn () => now()->addDays(rand(1, 30))->format('Y-m-d'),
             'maas_beklentisi' => fn () => (string) (rand(15, 60) * 1000),
@@ -185,7 +186,7 @@ class SubmissionSeeder extends Seeder
         }
 
         foreach (array_chunk($detailsData, 50) as $chunk) {
-            \DB::table('submission_details')->insert($chunk);
+            DB::table('submission_details')->insert($chunk);
         }
 
         $this->command->info('Created '.count($detailsData).' submission details');
@@ -193,8 +194,8 @@ class SubmissionSeeder extends Seeder
 
     private function seedSubmissionComments(): void
     {
-        $submissions = \DB::table('submissions')->get();
-        $users = \DB::table('users')->pluck('id')->toArray();
+        $submissions = DB::table('submissions')->get();
+        $users = DB::table('users')->pluck('id')->toArray();
 
         if (empty($users)) {
             $users = [1];
@@ -236,7 +237,7 @@ class SubmissionSeeder extends Seeder
         }
 
         foreach (array_chunk($commentsData, 50) as $chunk) {
-            \DB::table('submission_comments')->insert($chunk);
+            DB::table('submission_comments')->insert($chunk);
         }
 
         $this->command->info('Created '.count($commentsData).' submission comments');

@@ -6,8 +6,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Department;
-use App\Models\Employee;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeSeeder extends Seeder
 {
@@ -126,7 +126,7 @@ class EmployeeSeeder extends Seeder
             $childrenCount = $maritalStatus === 'married' ? rand(0, 4) : 0;
 
             $employeeData[] = [
-                'identity_no' => str_pad(rand(10000000000, 99999999999), 11, '0', STR_PAD_LEFT),
+                'identity_no' => str_pad((string) rand(10000000000, 99999999999), 11, '0', STR_PAD_LEFT),
                 'first_name' => $firstName,
                 'last_name' => $lastName,
                 'birth_date' => $birthDate,
@@ -147,11 +147,11 @@ class EmployeeSeeder extends Seeder
 
         // Bulk insert employees
         foreach (array_chunk($employeeData, 50) as $chunk) {
-            \DB::table('employees')->insert($chunk);
+            DB::table('employees')->insert($chunk);
         }
 
         // Get created employees for relationship seeding
-        $allEmployees = \DB::table('employees')->get();
+        $allEmployees = DB::table('employees')->get();
 
         // Create some manager relationships
         $deptEmployees = collect($allEmployees)->groupBy('department_id')->toArray();
@@ -163,7 +163,7 @@ class EmployeeSeeder extends Seeder
                 $subordinates = array_slice($employees, 1, min(5, count($employees) - 1));
 
                 foreach ($subordinates as $emp) {
-                    \DB::table('employees')
+                    DB::table('employees')
                         ->where('id', $emp->id)
                         ->update(['manager_id' => $manager->id]);
                 }
@@ -216,7 +216,7 @@ class EmployeeSeeder extends Seeder
         }
 
         foreach (array_chunk($educationData, 50) as $chunk) {
-            \DB::table('employee_education')->insert($chunk);
+            DB::table('employee_education')->insert($chunk);
         }
 
         $this->command->info('Created '.count($educationData).' education records');
@@ -260,7 +260,7 @@ class EmployeeSeeder extends Seeder
             }
         }
 
-        \DB::table('employee_certificates')->insert($certificateData);
+        DB::table('employee_certificates')->insert($certificateData);
 
         $this->command->info('Created '.count($certificateData).' certificates');
     }
@@ -306,7 +306,7 @@ class EmployeeSeeder extends Seeder
             }
         }
 
-        \DB::table('employee_position_history')->insert($positionHistoryData);
+        DB::table('employee_position_history')->insert($positionHistoryData);
 
         $this->command->info('Created '.count($positionHistoryData).' position history records');
     }

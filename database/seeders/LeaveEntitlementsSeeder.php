@@ -50,9 +50,9 @@ class LeaveEntitlementsSeeder extends Seeder
                     // Calculate used days (some percentage of entitled days)
                     $usedDays = 0;
                     if ($year == $currentYear && rand(1, 10) <= 3) { // 30% chance to have used some days
-                        $usedDays = min($entitledDays, rand(0, floor($entitledDays * 0.5)));
+                        $usedDays = min($entitledDays, rand(0, (int) floor($entitledDays * 0.5)));
                     } elseif ($year < $currentYear && rand(1, 10) <= 7) { // 70% chance to have used some days in previous year
-                        $usedDays = min($entitledDays, rand(0, floor($entitledDays * 0.8)));
+                        $usedDays = min($entitledDays, rand(0, (int) floor($entitledDays * 0.8)));
                     }
 
                     $entitlements[] = [
