@@ -6,69 +6,73 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
     const [openMenus, setOpenMenus] = useState({});
 
-    // isActive must be defined BEFORE menuGroups and useEffect (arrow functions don't hoist)
-    const isActive = (href) => currentRoute === href || currentRoute.startsWith(href + '?');
-
+    // Menu group'ları - href'ler relative path olarak tanımlanıyor (usePage().url ile karşılaştırılabilir olması için)
     const menuGroups = useMemo(() => [
         {
             title: 'Ana Sayfa',
             icon: 'home',
             items: [
-                { title: 'Dashboard', href: window.route('dashboard') },
+                { title: 'Dashboard', href: '/dashboard' },
             ],
         },
         {
             title: 'İnsan Kaynakları',
             icon: 'users',
             items: [
-                { title: 'Başvurular', href: window.route('admin.submissions.index') },
-                { title: 'Formlar', href: window.route('admin.forms.index') },
-                { title: 'Departmanlar', href: window.route('admin.departments.index') },
-                { title: 'Çalışanlar', href: window.route('admin.employees.index') },
-                { title: 'Kullanıcılar', href: window.route('admin.users.index') },
+                { title: 'Başvurular', href: '/admin/submissions' },
+                { title: 'Formlar', href: '/admin/forms' },
+                { title: 'Departmanlar', href: '/admin/departments' },
+                { title: 'Çalışanlar', href: '/admin/employees' },
+                { title: 'Kullanıcılar', href: '/admin/users' },
             ],
         },
         {
             title: 'Zaman Yönetimi',
             icon: 'clock',
             items: [
-                { title: 'Devam Takibi', href: window.route('admin.attendance.index') },
-                { title: 'Vardiyalar', href: window.route('admin.shifts.index') },
-                { title: 'Vardiya Takvimi', href: window.route('admin.shifts.schedules') },
-                { title: 'Düzeltme Talepleri', href: window.route('admin.adjustments.index') },
-                { title: 'Çalışma Takvimleri', href: window.route('admin.work-calendars.index') },
-                { title: 'Resmi Tatiller', href: window.route('admin.holidays.index') },
+                { title: 'Devam Takibi', href: '/admin/attendance' },
+                { title: 'Vardiyalar', href: '/admin/shifts' },
+                { title: 'Vardiya Takvimi', href: route('admin.shifts.schedules').replace(window.location.origin, '') },
+                { title: 'Düzeltme Talepleri', href: '/admin/adjustments' },
+                { title: 'Çalışma Takvimleri', href: '/admin/work-calendars' },
+                { title: 'Resmi Tatiller', href: '/admin/holidays' },
             ],
         },
         {
             title: 'İzin Yönetimi',
             icon: 'calendar-event',
             items: [
-                { title: 'İzin Talepleri', href: window.route('admin.leave.requests.index') },
-                { title: 'İzin Türleri', href: window.route('admin.leave.types.index') },
-                { title: 'İzin Hakları', href: window.route('admin.leave.entitlements.index') },
+                { title: 'İzin Talepleri', href: '/admin/leave/requests' },
+                { title: 'İzin Türleri', href: '/admin/leave/types' },
+                { title: 'İzin Hakları', href: '/admin/leave/entitlements' },
             ],
         },
         {
             title: 'Bordro ve Maaş',
             icon: 'cash-banknote',
             items: [
-                { title: 'Bordrolar', href: window.route('admin.payrolls.index') },
-                { title: 'Maaş Bileşenleri', href: window.route('admin.salary-components.index') },
-                { title: 'Avans Talepleri', href: window.route('admin.advances.index') },
+                { title: 'Bordrolar', href: '/admin/payrolls' },
+                { title: 'Maaş Bileşenleri', href: '/admin/salary-components' },
+                { title: 'Avans Talepleri', href: '/admin/advances' },
             ],
         },
         {
             title: 'Raporlar',
             icon: 'chart-bar',
             items: [
-                { title: 'Bordro Raporları', href: window.route('admin.payroll-reports.index') },
-                { title: 'Devam Raporları', href: window.route('admin.attendance-reports.index') },
+                { title: 'Bordro Raporları', href: '/admin/payroll-reports' },
+                { title: 'Devam Raporları', href: '/admin/attendance-reports' },
             ],
         },
     ], []);
 
-    // Auto-open menu that contains active route
+    // isActive: currentRoute ile href'i karşılaştırır
+    const isActive = (href) => currentRoute === href || currentRoute.startsWith(href + '?') || currentRoute.startsWith(href + '/');
+
+    // İlk mount kontrolü için ref
+    const isInitialized = React.useRef(false);
+
+    // Aktif menüyü otomatik aç
     useEffect(() => {
         const initialOpen = {};
         menuGroups.forEach((group) => {
@@ -77,7 +81,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 initialOpen[group.title] = true;
             }
         });
-        setOpenMenus(initialOpen);
+
+        // Sadece ilk mount'ta veya route değiştiğinde çalış
+        if (!isInitialized.current || currentRoute !== usePage().url) {
+            setOpenMenus((prev) => ({ ...prev, ...initialOpen }));
+            isInitialized.current = true;
+        }
     }, [currentRoute]);
 
     const toggleMenu = (title) => {
@@ -91,7 +100,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         <nav className={`pc-sidebar ${sidebarOpen ? '' : 'pc-sidebar-hide'}`}>
             <div className="navbar-wrapper">
                 <div className="m-header">
-                    <Link href={window.route('dashboard')}>
+                    <Link href="/dashboard">
                         <span className="font-size-1-3rem font-bold text-transform-uppercase">
                             {usePage().props.appName || 'Reqruit'}
                         </span>
