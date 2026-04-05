@@ -48,9 +48,9 @@ export default function Show({ periods }) {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {periods.map((period, index) => (
-                                        <tr key={index} className="hover:table-light">
+                                 <tbody className="bg-white divide-y divide-gray-200">
+                                     {periods.map(period => (
+                                         <tr key={period.id} className="hover:table-light">
                                             <td className="px-6 py-4 text-nowrap">
                                                 <div className="fs-sm fw-medium text-dark">
                                                     {period.name}

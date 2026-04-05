@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreShiftRequest;
 use App\Http\Requests\UpdateShiftRequest;
+use App\Interfaces\IShiftRepository;
 use App\Models\Shift;
 use App\Services\ShiftService;
 use Illuminate\Http\Request;
@@ -13,21 +15,24 @@ class ShiftController extends Controller
 {
     protected ShiftService $shiftService;
 
-    public function __construct(ShiftService $shiftService)
+    protected IShiftRepository $shiftRepository;
+
+    public function __construct(ShiftService $shiftService, IShiftRepository $shiftRepository)
     {
         $this->shiftService = $shiftService;
+        $this->shiftRepository = $shiftRepository;
         $this->authorizeResource(\App\Models\Shift::class, 'shift');
     }
 
     public function index(Request $request)
     {
-        $query = Shift::query();
+        $filters = [];
 
         if ($request->has('search')) {
-            $query->where('name', 'like', '%'.$request->search.'%');
+            $filters['search'] = $request->search;
         }
 
-        $shifts = $query->paginate(15);
+        $shifts = $this->shiftRepository->paginate($filters, [], 15);
 
         return inertia('Admin/Shifts/Index', [
             'shifts' => $shifts,

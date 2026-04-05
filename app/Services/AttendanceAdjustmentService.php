@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Enums\AdjustmentStatusEnum;
@@ -127,31 +128,10 @@ class AttendanceAdjustmentService
     {
         $requester = Auth::user();
         $employee = $this->employeeService->getById($data['employee_id']);
-        
-        if (!$employee) {
+
+        if (! $employee) {
             throw new \Exception('Employee not found.');
         }
-
-        // Check if there's already a pending request for this employee and date
-        $existingAdjustment = AttendanceAdjustment::where([
-            'employee_id' => $data['employee_id'],
-            'adjustment_date' => $data['adjustment_date'],
-            'status' => AdjustmentStatusEnum::PENDING,
-        ])->exists();
-
-        if ($existingAdjustment) {
-            throw new \Exception('There is already a pending adjustment request for this employee on the selected date.');
-        }
-
-        // Add additional data
-        $requestAdjustmentData = array_merge($data, [
-            'request_date' => now(),
-            'status' => AdjustmentStatusEnum::PENDING,
-            'requested_by' => Auth::id(),
-        ]);
-
-        return $this->attendanceAdjustmentRepository->create($requestAdjustmentData);
-    }
 
         // Check if there's already a pending request for this employee and date
         $existingAdjustment = AttendanceAdjustment::where([

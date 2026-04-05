@@ -184,7 +184,7 @@ export default function Show({ component }) {
                             </h6>
                         </div>
                         <div className="card-body p-0">
-                            <pre className="bg-light p-3 m-0 rounded" style={{ fontSize: '0.75rem' }}>
+                            <pre className="bg-light p-3 m-0 rounded code-font-small">
                                 {JSON.stringify(component, null, 2)}
                             </pre>
                         </div>

@@ -142,7 +142,7 @@ export default function Overtime({ overtimeReport = {}, filters = {}, employees 
                         <h5 className="mb-0"><i className="ti ti-chart-bar me-2"></i>Aylık Dağılım</h5>
                     </div>
                     <div className="card-body">
-                        <div style={{ height: '300px' }}>
+                        <div className="graph-height">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={overtimeData}>
                                     <CartesianGrid strokeDasharray="3 3" />

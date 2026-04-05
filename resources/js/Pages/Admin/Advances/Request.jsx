@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
-import { router, useForm, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { router, useForm, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatCurrency } from '@/Utils/formatters';
 
 export default function Request({ employee, salaryInfo }) {
-    const { props } = usePage();
-    
     const [calculation, setCalculation] = useState(salaryInfo);
     
     const { data, setData, post, processing, errors } = useForm({

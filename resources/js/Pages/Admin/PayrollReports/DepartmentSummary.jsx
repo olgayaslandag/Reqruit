@@ -81,7 +81,7 @@ export default function DepartmentSummary({ summary, period }) {
                                         <span className="fw-medium">{item.department?.name || 'Tanımsız'}</span>
                                         <span className="text-muted">{formatCurrency(item.total_gross)}</span>
                                     </div>
-                                    <div className="progress" style={{ height: '20px' }}>
+                                    <div className="progress payrall-progress-height">
                                         <div className="progress-bar bg-info" style={{ width: `${percent}%` }}></div>
                                     </div>
                                 </div>

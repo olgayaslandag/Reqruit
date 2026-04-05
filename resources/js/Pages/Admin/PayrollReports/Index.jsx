@@ -131,7 +131,7 @@ export default function Index({ periods, filters }) {
                             <div className="card-header">
                                 <h6 className="mb-0">Dönemler</h6>
                             </div>
-                            <div className="card-body p-0" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                            <div className="card-body p-0 payroll-report-container">
                                 {periods && periods.length > 0 ? (
                                     <div className="list-group list-group-flush">
                                         {periods.map((period) => (

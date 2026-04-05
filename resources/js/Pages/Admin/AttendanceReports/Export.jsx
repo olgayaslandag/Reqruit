@@ -1,13 +1,10 @@
 import { useState, useRef } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { formatDateTime } from '@/Utils/formatters.jsx';
 
 export default function Export() {
-    const { props } = usePage();
-    const flash = props.flash;
-    
     const [exportParams, setExportParams] = useState({
         report_type: 'daily',
         start_date: new Date().toISOString().split('T')[0],
@@ -219,8 +216,8 @@ export default function Export() {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {props.exportHistory.map((historyItem, index) => (
-                                            <tr key={index} className="hover:table-light">
+                                         {props.exportHistory.map(historyItem => (
+                                             <tr key={historyItem.id} className="hover:table-light">
                                                 <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                     {historyItem.filename}
                                                 </td>

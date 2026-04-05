@@ -383,7 +383,7 @@ export default function Show({ period, employees, salaryComponents }) {
                         <div>
                             <h6 className="fw-bold mb-3">Bordro Detayları</h6>
                             <div className="bg-light p-3 rounded">
-                                <pre className="mb-0" style={{ fontSize: '0.875rem' }}>
+                                <pre className="mb-0 text-small">
                                     {JSON.stringify(period, null, 2)}
                                 </pre>
                             </div>

@@ -66,7 +66,7 @@ export default function Compare({ comparison }) {
                                             <span className="fw-medium">{item.period?.name}</span>
                                             <span className="text-muted">{formatCurrency(item.total_gross)}</span>
                                         </div>
-                                        <div className="progress" style={{ height: '20px' }}>
+                                        <div className="progress payrall-progress-height">
                                             <div className="progress-bar" style={{ width: `${percent}%` }}></div>
                                         </div>
                                     </div>

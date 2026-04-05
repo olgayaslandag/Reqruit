@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Enums\AdvanceStatusEnum;
@@ -129,6 +130,19 @@ class AdvanceRepository extends BaseRepository implements IAdvanceRepository
         ]);
 
         return $advance->fresh();
+    }
+
+    /**
+     * Get status counts using GROUP BY for better performance.
+     * Returns array with status as key and count as value.
+     */
+    public function getStatusCounts(): array
+    {
+        return $this->model
+            ->select('status', \DB::raw('COUNT(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
     }
 
     protected function applyFilters($query, array $filters): void

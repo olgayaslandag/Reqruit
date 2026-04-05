@@ -303,10 +303,10 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                             </h6>
                         </div>
                         <div className="card-body">
-                            {approvalHistory?.length > 0 ? (
+                             {approvalHistory?.length > 0 ? (
                                 <div className="list-group list-group-flush">
-                                    {approvalHistory.map((item, index) => (
-                                        <div key={index} className="list-group-item px-0">
+                                    {approvalHistory.map(item => (
+                                        <div key={item.id} className="list-group-item px-0">
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <span className="fw-medium">{item.approver_name}</span>
                                                 <span className={`badge ${item.action === 'approved' ? 'bg-success' : 'bg-danger'}`}>
@@ -337,7 +337,7 @@ export default function Approve({ period, employees, approvalHistory, approvers 
                             <div className="list-group list-group-flush">
                                 {approvers.map((approver, index) => (
                                     <div key={approver.id} className="list-group-item px-0 d-flex align-items-center">
-                                        <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style={{ width: '32px', height: '32px' }}>
+                                        <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 payroll-approver-icon">
                                             <small className="fw-bold">{index + 1}</small>
                                         </div>
                                         <div className="flex-grow-1">

@@ -1,7 +1,7 @@
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import React from 'react';
 
-export default function Pagination({ meta, baseUrl }) {
+export default function Pagination({ meta, baseUrl, only = [] }) {
     if (!meta) return null;
 
     const getPageNumbers = () => {
@@ -54,6 +54,12 @@ export default function Pagination({ meta, baseUrl }) {
         return '#';
     };
 
+    const handlePageClick = (page) => {
+        if (typeof page === 'number' && only.length > 0) {
+            router.get(getPageUrl(page), {}, { only });
+        }
+    };
+
     const pageNumbers = getPageNumbers();
 
     return (
@@ -71,21 +77,37 @@ export default function Pagination({ meta, baseUrl }) {
                                 href={getPageUrl(meta.current_page - 1)}
                                 className="page-link"
                                 tabIndex={meta.current_page === 1 ? -1 : undefined}
+                                aria-label="Önceki sayfa"
+                                onClick={(e) => {
+                                    if (only.length > 0 && meta.current_page > 1) {
+                                        e.preventDefault();
+                                        router.get(getPageUrl(meta.current_page - 1), {}, { only });
+                                    }
+                                }}
                             >
-                                <i className="ti ti-chevron-left"></i>
+                                <i className="ti ti-chevron-left" aria-hidden="true"></i>
                             </Link>
                         </li>
 
                         {/* Sayfa numaraları */}
-                        {pageNumbers.map((page, index) => (
+                        {pageNumbers.map((page) => (
                             <li
-                                key={index}
+                                key={typeof page === 'number' ? `page-${page}` : 'ellipsis'}
                                 className={`page-item ${typeof page === 'number' && page === meta.current_page ? 'active' : ''} ${page === '...' ? 'disabled' : ''}`}
                             >
                                 {page === '...' ? (
                                     <span className="page-link">...</span>
                                 ) : (
-                                    <Link href={getPageUrl(page)} className="page-link">
+                                    <Link
+                                        href={getPageUrl(page)}
+                                        className="page-link"
+                                        onClick={(e) => {
+                                            if (only.length > 0) {
+                                                e.preventDefault();
+                                                handlePageClick(page);
+                                            }
+                                        }}
+                                    >
                                         {page}
                                     </Link>
                                 )}
@@ -98,8 +120,15 @@ export default function Pagination({ meta, baseUrl }) {
                                 href={getPageUrl(meta.current_page + 1)}
                                 className="page-link"
                                 tabIndex={meta.current_page === meta.last_page ? -1 : undefined}
+                                aria-label="Sonraki sayfa"
+                                onClick={(e) => {
+                                    if (only.length > 0 && meta.current_page < meta.last_page) {
+                                        e.preventDefault();
+                                        router.get(getPageUrl(meta.current_page + 1), {}, { only });
+                                    }
+                                }}
                             >
-                                <i className="ti ti-chevron-right"></i>
+                                <i className="ti ti-chevron-right" aria-hidden="true"></i>
                             </Link>
                         </li>
                     </ul>

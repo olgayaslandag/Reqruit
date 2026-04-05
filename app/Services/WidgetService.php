@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Interfaces\IFormRepository;
@@ -92,38 +93,40 @@ class WidgetService
 
     public function handleSubmission(Form $form, array $data, array $files = []): mixed
     {
-        $uploadedFiles = [];
-        foreach ($files as $key => $file) {
-            if ($file && $file->isValid()) {
-                $path = $file->store('submissions/'.$form->id, 'local');
-                $uploadedFiles[$key] = $path;
-            }
-        }
-
-        $data = array_merge($data, $uploadedFiles);
-
-        $details = [];
-        $labels = $data['labels'] ?? [];
-
-        foreach ($data as $key => $value) {
-            if (in_array($key, ['_token', 'labels'])) {
-                continue;
+        return \DB::transaction(function () use ($form, $data, $files) {
+            $uploadedFiles = [];
+            foreach ($files as $key => $file) {
+                if ($file && $file->isValid()) {
+                    $path = $file->store('submissions/'.$form->id, 'local');
+                    $uploadedFiles[$key] = $path;
+                }
             }
 
-            $details[] = [
-                'field_name' => $key,
-                'field_label' => $labels[$key] ?? $key,
-                'field_value' => is_array($value) ? implode(', ', $value) : $value,
-            ];
-        }
+            $data = array_merge($data, $uploadedFiles);
 
-        $submission = $this->submissionRepository->create([
-            'form_id' => $form->id,
-            'details' => $details,
-        ]);
+            $details = [];
+            $labels = $data['labels'] ?? [];
 
-        SendSubmissionNotification::dispatch($form, $submission);
+            foreach ($data as $key => $value) {
+                if (in_array($key, ['_token', 'labels'])) {
+                    continue;
+                }
 
-        return $submission;
+                $details[] = [
+                    'field_name' => $key,
+                    'field_label' => $labels[$key] ?? $key,
+                    'field_value' => is_array($value) ? implode(', ', $value) : $value,
+                ];
+            }
+
+            $submission = $this->submissionRepository->create([
+                'form_id' => $form->id,
+                'details' => $details,
+            ]);
+
+            SendSubmissionNotification::dispatch($form, $submission);
+
+            return $submission;
+        });
     }
 }

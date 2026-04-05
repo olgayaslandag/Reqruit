@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import Sidebar from '@/Components/Sidebar';
 
 export default function AuthenticatedLayout({ header, children, pageHeader }) {
     const user = usePage().props.auth.user;
     const appName = usePage().props.appName || 'Reqruit';
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const currentRoute = usePage().url;
     const [toasts, setToasts] = useState([]);
     const toastIdRef = useRef(0);
 
@@ -26,13 +26,11 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
         setToasts((prev) => prev.filter((t) => t.id !== id));
     };
 
-    const isActive = (href) => currentRoute === href || currentRoute.startsWith(href + '?');
-
     const renderBreadcrumb = () => {
         // pageHeader.breadcrumbs varsa onu kullan
         if (pageHeader?.breadcrumbs && (pageHeader.breadcrumbs || []).length > 0) {
-            return (pageHeader.breadcrumbs || []).map((crumb, index) => (
-                <li key={index} className="breadcrumb-item">
+            return (pageHeader.breadcrumbs || []).map((crumb) => (
+                <li key={crumb.label} className="breadcrumb-item">
                     {crumb.url && crumb.url !== '#' ? (
                         <Link href={crumb.url}>{crumb.label}</Link>
                     ) : (
@@ -86,37 +84,39 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
 
                 {/* Geri Butonu */}
                 {pageHeader.backUrl && (
-                    <Link
-                        href={pageHeader.backUrl}
-                        className="btn btn-light-secondary pt-2 me-2"
-                    >
-                        <i className="ti ti-arrow-left"></i>
-                        <span style={{ position: "relative", top: "-1.5px" }}>Geri</span>
-                    </Link>
+                                <Link
+                                    href={pageHeader.backUrl}
+                                    className="btn btn-light-secondary pt-2 me-2"
+                                    aria-label="Geri"
+                                >
+                                    <i className="ti ti-arrow-left" aria-hidden="true"></i>
+                                <span className="relative-neg-top-1px">Geri</span>
+                            </Link>
                 )}
 
                 {/* Excel Butonu */}
                 {pageHeader.exportUrl && (
-                    <Link
-                        href={pageHeader.exportUrl}
-                        className="btn btn-outline-success btn-sm me-2"
-                        title="Excel İndir"
-                    >
-                        <i className="ti ti-download"></i>
-                    </Link>
+                        <Link
+                            href={pageHeader.exportUrl}
+                            className="btn btn-outline-success btn-sm me-2"
+                            title="Excel İndir"
+                            aria-label="Excel İndir"
+                        >
+                            <i className="ti ti-download" aria-hidden="true"></i>
+                        </Link>
                 )}
 
                 {/* Filtre Butonu */}
                 {pageHeader.filterCollapse && (
                     <button
                         type="button"
-                        className="btn btn-outline-primary btn-sm me-2"
+                        className="btn btn-outline-primary btn-sm me-2 margin-top-2px"
                         data-bs-toggle="collapse"
                         data-bs-target="#filterCollapse"
                         aria-expanded="false"
-                        style={{ marginTop: "2px" }}
+                        aria-label="Filtre panelini aç/kapat"
                     >
-                        <i className="ti ti-filter"></i>
+                        <i className="ti ti-filter" aria-hidden="true"></i>
                     </button>
                 )}
 
@@ -125,9 +125,10 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                     <Link
                         href={pageHeader.newUrl}
                         className="btn btn-primary pt-2"
+                        aria-label="Yeni oluştur"
                     >
-                        <i className="ti ti-plus"></i>
-                        <span style={{ position: "relative", top: "-1.5px" }}>Yeni</span>
+                        <i className="ti ti-plus" aria-hidden="true"></i>
+                                <span className="relative-neg-top-1px">Yeni</span>
                     </Link>
                 )}
             </div>
@@ -138,113 +139,22 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
     const isHeaderString = typeof header === 'string';
     const headerTitle = isHeaderString ? header : (pageHeader?.title || '');
 
-    const menuGroups = [
-        {
-            title: 'Ana Sayfa',
-            items: [
-                { title: 'Dashboard', icon: 'dashboard', href: window.route('dashboard') },
-            ],
-        },
-        {
-            title: 'İnsan Kaynakları',
-            items: [
-                { title: 'Başvurular', icon: 'clipboard-list', href: window.route('admin.submissions.index') },
-                { title: 'Formlar', icon: 'file-text', href: window.route('admin.forms.index') },
-                { title: 'Departmanlar', icon: 'building', href: window.route('admin.departments.index') },
-                { title: 'Çalışanlar', icon: 'users', href: window.route('admin.employees.index') },
-                { title: 'Kullanıcılar', icon: 'user', href: window.route('admin.users.index') },
-            ],
-        },
-        {
-            title: 'Zaman Yönetimi',
-            items: [
-                { title: 'Devam Takibi', icon: 'clock', href: window.route('admin.attendance.index') },
-                { title: 'Vardiyalar', icon: 'clock', href: window.route('admin.shifts.index') },
-                { title: 'Vardiya Takvimi', icon: 'calendar-event', href: window.route('admin.shifts.schedules') },
-                { title: 'Düzeltme Talepleri', icon: 'edit', href: window.route('admin.adjustments.index') },
-                { title: 'Çalışma Takvimleri', icon: 'calendar', href: window.route('admin.work-calendars.index') },
-                { title: 'Resmi Tatiller', icon: 'confetti', href: window.route('admin.holidays.index') },
-            ],
-        },
-        {
-            title: 'İzin Yönetimi',
-            items: [
-                { title: 'İzin Talepleri', icon: 'calendar-event', href: window.route('admin.leave.requests.index') },
-                { title: 'İzin Türleri', icon: 'tag', href: window.route('admin.leave.types.index') },
-                { title: 'İzin Hakları', icon: 'clipboard-check', href: window.route('admin.leave.entitlements.index') },
-            ],
-        },
-        {
-            title: 'Bordro ve Maaş',
-            items: [
-                { title: 'Bordrolar', icon: 'cash-banknote', href: window.route('admin.payrolls.index') },
-                { title: 'Maaş Bileşenleri', icon: 'calculator', href: window.route('admin.salary-components.index') },
-                { title: 'Avans Talepleri', icon: 'hand-finger', href: window.route('admin.advances.index') },
-            ],
-        },
-        {
-            title: 'Raporlar',
-            items: [
-                { title: 'Bordro Raporları', icon: 'chart-bar', href: window.route('admin.payroll-reports.index') },
-                { title: 'Devam Raporları', icon: 'file-analytics', href: window.route('admin.attendance-reports.index') },
-            ],
-        },
-    ];
-
     return (
         <>
-            <nav className={`pc-sidebar ${sidebarOpen ? '' : 'pc-sidebar-hide'}`}>
-                <div className="navbar-wrapper">
-                    <div className="m-header">
-                        <Link href={window.route('dashboard')}>
-                            <span style={{ fontSize: "1.3rem", fontWeight: "bold", textTransform: "uppercase" }}>
-                                {appName}
-                            </span>
-                        </Link>
-                    </div>
-
-                    <div className="navbar-content">
-                        <ul className='pc-navbar'>
-                            {menuGroups.map((group, groupIndex) => (
-                                <React.Fragment key={groupIndex}>
-                                    <li className="pc-item pc-caption">
-                                        {sidebarOpen && (
-                                            <label>{group.title}</label>
-                                        )}
-                                    </li>
-                                    {group.items.map((item, itemIndex) => (
-                                        <li key={itemIndex} className="pc-item">
-                                            <Link
-                                                href={item.href}
-                                                className={`pc-link${isActive(item.href) ? ' active' : ''}`}
-                                                preserveScroll
-                                            >
-                                                <span className='pc-micon'>
-                                                    <i className={`ti ti-${item.icon}`}></i>
-                                                </span>
-                                                {sidebarOpen && <span className='pc-mtext'>{item.title}</span>}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </React.Fragment>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </nav>
+            <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
             <header className='pc-header'>
                 <div className="header-wrapper">
                     <div className="me-auto pc-mob-drp">
                         <ul className="list-unstyled">
                             <li className="pc-h-item pc-sidebar-collapse">
-                                <a href="#" className="pc-head-link ms-0" id="sidebar-hide" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                                    <i className="ti ti-menu-2"></i>
+                                <a href="#" className="pc-head-link ms-0" id="sidebar-hide" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Kenar çubuğunu aç/kapat">
+                                    <i className="ti ti-menu-2" aria-hidden="true"></i>
                                 </a>
                             </li>
                             <li className="pc-h-item pc-sidebar-popup">
-                                <a href="#" className="pc-head-link ms-0" id="mobile-collapse">
-                                    <i className="ti ti-menu-2"></i>
+                                <a href="#" className="pc-head-link ms-0" id="mobile-collapse" aria-label="Mobil menüyü aç">
+                                    <i className="ti ti-menu-2" aria-hidden="true"></i>
                                 </a>
                             </li>
                         </ul>
@@ -256,9 +166,9 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                             {/* Bildirimler */}
                             <li className="dropdown pc-h-item">
 
-                                <a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown">
-                                    <i className='ti ti-bell'></i>
-                                    <span className="badge-dot"></span>
+                                <a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" aria-label="Bildirimler">
+                                    <i className='ti ti-bell' aria-hidden="true"></i>
+                                    <span className="badge-dot" aria-hidden="true"></span>
                                 </a>
                                 <div className="dropdown-menu dropdown-notification dropdown-menu-end">
                                     <div className="dropdown-header d-flex align-items-center justify-content-between">
@@ -274,8 +184,8 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
 
                             {/* Kullanıcı Profili */}
                             <li className="pc-h-item header-user-profile">
-                                <a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown">
-                                    <div className="user-avatar-sm">
+                                <a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" aria-label="Kullanıcı profili">
+                                    <div className="user-avatar-sm" aria-hidden="true">
                                         {user?.name?.charAt(0) || 'U'}
                                     </div>
                                     <span>{user?.name || 'User'}</span>
@@ -296,19 +206,19 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                                     </div>
                                     <ul className="nav drp-tabs nav-fill nav-tabs">
                                         <li className="nav-item">
-                                            <button className="nav-link active" data-bs-toggle="tab">
-                                                <i className="ti ti-user"></i> Hesap
+                                            <button className="nav-link active" data-bs-toggle="tab" aria-label="Hesap sekmesi">
+                                                <i className="ti ti-user" aria-hidden="true"></i> Hesap
                                             </button>
                                         </li>
                                     </ul>
                                     <div className="tab-content">
                                         <div className="tab-pane fade show active">
-                                                 <Link href={window.route('profile.edit')} className="dropdown-item">
-                                                <i className="ti ti-user"></i>
+                                                 <Link href={window.route('profile.edit')} className="dropdown-item" aria-label="Profili düzenle">
+                                                <i className="ti ti-user" aria-hidden="true"></i>
                                                 <span>Profil</span>
                                             </Link>
-                                                 <Link href={window.route('logout')} method="post" className="dropdown-item">
-                                                <i className="ti ti-logout"></i>
+                                                 <Link href={window.route('logout')} method="post" className="dropdown-item" aria-label="Çıkış yap">
+                                                <i className="ti ti-logout" aria-hidden="true"></i>
                                                 <span>Çıkış Yap</span>
                                             </Link>
                                         </div>
@@ -367,50 +277,28 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
 
 
             {/* Toast Container */}
-            <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 9999, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="fixed-toast-container">
                 {toasts.map((toast) => {
-                    const colors = {
-                        success: { bg: '#d1e7dd', border: '#0f5132', text: '#0f5132', icon: '✓' },
-                        error: { bg: '#f8d7da', border: '#842029', text: '#842029', icon: '✕' },
-                        warning: { bg: '#fff3cd', border: '#664d03', text: '#664d03', icon: '!' },
-                        info: { bg: '#cff4fc', border: '#055160', text: '#055160', icon: 'i' },
+                    const bgClass = {
+                        success: 'toast-item-bg-success toast-icon-bg-success',
+                        error: 'toast-item-bg-error toast-icon-bg-error',
+                        warning: 'toast-item-bg-warning toast-icon-bg-warning', 
+                        info: 'toast-item-bg-info toast-icon-bg-info'
                     };
-                    const c = colors[toast.type] || colors.info;
+                    const toastClass = `toast-item-container ${bgClass[toast.type] || bgClass.info.split(' ')[0]}`;
                     return (
                         <div
                             key={toast.id}
                             onClick={() => removeToast(toast.id)}
-                            style={{
-                                background: c.bg,
-                                borderLeft: `4px solid ${c.border}`,
-                                color: c.text,
-                                padding: '12px 16px',
-                                borderRadius: 6,
-                                fontSize: 14,
-                                fontWeight: 500,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                cursor: 'pointer',
-                                minWidth: 280,
-                                maxWidth: 400,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 10,
-                                animation: 'slideIn 0.3s ease',
-                            }}
+                            className={toastClass}
                         >
-                            <span style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: 22,
-                                height: 22,
-                                borderRadius: '50%',
-                                background: c.border,
-                                color: c.bg,
-                                fontSize: 12,
-                                fontWeight: 700,
-                                flexShrink: 0,
-                            }}>{c.icon}</span>
+                            <span className={`toast-icon ${bgClass[toast.type]?.split(' ')[1] || bgClass.info.split(' ')[1]}`}>
+                                {toast.type === 'success' && '✓'}
+                                {toast.type === 'error' && '✕'}
+                                {toast.type === 'warning' && '!'}
+                                {toast.type === 'info' && 'i'}
+                                {!['success', 'error', 'warning', 'info'].includes(toast.type) && 'i'}
+                            </span>
                             {toast.message}
                         </div>
                     );

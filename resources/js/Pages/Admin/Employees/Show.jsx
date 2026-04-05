@@ -314,8 +314,8 @@ export default function Show({ employee }) {
                 
                 {employee.educations && employee.educations.length > 0 ? (
                     <div className="row">
-                        {employee.educations.map((edu, index) => (
-                            <div key={index} className="col-md-4 mb-3">
+                        {employee.educations.map(edu => (
+                            <div key={edu.id} className="col-md-4 mb-3">
                                 <div className="card border">
                                     <div className="card-body">
                                         <div className="d-flex align-items-start">
@@ -358,8 +358,8 @@ export default function Show({ employee }) {
                 
                 {employee.certifications && employee.certifications.length > 0 ? (
                     <div className="row">
-                        {employee.certifications.map((cert, index) => (
-                            <div key={index} className="col-md-4 mb-3">
+                        {employee.certifications.map(cert => (
+                            <div key={cert.id} className="col-md-4 mb-3">
                                 <div className="card border">
                                     <div className="card-body">
                                         <div className="d-flex align-items-start">
@@ -420,8 +420,8 @@ export default function Show({ employee }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {employee.attendances.map((attendance, index) => (
-                                    <tr key={index}>
+                                {employee.attendances.map(attendance => (
+                                    <tr key={attendance.id}>
                                         <td>{formatDate(attendance.date)}</td>
                                         <td>{formatTime(attendance.clock_in)}</td>
                                         <td>{formatTime(attendance.clock_out)}</td>
@@ -466,8 +466,8 @@ export default function Show({ employee }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {employee.leave_requests.map((leave, index) => (
-                                    <tr key={index}>
+                                {employee.leave_requests.map(leave => (
+                                    <tr key={leave.id}>
                                         <td>{formatDate(leave.start_date)}</td>
                                         <td>{formatDate(leave.end_date)}</td>
                                         <td>
@@ -522,8 +522,8 @@ export default function Show({ employee }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {employee.advances.map((advance, index) => (
-                                    <tr key={index}>
+                                {employee.advances.map(advance => (
+                                    <tr key={advance.id}>
                                         <td>{formatDate(advance.request_date)}</td>
                                         <td><strong>{new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(parseFloat(advance.amount))}</strong></td>
                                         <td>
@@ -582,7 +582,7 @@ export default function Show({ employee }) {
                                 </button>
                                 
                                 {isPositionModalOpen && (
-                                    <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                                    <div className="modal show d-block modal-overlay">
                                         <div className="modal-dialog modal-dialog-centered">
                                             <div className="modal-content">
                                                 <div className="modal-header">
@@ -764,7 +764,7 @@ export default function Show({ employee }) {
 
                     {/* Document Upload Modal */}
                     {isUploadModalOpen && (
-                        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                        <div className="modal show d-block modal-overlay">
                             <div className="modal-dialog modal-dialog-centered">
                                 <div className="modal-content">
                                     <div className="modal-header">
@@ -820,7 +820,7 @@ export default function Show({ employee }) {
 
                     {/* Terminate Employee Modal */}
                     {isTerminateModalOpen && (
-                        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                        <div className="modal show d-block modal-overlay">
                             <div className="modal-dialog modal-dialog-centered">
                                 <div className="modal-content">
                                     <div className="modal-header">
@@ -881,141 +881,6 @@ export default function Show({ employee }) {
                             </div>
                         </div>
                     )}
-                </div>
-            </div>
-        </AuthenticatedLayout>
-    );
-}
-
-        // Using Inertia's router.post for direct file upload
-        router.post(
-            route('admin.employees.uploadDocument', employee.id),
-            { file: file, document_type: uploadType },
-            {
-                forceFormData: true, // Force Inertia to use FormData for file uploads
-                onSuccess: () => {
-                    showSuccess('Doküman başarıyla yüklendi.');
-                    setIsUploadModalOpen(false);
-                    fileInput.value = '';
-                },
-                onError: (errors) => {
-                    const errorMessage = errors.file || Object.values(errors).flat().join(', ') || 'Doküman yüklenirken hata oluştu.';
-                    showError(errorMessage);
-                }
-            }
-        );
-    };
-
-    // Belge silme
-    const handleDocumentDelete = (documentId) => {
-        confirmDelete('Bu dokümanı silmek istediğinize emin misiniz?', async () => {
-            try {
-                router.delete(
-                    route('admin.employees.deleteDocument', { employee: employee.id, documentId }),
-                    {
-                        onSuccess: () => {
-                            showSuccess('Doküman başarıyla silindi.');
-                        },
-                        onError: (errors) => {
-                            const errorMessage = Object.values(errors).flat().join(', ') || 'Doküman silinirken hata oluştu.';
-                            showError(errorMessage);
-                        }
-                    }
-                );
-            } catch (err) {
-                showError('Doküman silinirken hata oluştu.');
-            }
-        });
-    };
-
-    // Pozisyon ekleme
-    const handlePositionAdd = (e) => {
-        e.preventDefault();
-        postPosition(route('admin.employees.addPosition', employee.id));
-    };
-
-    // İşten çıkarma
-    const handleTerminate = (e) => {
-        e.preventDefault();
-        postTerminate(route('admin.employees.terminate', employee.id));
-    };
-
-    return (
-        <AuthenticatedLayout
-            header={
-                <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 className="fw-semibold text-dark">
-                            {employee.first_name} {employee.last_name}
-                        </h5>
-                        <p className="fs-sm text-muted">
-                            {employee.email} • {employee.phone}
-                        </p>
-                    </div>
-                </div>
-            }
-        >
-            <Head title={`${employee.first_name} ${employee.last_name}`} />
-
-            <div className="py-12">
-                <div className="mw-100 mx-auto">
-                    {/* Tabs */}
-                    <div className="bg-white rounded-3 shadow-sm">
-                        <div className="border-b border-secondary">
-                            <nav className="d-flex -mb-px">
-                                 {[
-                                    { id: 'info', label: 'Bilgi', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-                                    { id: 'education', label: 'Eğitim', icon: 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z' },
-                                    { id: 'certificates', label: 'Sertifikalar', icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z' },
-                                    { id: 'documents', label: 'Belgeler', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-                                    { id: 'attendances', label: 'Devamlılık', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-                                    { id: 'leaves', label: 'İzinler', icon: 'M19 9l-7 7-7-7' },
-                                    { id: 'advances', label: 'Avanslar', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-                                    { id: 'positions', label: 'Pozisyon Geçmişi', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
-                                ].map((tab) => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`py-4 px-3 text-center border-b-2 fw-medium fs-sm ${
-                                            activeTab === tab.id
-                                                ? 'border-indigo-500 text-primary'
-                                                : 'border-transparent text-muted hover:text-dark hover:border-secondary'
-                                        }`}
-                                    >
-                                        <div className="d-flex flex-column align-items-center">
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
-                                            </svg>
-                                            <span className="mt-1">{tab.label}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </nav>
-                        </div>
-
-                        <div className="p-4">
-                            {/* Info Tab */}
-                            {activeTab === 'info' && (
-                                <div>Bilgi içeriği burada</div>
-                            )}
-                            {/* Education Tab */}
-                            {activeTab === 'education' && (
-                                <div>Eğitim içeriği burada</div>
-                            )}
-                            {/* Certificates Tab */}
-                            {activeTab === 'certificates' && (
-                                <div>Sertifikalar içeriği burada</div>
-                            )}
-                            {/* Documents Tab */}
-                            {activeTab === 'documents' && (
-                                <div>Belgeler içeriği burada</div>
-                            )}
-                            {/* Positions (disabled) */}
-                            {activeTab === 'positions' && (
-                                <div>Bu modül temporarily pasif</div>
-                            )}
-                        </div>
-                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

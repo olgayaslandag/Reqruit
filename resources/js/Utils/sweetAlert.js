@@ -52,3 +52,28 @@ export const showError = (message) => {
         icon: 'error',
     });
 };
+
+export const confirmAction = (message = 'Emin misiniz?', onConfirm, onCancel) => {
+    if (typeof Swal === 'undefined') {
+        console.error('SweetAlert2 is not loaded');
+        if (onConfirm) onConfirm();
+        return;
+    }
+
+    Swal.fire({
+        title: 'Onay',
+        text: message,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Evet',
+        cancelButtonText: 'İptal',
+    }).then((result) => {
+        if (result.isConfirmed && onConfirm) {
+            onConfirm();
+        } else if (result.isDismissed && onCancel) {
+            onCancel();
+        }
+    });
+};

@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import EmptyState from '@/Components/EmptyState';
 import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import { formatDate, formatCurrency, formatMonthYear } from '@/Utils/formatters';
 
 export default function Index({ payrollPeriods, filters }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [statusFilter, setStatusFilter] = useState(filters?.status || '');
 
@@ -17,14 +15,14 @@ export default function Index({ payrollPeriods, filters }) {
         router.get(route('admin.payrolls.index'), {
             ...(statusFilter && { status: statusFilter }),
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['payrollPeriods', 'filters'] });
     };
 
     const handleFilterChange = (key, value) => {
         router.get(route('admin.payrolls.index'), {
             ...(key === 'status' ? { status: value } : { [key]: value }),
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['payrollPeriods', 'filters'] });
     };
 
     const handleDelete = (id) => {
@@ -296,9 +294,23 @@ export default function Index({ payrollPeriods, filters }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center py-4 text-muted">
-                                            <i className="ti ti-calendar-off fs-1 d-block mb-2"></i>
-                                            Bordro dönemi bulunamadı.
+                                        <td colSpan="7">
+                                            <EmptyState
+                                                title="Bordro dönemi bulunamadı"
+                                                description={filters.search || filters.start_year ? 
+                                                    "Aradığınız kriterlere uygun bordro dönemi bulunamadı." : 
+                                                    "Henüz hiç bordro dönemi oluşturulmamış. İlk döneminizi oluşturmak için aşağıdaki butona tıklayabilirsiniz."
+                                                }
+                                                icon={<i className="ti ti-calendar-off"></i>}
+                                                actionUrl={filters.search || filters.start_year ?
+                                                    route('admin.payrolls.index') :
+                                                    route('admin.payrolls.create')
+                                                }
+                                                linkText={filters.search || filters.start_year ?
+                                                    "Filtreleri Temizle" :
+                                                    "Yeni Bordro Dönemi Oluştur"
+                                                }
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -318,11 +330,12 @@ export default function Index({ payrollPeriods, filters }) {
                             </div>
                             <nav>
                                 <ul className="pagination pagination-sm mb-0">
-                                    {payrollPeriods.meta.links.filter(link => link.url).map((link, index) => (
-                                        <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                    {payrollPeriods.meta.links.filter(link => link.url).map(link => (
+                                        <li key={link.url || link.label} className={`page-item ${link.active ? 'active' : ''}`}>
                                             <Link
                                                 href={link.url}
                                                 className="page-link"
+                                                data={{ only: ['payrollPeriods', 'filters'] }}
                                                 dangerouslySetInnerHTML={{
                                                     __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
                                                 }}

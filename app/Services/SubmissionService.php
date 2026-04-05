@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Interfaces\IFormRepository;
@@ -15,14 +16,36 @@ class SubmissionService
         protected IFormRepository $formRepository
     ) {}
 
-    public function getAll(array $filters = [])
+    /**
+     * Get submissions with optional limit/offset.
+     *
+     * WARNING: Calling without limit loads all records into memory.
+     * Use getCursorPaginated() or getPaginated() for large datasets.
+     */
+    public function getAll(array $filters = [], ?int $limit = null, int $offset = 0)
     {
-        return $this->submissionRepository->getAll($filters);
+        return $this->submissionRepository->getAll($filters, $limit, $offset);
     }
 
+    /**
+     * Get paginated submissions using offset-based pagination.
+     */
     public function getPaginated(array $filters = [], int $perPage = 15)
     {
         return $this->submissionRepository->getPaginated($filters, $perPage);
+    }
+
+    /**
+     * Get cursor-paginated submissions for memory-efficient large dataset handling.
+     *
+     * @param  array  $filters  Filter options
+     * @param  int  $perPage  Items per page
+     * @param  string|null  $cursor  Encoded cursor for next page
+     * @return array Contains 'items' (Collection), 'next_cursor' (string|null), 'has_more' (bool)
+     */
+    public function getCursorPaginated(array $filters = [], int $perPage = 15, ?string $cursor = null): array
+    {
+        return $this->submissionRepository->getCursorPaginated($filters, $perPage, $cursor);
     }
 
     public function getById(int $id)
@@ -37,49 +60,51 @@ class SubmissionService
 
     public function handleSubmission(string $formSlug, array $data, array $files = [])
     {
-        $form = $this->formRepository->getBySlug($formSlug);
+        return \DB::transaction(function () use ($formSlug, $data, $files) {
+            $form = $this->formRepository->getBySlug($formSlug);
 
-        // Handle file uploads - secure storage with local disk
-        $uploadedFiles = [];
-        foreach ($files as $key => $file) {
-            if ($file && $file->isValid()) {
-                // Store in local disk (private) - not publicly accessible
-                $path = $file->store('submissions/'.$form->id, 'local');
-                // Store only the path, not a public URL
-                // Signed URLs will be generated via FileController
-                $uploadedFiles[$key] = $path;
-            }
-        }
-
-        // Merge uploaded files with form data
-        $data = array_merge($data, $uploadedFiles);
-
-        // Prepare details
-        $details = [];
-        $labels = $data['labels'] ?? [];
-
-        foreach ($data as $key => $value) {
-            if (in_array($key, ['_token', 'labels'])) {
-                continue;
+            // Handle file uploads - secure storage with local disk
+            $uploadedFiles = [];
+            foreach ($files as $key => $file) {
+                if ($file && $file->isValid()) {
+                    // Store in local disk (private) - not publicly accessible
+                    $path = $file->store('submissions/'.$form->id, 'local');
+                    // Store only the path, not a public URL
+                    // Signed URLs will be generated via FileController
+                    $uploadedFiles[$key] = $path;
+                }
             }
 
-            $details[] = [
-                'field_name' => $key,
-                'field_label' => $labels[$key] ?? $key,
-                'field_value' => is_array($value) ? implode(', ', $value) : $value,
-            ];
-        }
+            // Merge uploaded files with form data
+            $data = array_merge($data, $uploadedFiles);
 
-        // Create submission
-        $submission = $this->submissionRepository->create([
-            'form_id' => $form->id,
-            'details' => $details,
-        ]);
+            // Prepare details
+            $details = [];
+            $labels = $data['labels'] ?? [];
 
-        // Dispatch notification job to queue (async)
-        SendSubmissionNotification::dispatch($form, $submission);
+            foreach ($data as $key => $value) {
+                if (in_array($key, ['_token', 'labels'])) {
+                    continue;
+                }
 
-        return $submission;
+                $details[] = [
+                    'field_name' => $key,
+                    'field_label' => $labels[$key] ?? $key,
+                    'field_value' => is_array($value) ? implode(', ', $value) : $value,
+                ];
+            }
+
+            // Create submission
+            $submission = $this->submissionRepository->create([
+                'form_id' => $form->id,
+                'details' => $details,
+            ]);
+
+            // Dispatch notification job to queue (async)
+            SendSubmissionNotification::dispatch($form, $submission);
+
+            return $submission;
+        });
     }
 
     public function updateStatus(int $id, string $status)
@@ -94,17 +119,19 @@ class SubmissionService
 
     public function addComment(int $submissionId, array $data, ?int $userId = null)
     {
-        $submission = $this->submissionRepository->getById($submissionId);
+        return \DB::transaction(function () use ($submissionId, $data, $userId) {
+            $submission = $this->submissionRepository->getById($submissionId);
 
-        $comment = SubmissionComment::create([
-            'submission_id' => $submissionId,
-            'user_id' => $userId,
-            'comment' => $data['comment'],
-            'rating' => $data['rating'] ?? null,
-            'is_private' => $data['is_private'] ?? true,
-        ]);
+            $comment = SubmissionComment::create([
+                'submission_id' => $submissionId,
+                'user_id' => $userId,
+                'comment' => $data['comment'],
+                'rating' => $data['rating'] ?? null,
+                'is_private' => $data['is_private'] ?? true,
+            ]);
 
-        return $comment->load('user');
+            return $comment->load('user');
+        });
     }
 
     public function delete(int $id)

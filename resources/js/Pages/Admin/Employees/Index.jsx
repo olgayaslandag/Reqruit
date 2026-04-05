@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import EmptyState from '@/Components/EmptyState';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import {
     getStatusBadge,
@@ -10,10 +11,10 @@ import {
     statusFilterOptions,
 } from '@/Utils/employeeHelpers.jsx';
 import Pagination from '@/Components/Pagination';
+import { useFlash } from '@/Hooks/useFlash';
 
-export default function Index({ employees, filters, employeeTree }) {
-    const { props } = usePage();
-    const flash = props.flash;
+export default function Index({ employees, filters, employeeTree, departments }) {
+    const flash = useFlash();
 
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [localFilters, setLocalFilters] = useState({
@@ -28,7 +29,7 @@ export default function Index({ employees, filters, employeeTree }) {
         router.get(route('admin.employees.index'), {
             ...localFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['employees', 'filters', 'employeeTree'] });
     };
 
     // Filtre değişikliği
@@ -38,7 +39,7 @@ export default function Index({ employees, filters, employeeTree }) {
         router.get(route('admin.employees.index'), {
             ...newFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['employees', 'filters', 'employeeTree'] });
     };
 
     // Silme işlemi
@@ -58,13 +59,13 @@ export default function Index({ employees, filters, employeeTree }) {
         const rows = [
             <tr key={employee.id} className="table-hover">
                 <td className="px-4 py-3">
-                    <div className="d-flex align-items-center" style={{ paddingLeft: indent }}>
+                    <div className={`d-flex align-items-center ${employee.manager_id ? 'department-tree-node': ''}`} style={employee.manager_id ? {paddingLeft: `calc(${level} * 20px)`} : {}}>
                         {hasChildren ? (
-                            <i className="ti ti-chevron-right me-2 text-muted"></i>
+                            <i className="ti ti-chevron-right me-2 text-muted" aria-hidden="true" title="Alt öğeleri göster/gizle"></i>
                         ) : level > 0 ? (
-                            <span className="me-2 text-muted">└</span>
+                            <span className="me-2 text-muted" aria-hidden="true">└</span>
                         ) : (
-                            <span className="me-2"></span>
+                            <span className="me-2" aria-hidden="true"></span>
                         )}
                         <div>
                             <Link
@@ -104,26 +105,29 @@ export default function Index({ employees, filters, employeeTree }) {
                 </td>
                 <td className="px-4 py-3 text-nowrap text-end">
                     <div className="d-flex align-items-center justify-content-end gap-2">
-                        <Link
-                            href={route('admin.employees.show', employee.id)}
-                            className="btn btn-link text-primary p-0"
-                            title="Görüntüle"
-                        >
-                            <i className="ti ti-eye"></i>
-                        </Link>
-                        <Link
-                            href={route('admin.employees.edit', employee.id)}
-                            className="btn btn-link text-secondary p-0"
-                            title="Düzenle"
-                        >
-                            <i className="ti ti-edit"></i>
-                        </Link>
+                            <Link
+                                href={route('admin.employees.show', employee.id)}
+                                className="btn btn-link text-primary p-0"
+                                title="Görüntüle"
+                                aria-label={`Çalışanı görüntüle: ${employee.first_name} ${employee.last_name}`}
+                            >
+                                <i className="ti ti-eye" aria-hidden="true"></i>
+                            </Link>
+                            <Link
+                                href={route('admin.employees.edit', employee.id)}
+                                className="btn btn-link text-secondary p-0"
+                                title="Düzenle"
+                                aria-label={`Çalışanı düzenle: ${employee.first_name} ${employee.last_name}`}
+                            >
+                                <i className="ti ti-edit" aria-hidden="true"></i>
+                            </Link>
                         <button
                             onClick={() => handleDelete(employee.id)}
                             className="btn btn-link text-danger p-0"
                             title="Sil"
+                            aria-label={`Çalışanı sil: ${employee.first_name} ${employee.last_name}`}
                         >
-                            <i className="ti ti-trash"></i>
+                            <i className="ti ti-trash" aria-hidden="true"></i>
                         </button>
                     </div>
                 </td>
@@ -201,7 +205,7 @@ export default function Index({ employees, filters, employeeTree }) {
                                 onChange={(e) => handleFilterChange('department_id', e.target.value)}
                             >
                                 <option value="">Tümü</option>
-                                {props.departments?.map((dept) => (
+                                {departments?.map((dept) => (
                                     <option key={dept.id} value={dept.id}>
                                         {dept.title}
                                     </option>
@@ -231,8 +235,10 @@ export default function Index({ employees, filters, employeeTree }) {
                             <button
                                 type="submit"
                                 className="btn btn-primary btn-sm"
+                                aria-label="Ara"
                             >
-                                <i className="ti ti-search me-1"></i>
+                                <i className="ti ti-search me-1" aria-hidden="true"></i>
+                                Ara
                             </button>
                         </div>
                     </form>
@@ -270,8 +276,23 @@ export default function Index({ employees, filters, employeeTree }) {
                                 allRows
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="px-4 py-8 text-center text-muted">
-                                        Çalışan bulunamadı.
+                                    <td colSpan="7">
+                                        <EmptyState
+                                            title="Çalışan bulunamadı"
+                                            description={filters.search || filters.status || filters.department_id || filters.employment_type ? 
+                                                "Aradığınız kriterlere uygun çalışan bulunamadı." : 
+                                                "Henüz hiç çalışan eklenmemiş. Yeni bir çalışan eklemek için aşağıdaki butona tıklayabilirsiniz."
+                                            }
+                                            icon={<i className="ti ti-users"></i>}
+                                            actionUrl={filters.search || filters.status || filters.department_id || filters.employment_type ?
+                                                route('admin.employees.index') :
+                                                route('admin.employees.create')
+                                            }
+                                            linkText={filters.search || filters.status || filters.department_id || filters.employment_type ?
+                                                "Filtreleri temizle" :
+                                                "Yeni Çalışan Ekle"
+                                            }
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -280,7 +301,7 @@ export default function Index({ employees, filters, employeeTree }) {
                 </div>
             </div>
 
-            <Pagination meta={employees} baseUrl={route('admin.employees.index')} />
+            <Pagination meta={employees} baseUrl={route('admin.employees.index')} only={['employees', 'filters', 'employeeTree']} />
         </AuthenticatedLayout>
     );
 }

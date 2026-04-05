@@ -1,21 +1,10 @@
-import { useEffect } from 'react';
-import { router, useForm, Link, usePage } from '@inertiajs/react';
+import { router, useForm, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { showSuccess, showError } from '@/Utils/toast';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 export default function Edit({ attendance, employees }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
-    useEffect(() => {
-        if (flash?.success) {
-            showSuccess(flash.success);
-        }
-        if (flash?.error) {
-            showError(flash.error);
-        }
-    }, [flash]);
+    const flash = useFlashWithToast();
 
     const { data, setData, put, processing, errors, hasErrors } = useForm({
         employee_id: attendance?.employee_id || '',
@@ -191,6 +180,8 @@ export default function Edit({ attendance, employees }) {
                                         İptal
                                     </Link>
                                 </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

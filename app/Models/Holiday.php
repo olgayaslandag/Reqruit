@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\HolidayTypeEnum;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Holiday extends Model
 {
     use HasFactory;
+
+    protected $table = 'holidays';
 
     protected $fillable = [
         'work_calendar_id',

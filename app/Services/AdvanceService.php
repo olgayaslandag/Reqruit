@@ -1,13 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Interfaces\IAdvanceRepository;
 use App\Models\AdvanceDeduction;
 use App\Models\AdvanceRequest;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class AdvanceService
@@ -45,32 +45,34 @@ class AdvanceService
      */
     public function create(array $data): AdvanceRequest
     {
-        // Çalışanın daha önce onaylanmış ve ödenmemiş avansı var mı kontrolü
-        $existingAdvance = $this->advanceRepository->getAll([
-            'employee_id' => $data['employee_id'],
-            'status' => 'approved',
-        ]);
+        return \DB::transaction(function () use ($data) {
+            // Çalışanın daha önce onaylanmış ve ödenmemiş avansı var mı kontrolü
+            $existingAdvance = $this->advanceRepository->getAll([
+                'employee_id' => $data['employee_id'],
+                'status' => 'approved',
+            ]);
 
-        // Calculate unpaid advance deductions in a single query per existing advances
-        $advanceIds = $existingAdvance->pluck('id')->toArray();
-        $advanceDeductions = DB::table('advance_deductions')
-            ->whereIn('advance_request_id', $advanceIds)
-            ->where('status', 'deducted')
-            ->groupBy('advance_request_id')
-            ->selectRaw('advance_request_id, SUM(deduction_amount) as total_deducted')
-            ->pluck('total_deducted', 'advance_request_id')
-            ->toArray();
+            // Calculate unpaid advance deductions in a single query per existing advances
+            $advanceIds = $existingAdvance->pluck('id')->toArray();
+            $advanceDeductions = \Illuminate\Support\Facades\DB::table('advance_deductions')
+                ->whereIn('advance_request_id', $advanceIds)
+                ->where('status', 'deducted')
+                ->groupBy('advance_request_id')
+                ->selectRaw('advance_request_id, SUM(deduction_amount) as total_deducted')
+                ->pluck('total_deducted', 'advance_request_id')
+                ->toArray();
 
-        $totalUnpaid = 0;
-        foreach ($existingAdvance as $advance) {
-            $deductedAmount = $advanceDeductions[$advance->id] ?? 0;
-            $totalUnpaid += $advance->amount - $deductedAmount;
-        }
+            $totalUnpaid = 0;
+            foreach ($existingAdvance as $advance) {
+                $deductedAmount = $advanceDeductions[$advance->id] ?? 0;
+                $totalUnpaid += $advance->amount - $deductedAmount;
+            }
 
-        // Yeni talep + ödenmemiş toplam, brüt maaşın 3 katını geçemez
-        // Bu kontrol SalaryCalculationService ile entegre edilebilir
+            // Yeni talep + ödenmemiş toplam, brüt maaşın 3 katını geçemez
+            // Bu kontrol SalaryCalculationService ile entegre edilebilir
 
-        return $this->advanceRepository->create($data);
+            return $this->advanceRepository->create($data);
+        });
     }
 
     /**
@@ -106,12 +108,14 @@ class AdvanceService
      */
     public function approve(int $id, int $approverId): AdvanceRequest
     {
-        $advance = $this->advanceRepository->approve($id, $approverId);
+        return \DB::transaction(function () use ($id, $approverId) {
+            $advance = $this->advanceRepository->approve($id, $approverId);
 
-        // E-posta gönder
-        $this->sendApprovalEmail($advance);
+            // E-posta gönder
+            $this->sendApprovalEmail($advance);
 
-        return $advance;
+            return $advance;
+        });
     }
 
     /**
@@ -119,12 +123,14 @@ class AdvanceService
      */
     public function reject(int $id, int $approverId, string $reason): AdvanceRequest
     {
-        $advance = $this->advanceRepository->reject($id, $approverId, $reason);
+        return \DB::transaction(function () use ($id, $approverId, $reason) {
+            $advance = $this->advanceRepository->reject($id, $approverId, $reason);
 
-        // E-posta gönder
-        $this->sendRejectionEmail($advance);
+            // E-posta gönder
+            $this->sendRejectionEmail($advance);
 
-        return $advance;
+            return $advance;
+        });
     }
 
     /**
@@ -132,26 +138,30 @@ class AdvanceService
      */
     public function markAsPaid(int $id, ?string $paymentDate = null): AdvanceRequest
     {
-        return $this->advanceRepository->markAsPaid($id, $paymentDate);
+        return \DB::transaction(function () use ($id, $paymentDate) {
+            return $this->advanceRepository->markAsPaid($id, $paymentDate);
+        });
     }
 
     /**
-     * Avans talebini iptal eder.
+     * Avans iptal etme işlemi.
      */
     public function cancel(int $id): AdvanceRequest
     {
-        $advance = $this->advanceRepository->getById($id);
+        return \DB::transaction(function () use ($id) {
+            $advance = $this->advanceRepository->getById($id);
 
-        if ($advance && ! in_array($advance->status, ['pending', 'approved'])) {
-            throw new \Exception('Sadece bekleyen veya onaylanmış avans talepleri iptal edilebilir.');
-        }
+            if ($advance && ! in_array($advance->status, ['pending', 'approved'])) {
+                throw new \Exception('Sadece bekleyen veya onaylanmış avans talepleri iptal edilebilir.');
+            }
 
-        // Ödenmişse kesintileri de iptal et
-        if ($advance->status === 'paid') {
-            $advance->deductions()->update(['status' => 'cancelled']);
-        }
+            // Ödenmişse kesintileri de iptal et
+            if ($advance->status === 'paid') {
+                $advance->deductions()->update(['status' => 'cancelled']);
+            }
 
-        return $this->advanceRepository->cancel($id);
+            return $this->advanceRepository->cancel($id);
+        });
     }
 
     /**
@@ -159,38 +169,40 @@ class AdvanceService
      */
     public function createDeduction(int $advanceId, int $payrollPeriodId, float $deductionAmount): AdvanceDeduction
     {
-        $advance = $this->advanceRepository->getById($advanceId);
+        return \DB::transaction(function () use ($advanceId, $payrollPeriodId, $deductionAmount) {
+            $advance = $this->advanceRepository->getById($advanceId);
 
-        if (! $advance) {
-            throw new \Exception('Avans talebi bulunamadı.');
-        }
+            if (! $advance) {
+                throw new \Exception('Avans talebi bulunamadı.');
+            }
 
-        if ($advance->status !== 'approved' && $advance->status !== 'paid') {
-            throw new \Exception('Sadece onaylanmış avanslar için kesinti oluşturulabilir.');
-        }
+            if ($advance->status !== 'approved' && $advance->status !== 'paid') {
+                throw new \Exception('Sadece onaylanmış avanslar için kesinti oluşturulabilir.');
+            }
 
-        $remainingAmount = $advance->amount - $advance->deductions()->where('status', '!=', 'cancelled')->sum('deduction_amount');
+            $remainingAmount = $advance->amount - $advance->deductions()->where('status', '!=', 'cancelled')->sum('deduction_amount');
 
-        if ($deductionAmount > $remainingAmount) {
-            throw new \Exception('Kesinti tutarı kalan tutarı aşıyor.');
-        }
+            if ($deductionAmount > $remainingAmount) {
+                throw new \Exception('Kesinti tutarı kalan tutarı aşıyor.');
+            }
 
-        $deduction = AdvanceDeduction::create([
-            'advance_request_id' => $advanceId,
-            'payroll_period_id' => $payrollPeriodId,
-            'deduction_amount' => $deductionAmount,
-            'remaining_amount' => $remainingAmount - $deductionAmount,
-            'status' => 'pending',
-        ]);
+            $deduction = AdvanceDeduction::create([
+                'advance_request_id' => $advanceId,
+                'payroll_period_id' => $payrollPeriodId,
+                'deduction_amount' => $deductionAmount,
+                'remaining_amount' => $remainingAmount - $deductionAmount,
+                'status' => 'pending',
+            ]);
 
-        // Tümü kesildiyse tamamlandı işaretle
-        $newRemaining = $remainingAmount - $deductionAmount;
-        if ($newRemaining <= 0) {
-            $deduction->update(['status' => 'deducted', 'deduction_date' => now()->toDateString()]);
-            $advance->update(['status' => 'paid']);
-        }
+            // Tümü kesildiyse tamamlandı işaretle
+            $newRemaining = $remainingAmount - $deductionAmount;
+            if ($newRemaining <= 0) {
+                $deduction->update(['status' => 'deducted', 'deduction_date' => now()->toDateString()]);
+                $advance->update(['status' => 'paid']);
+            }
 
-        return $deduction;
+            return $deduction;
+        });
     }
 
     /**
@@ -233,17 +245,16 @@ class AdvanceService
 
     /**
      * Avans taleplerinin durumlarına göre sayısını getirir.
+     * Optimized to use single GROUP BY query instead of 3 separate COUNT queries.
      */
     public function getStatusCounts(): array
     {
-        $pendingCount = $this->advanceRepository->getPending()->count();
-        $approvedCount = $this->advanceRepository->getAll(['status' => 'approved'])->count();
-        $rejectedCount = $this->advanceRepository->getAll(['status' => 'rejected'])->count();
+        $statusCounts = $this->advanceRepository->getStatusCounts();
 
         return [
-            'pending' => $pendingCount,
-            'approved' => $approvedCount,
-            'rejected' => $rejectedCount,
+            'pending' => $statusCounts['pending'] ?? 0,
+            'approved' => $statusCounts['approved'] ?? 0,
+            'rejected' => $statusCounts['rejected'] ?? 0,
         ];
     }
 }

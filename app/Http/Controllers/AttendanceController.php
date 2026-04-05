@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Enums\AttendanceSourceEnum;
 use App\Enums\AttendanceTypeEnum;
+use App\Http\Requests\ManualClockRequest;
 use App\Http\Requests\StoreAttendanceRequest;
 use App\Http\Requests\UpdateAttendanceRequest;
 use App\Models\AttendanceRecord;
@@ -26,11 +28,16 @@ class AttendanceController extends Controller
     ) {
         $this->attendanceService = $attendanceService;
         $this->calculationService = $calculationService;
-        $this->authorizeResource(\App\Models\AttendanceRecord::class, 'attendance');
     }
 
     public function index(Request $request)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $filters = [
             'employee_id' => $request->employee_id,
             'date' => $request->date,
@@ -49,6 +56,12 @@ class AttendanceController extends Controller
 
     public function show(AttendanceRecord $attendance)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2]) && $attendance->employee->user_id !== $user?->id) {
+            abort(403, 'Unauthorized');
+        }
+
         $attendance->load(['employee.department']);
 
         return inertia('Admin/Attendance/Show', [
@@ -58,6 +71,12 @@ class AttendanceController extends Controller
 
     public function store(StoreAttendanceRequest $request)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $data = $request->validated();
 
         $employee = Employee::findOrFail($data['employee_id']);
@@ -88,6 +107,12 @@ class AttendanceController extends Controller
 
     public function update(UpdateAttendanceRequest $request, AttendanceRecord $attendance)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $data = $request->validated();
 
         // Update the attendance record
@@ -113,6 +138,12 @@ class AttendanceController extends Controller
 
     public function destroy(AttendanceRecord $attendance)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $attendance->delete();
 
         return redirect()->back()->with('success', 'Attendance record deleted successfully.');
@@ -123,8 +154,11 @@ class AttendanceController extends Controller
         try {
             $employee = Employee::findOrFail($request->employee_id);
 
-            // Authorization check
-            $this->authorize('clock', $employee);
+            // Manual authorization check
+            $user = auth()->user();
+            if (! in_array($user?->rank_id?->value, [1, 2]) && $employee->user_id !== $user?->id) {
+                abort(403, 'Unauthorized');
+            }
 
             $attendance = $this->attendanceService->clockIn(
                 $request->employee_id,
@@ -158,8 +192,11 @@ class AttendanceController extends Controller
         try {
             $employee = Employee::findOrFail($request->employee_id);
 
-            // Authorization check
-            $this->authorize('clock', $employee);
+            // Manual authorization check
+            $user = auth()->user();
+            if (! in_array($user?->rank_id?->value, [1, 2]) && $employee->user_id !== $user?->id) {
+                abort(403, 'Unauthorized');
+            }
 
             $attendance = $this->attendanceService->clockOut(
                 $request->employee_id,
@@ -190,6 +227,12 @@ class AttendanceController extends Controller
 
     public function forEmployee(Request $request, int $employeeId)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $employee = Employee::findOrFail($employeeId);
 
         $filters = [
@@ -214,8 +257,11 @@ class AttendanceController extends Controller
 
             $employee = Employee::findOrFail($employeeId);
 
-            // Authorization check
-            $this->authorize('clock', $employee);
+            // Manual authorization check - only admin/IK can manually clock for other employees
+            $user = auth()->user();
+            if (! in_array($user?->rank_id?->value, [1, 2])) {
+                abort(403, 'Unauthorized');
+            }
 
             if ($request->type === 'clock_in') {
                 $result = $this->attendanceService->manualClockIn(
@@ -297,6 +343,12 @@ class AttendanceController extends Controller
 
     public function create()
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $employees = Employee::whereNull('termination_date')
             ->orderBy('first_name')
             ->get(['id', 'first_name', 'last_name']);
@@ -308,6 +360,12 @@ class AttendanceController extends Controller
 
     public function edit(AttendanceRecord $attendance)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $employees = Employee::whereNull('termination_date')
             ->orderBy('first_name')
             ->get(['id', 'first_name', 'last_name']);

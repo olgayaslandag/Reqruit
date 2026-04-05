@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import EmptyState from '@/Components/EmptyState';
 import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatDate, formatCurrency } from '@/Utils/formatters';
 import { getStatusBadgeClass } from '@/Utils/commonUtils';
 
 export default function Index({ advances, filters, pendingCount, approvedCount, rejectedCount }) {
-    const { props } = usePage();
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [statusFilter, setStatusFilter] = useState(filters?.status || '');
@@ -17,14 +17,14 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
         router.get(route('admin.advances.index'), {
             ...(statusFilter && { status: statusFilter }),
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['advances', 'filters'] });
     };
 
     const handleFilterChange = (key, value) => {
         router.get(route('admin.advances.index'), {
             ...(key === 'status' ? { status: value } : { [key]: value }),
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['advances', 'filters'] });
     };
 
     const handleCancel = (id) => {
@@ -299,9 +299,23 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center py-4 text-muted">
-                                            <i className="ti ti-hand-finger-off fs-1 d-block mb-2"></i>
-                                            Avans talebi bulunamadı.
+                                        <td colSpan="7">
+                                            <EmptyState
+                                                title="Avans talebi bulunamadı"
+                                                description={filters.search || filters.status || filters.employee_id ? 
+                                                    "Aradığınız kriterlere uygun avans talebi bulunamadı." : 
+                                                    "Henüz hiç avans talebi alınmamış. Yeni bir talep başlatmak için aşağıdaki butona tıklayabilirsiniz."
+                                                }
+                                                icon={<i className="ti ti-hand-finger-off"></i>}
+                                                actionUrl={filters.search || filters.status || filters.employee_id ?
+                                                    route('admin.advances.index') :
+                                                    route('admin.advances.create')
+                                                }
+                                                linkText={filters.search || filters.status || filters.employee_id ?
+                                                    "Filtreleri Temizle" :
+                                                    "Yeni Avans Talebi Oluştur"
+                                                }
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -321,11 +335,12 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
                             </div>
                             <nav>
                                 <ul className="pagination pagination-sm mb-0">
-                                    {advances.meta.links.filter(link => link.url).map((link, index) => (
-                                        <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                    {advances.meta.links.filter(link => link.url).map(link => (
+                                        <li key={link.url || link.label} className={`page-item ${link.active ? 'active' : ''}`}>
                                             <Link
                                                 href={link.url}
                                                 className="page-link"
+                                                data={{ only: ['advances', 'filters'] }}
                                                 dangerouslySetInnerHTML={{
                                                     __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
                                                 }}

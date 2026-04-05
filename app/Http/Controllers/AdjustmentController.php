@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Enums\AdjustmentStatusEnum;
@@ -27,11 +28,16 @@ class AdjustmentController extends Controller
     {
         $this->attendanceService = $attendanceService;
         $this->attendanceAdjustmentService = $attendanceAdjustmentService;
-        $this->authorizeResource(\App\Models\AttendanceAdjustment::class, 'adjustment');
     }
 
     public function index(Request $request)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $query = AttendanceAdjustment::query()->with(['employee', 'attendanceRecord', 'requester', 'approver']);
 
         // Apply filters

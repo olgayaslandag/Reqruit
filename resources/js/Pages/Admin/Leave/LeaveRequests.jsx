@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showSuccess, showError, confirmDelete } from '@/Utils/sweetAlert';
+import { useFlash } from '@/Hooks/useFlash';
 
 export default function LeaveRequests({ leaveRequests, employees, leaveTypes, filters }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlash();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [localFilters, setLocalFilters] = useState({
@@ -35,7 +35,7 @@ export default function LeaveRequests({ leaveRequests, employees, leaveTypes, fi
         router.get(route('admin.leave.requests.index'), {
             ...newFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['leaveRequests', 'filters'] });
     };
 
     const handleSubmit = (e) => {
@@ -383,7 +383,7 @@ export default function LeaveRequests({ leaveRequests, employees, leaveTypes, fi
 
             {/* Add/Edit Modal */}
             {showModal && (
-                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal show d-block modal-overlay">
                     <div className="modal-dialog modal-dialog-centered modal-lg">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -498,7 +498,7 @@ export default function LeaveRequests({ leaveRequests, employees, leaveTypes, fi
 
             {/* Approve Modal */}
             {showApproveModal && selectedRequest && (
-                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                <div className="modal show d-block modal-overlay">
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header">

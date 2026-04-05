@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class EmployeeEducation extends Model
 {
     use HasFactory;
+
+    protected $table = 'employee_education';
 
     protected $fillable = [
         'employee_id',

@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { router, useForm, Link, usePage } from '@inertiajs/react';
+import { router, useForm, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showSuccess, showError } from '@/Utils/sweetAlert';
 import { formatCurrency } from '@/Utils/formatters';
 
-export default function Request({ employee, salaryInfo }) {
-    const { props } = usePage();
-    
+export default function Request({ employee, salaryInfo, employees }) {
     const [calculation, setCalculation] = useState(salaryInfo);
+    const [employeeList, setEmployeeList] = useState(employees || []);
     
     const { data, setData, post, processing, errors } = useForm({
         employee_id: employee?.id || '',
@@ -31,13 +30,15 @@ export default function Request({ employee, salaryInfo }) {
 
     useEffect(() => {
         if (data.employee_id) {
-            router.get(route('admin.advances.getSalaryInfo', { employee_id: data.employee_id }), {}, {
-                onSuccess: (page) => {
-                    if (page.props.salaryInfo) {
-                        setCalculation(page.props.salaryInfo);
+            axios.get(route('admin.advances.getSalaryInfo', { employee_id: data.employee_id }))
+                .then(response => {
+                    if (response.data.salaryInfo) {
+                        setCalculation(response.data.salaryInfo);
                     }
-                },
-            });
+                })
+                .catch(error => {
+                    console.error('Error fetching salary info:', error);
+                });
         }
     }, [data.employee_id]);
 
@@ -106,7 +107,7 @@ export default function Request({ employee, salaryInfo }) {
                                             onChange={(e) => setData('employee_id', e.target.value)}
                                         >
                                             <option value="">Çalışan seçin</option>
-                                            {props.employees?.map((emp) => (
+                                            {employeeList?.map((emp) => (
                                                 <option key={emp.id} value={emp.id}>
                                                     {emp.first_name} {emp.last_name}
                                                 </option>

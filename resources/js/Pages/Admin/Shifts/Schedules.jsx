@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showError, showSuccess } from '@/Utils/sweetAlert';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 export default function Schedules({ schedules, shifts, employees, departments }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlashWithToast();
     
     const [assignments, setAssignments] = useState(Array.isArray(schedules) ? schedules : []);
     const [filter, setFilter] = useState({ department_id: '', shift_id: '' });
@@ -19,12 +19,6 @@ export default function Schedules({ schedules, shifts, employees, departments })
         end_date: '',
         recurrence: 'single'
     });
-
-    useEffect(() => {
-        if (flash?.success) {
-            showSuccess(flash.success);
-        }
-    }, [flash]);
 
     const filteredSchedules = assignments.filter(schedule => {
         if (filter.department_id && schedule.employee.department_id != filter.department_id) {
@@ -147,11 +141,10 @@ export default function Schedules({ schedules, shifts, employees, departments })
                         <div className="row g-3">
                             <div className="col-md-4">
                                 <label className="form-label fw-medium">Personeller</label>
-                                <select
-                                    className="form-select"
-                                    multiple
-                                    style={{ height: '150px' }}
-                                    value={bulkAssignment.selectedEmployees}
+                            <select
+                                className="form-select shift-calendar-cell"
+                                multiple
+                                value={bulkAssignment.selectedEmployees}
                                     onChange={(e) => {
                                         const selected = Array.from(e.target.selectedOptions).map(opt => opt.value);
                                         setBulkAssignment({...bulkAssignment, selectedEmployees: selected});

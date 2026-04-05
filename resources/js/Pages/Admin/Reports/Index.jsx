@@ -165,8 +165,8 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
-                                                {monthlyData.map((month, index) => (
-                                                    <tr key={index} className="hover:table-light">
+                                                {monthlyData.map((month) => (
+                                                    <tr key={month.period} className="hover:table-light">
                                                         <td className="px-4 py-3 fs-sm fw-medium text-dark">{month.period}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{month.employee_count}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(month.total_gross)}</td>
@@ -218,8 +218,8 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200">
-                                            {departmentCosts.map((dept, index) => (
-                                                <tr key={index} className="hover:table-light">
+                                            {departmentCosts.map((dept) => (
+                                                <tr key={dept.id || dept.name} className="hover:table-light">
                                                     <td className="px-4 py-3 fs-sm fw-medium text-dark">{dept.name}</td>
                                                     <td className="px-4 py-3 fs-sm text-dark">{dept.employee_count}</td>
                                                     <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(dept.avg_salary)}</td>
@@ -251,8 +251,8 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200">
-                                                {topEmployees.map((emp, index) => (
-                                                    <tr key={index} className="hover:table-light">
+                                             {topEmployees.map((emp) => (
+                                                 <tr key={emp.id || emp.name} className="hover:table-light">
                                                         <td className="px-4 py-3 fs-sm text-muted">{index + 1}</td>
                                                         <td className="px-4 py-3 fs-sm fw-medium text-dark">{emp.name}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{emp.department}</td>

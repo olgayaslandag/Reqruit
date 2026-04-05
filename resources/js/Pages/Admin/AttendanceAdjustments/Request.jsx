@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showError, showSuccess } from '@/Utils/sweetAlert';
 
 export default function Request({ employees, attendanceRecords }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
     const [formData, setFormData] = useState({
         employee_id: '',
         date: new Date().toISOString().split('T')[0],

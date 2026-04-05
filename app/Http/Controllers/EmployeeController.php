@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreEmployeeRequest;
@@ -263,92 +264,13 @@ class EmployeeController extends Controller
         ]);
 
         $employees = $this->employeeService->search($request->input('keyword'));
-        
+
         // Mask sensitive data before sending to client
         $maskedEmployees = $employees->map(function ($employee) {
             $empArray = $employee->toArray();
             if (isset($empArray['identity_no'])) {
                 $empArray['identity_no'] = $this->maskIdentityNumber($empArray['identity_no']);
             }
-            return $empArray;
-        });
-
-        return response()->json([
-            'employees' => $maskedEmployees,
-        ]);
-    }
-
-    private function maskIdentityNumber(?string $identityNo): ?string
-    {
-        if (!$identityNo || strlen($identityNo) !== 11) {
-            return $identityNo;
-        }
-        
-        // Show only last 4 digits, mask others with X
-        return 'XXXXX' . substr($identityNo, -4);
-    }
-}
-            return $empArray;
-        });
-
-        return response()->json([
-            'employees' => $maskedEmployees,
-        ]);
-    }
-
-    private function maskIdentityNumber(?string $identityNo): ?string
-    {
-        if (!$identityNo || strlen($identityNo) !== 11) {
-            return $identityNo;
-        }
-        
-        // Show only last 4 digits, mask others with X
-        return 'XXXXX' . substr($identityNo, -4);
-    }
-    
-    /**
-     * Return employee tree structure with masked identity numbers
-     */
-    public function getTree(): JsonResponse
-    {
-        $tree = $this->employeeService->getTree();
-        
-        // Mask identity_no in tree if present
-        $maskedTree = $this->maskTreeIdentityNos($tree);
-        
-        return response()->json($maskedTree);
-    }
-    
-    private function maskTreeIdentityNos($node)
-    {
-        if (is_array($node)) {
-            foreach ($node as $key => $value) {
-                if ($key === 'identity_no' && isset($node[$key])) {
-                    $node[$key] = $this->maskIdentityNumber($node[$key]);
-                } elseif (is_array($value) || is_object($value)) {
-                    $node[$key] = $this->maskTreeIdentityNos($value);
-                }
-            }
-        }
-        return $node;
-    }
-    
-    /**
-     * Get employee for dropdowns with masked identity_no
-     */
-    public function getForDropdown(): JsonResponse
-    {
-        $employees = $this->employeeRepository->getActiveForDropdown();
-        
-        $maskedEmployees = collect($employees)->map(function ($employee) {
-            if (isset($employee['identity_no'])) {
-                $employee['identity_no'] = $this->maskIdentityNumber($employee['identity_no']);
-            }
-            return $employee;
-        });
-
-        return response()->json($maskedEmployees);
-    }
 
             return $empArray;
         });
@@ -366,5 +288,51 @@ class EmployeeController extends Controller
 
         // Show only last 4 digits, mask others with X
         return 'XXXXX'.substr($identityNo, -4);
+    }
+
+    /**
+     * Return employee tree structure with masked identity numbers
+     */
+    public function getTree(): JsonResponse
+    {
+        $tree = $this->employeeService->getTree();
+
+        // Mask identity_no in tree if present
+        $maskedTree = $this->maskTreeIdentityNos($tree);
+
+        return response()->json($maskedTree);
+    }
+
+    private function maskTreeIdentityNos($node)
+    {
+        if (is_array($node)) {
+            foreach ($node as $key => $value) {
+                if ($key === 'identity_no' && isset($node[$key])) {
+                    $node[$key] = $this->maskIdentityNumber($node[$key]);
+                } elseif (is_array($value) || is_object($value)) {
+                    $node[$key] = $this->maskTreeIdentityNos($value);
+                }
+            }
+        }
+
+        return $node;
+    }
+
+    /**
+     * Get employee for dropdowns with masked identity_no
+     */
+    public function getForDropdown(): JsonResponse
+    {
+        $employees = $this->employeeRepository->getActiveForDropdown();
+
+        $maskedEmployees = collect($employees)->map(function ($employee) {
+            if (isset($employee['identity_no'])) {
+                $employee['identity_no'] = $this->maskIdentityNumber($employee['identity_no']);
+            }
+
+            return $employee;
+        });
+
+        return response()->json($maskedEmployees);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Interfaces;
 
 use App\Models\AdvanceRequest;
@@ -35,4 +36,9 @@ interface IAdvanceRepository
     public function markAsPaid(int $id, ?string $paymentDate = null): AdvanceRequest;
 
     public function cancel(int $id): AdvanceRequest;
+
+    /**
+     * Get status counts using GROUP BY for better performance.
+     */
+    public function getStatusCounts(): array;
 }

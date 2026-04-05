@@ -1,31 +1,22 @@
-import { useState, useEffect } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Pagination from '@/Components/Pagination';
+import EmptyState from '@/Components/EmptyState';
 import { Head } from '@inertiajs/react';
 import { confirmDelete } from '@/Utils/sweetAlert';
-import { showSuccess as showToastSuccess, showError as showToastError } from '@/Utils/toast';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 export default function Index({ forms, departments, filters }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlashWithToast();
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
-
-    useEffect(() => {
-        if (flash?.success) {
-            showToastSuccess(flash.success);
-        }
-        if (flash?.error) {
-            showToastError(flash.error);
-        }
-    }, [flash]);
     const formList = forms?.data || forms || [];
 
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('admin.forms.index'), {
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['forms', 'filters'] });
     };
 
     const handleDelete = (id) => {
@@ -131,8 +122,23 @@ export default function Index({ forms, departments, filters }) {
                             </tr>
                         ))) : (
                             <tr>
-                                <td colSpan="4" className="px-4 py-8 text-center text-muted">
-                                    Form bulunamadı.
+                                <td colSpan="4">
+                                    <EmptyState
+                                        title="Form bulunamadı"
+                                        description={searchTerm ? 
+                                            "Aradığınız kriterlere uygun form bulunamadı." : 
+                                            "Henüz hiç form oluşturulmamış. İlk formunuzu oluşturmak için aşağıdaki butona tıklayabilirsiniz."
+                                        }
+                                        icon={<i className="ti ti-forms"></i>}
+                                        actionUrl={searchTerm ?
+                                            route('admin.forms.index') :
+                                            route('admin.forms.create')
+                                        }
+                                        linkText={searchTerm ?
+                                            "Aramayı Temizle" :
+                                            "Yeni Form Oluştur"
+                                        }
+                                    />
                                 </td>
                             </tr>
                         )}
@@ -141,7 +147,7 @@ export default function Index({ forms, departments, filters }) {
                 </div>
             </div>
 
-            <Pagination meta={forms} baseUrl={route('admin.forms.index')} />
+            <Pagination meta={forms} baseUrl={route('admin.forms.index')} only={['forms', 'filters']} />
         </AuthenticatedLayout>
     );
 }

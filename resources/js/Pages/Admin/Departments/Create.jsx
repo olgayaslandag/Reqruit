@@ -88,8 +88,8 @@ export default function Create({ departments }) {
 
                                 <div className="mb-4">
                                     <label className="form-label fw-medium">E-postalar</label>
-                                    {data.emails.map((email, index) => (
-                                        <div key={index} className="input-group mb-2">
+                                    {data.emails.map((email, idx) => (
+                                        <div key={`${idx}-${email || 'empty'}`} className="input-group mb-2">
                                             <input
                                                 type="email"
                                                 className="form-control"

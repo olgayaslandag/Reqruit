@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Enums\UserRoleEnum;
@@ -14,7 +15,7 @@ class AdjustmentPolicy
 
     public function viewAny(User $user): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function view(User $user, AttendanceAdjustment $adjustment): bool
@@ -23,7 +24,7 @@ class AdjustmentPolicy
             return true;
         }
 
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function create(User $user): bool
@@ -33,7 +34,7 @@ class AdjustmentPolicy
 
     public function update(User $user, AttendanceAdjustment $adjustment): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function delete(User $user, AttendanceAdjustment $adjustment): bool
@@ -43,17 +44,17 @@ class AdjustmentPolicy
         }
 
         return ($adjustment->requested_by === $user->id) ||
-               in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+               in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function approve(User $user, AttendanceAdjustment $adjustment): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function reject(User $user, AttendanceAdjustment $adjustment): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function updateOwn(User $user, AttendanceAdjustment $adjustment): bool

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { router, Link, Head, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Pagination from '@/Components/Pagination';
+import EmptyState from '@/Components/EmptyState';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 
 const getRankLabel = (rankId) => {
@@ -34,14 +35,13 @@ const getStatusColor = (statusId) => {
 };
 
 export default function Index({ users, filters }) {
-    const { props } = usePage();
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
 
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('admin.users.index'), {
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['users', 'filters'] });
     };
 
     const handleDelete = (id) => {
@@ -130,14 +130,14 @@ export default function Index({ users, filters }) {
                                             <div className="d-flex align-items-center justify-content-end gap-2">
                                                 <Link
                                                     href={`/admin/users/${user.id}/edit`}
-                                                    className="btn btn-link btn-sm text-primary p-0"
+                                                    className="btn btn-link text-primary p-0"
                                                     title="Düzenle"
                                                 >
                                                     <i className="ti ti-edit"></i>
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(user.id)}
-                                                    className="btn btn-link btn-sm text-danger p-0"
+                                                    className="btn btn-link text-danger p-0"
                                                     title="Sil"
                                                 >
                                                     <i className="ti ti-trash"></i>
@@ -149,8 +149,14 @@ export default function Index({ users, filters }) {
 
                                 {(users?.data?.length === 0 || !users?.data) && (
                                     <tr>
-                                        <td colSpan="6" className="px-4 py-8 text-center fs-sm text-muted">
-                                            Kullanıcı bulunamadı.
+                                        <td colSpan="6">
+                                            <EmptyState
+                                                title="Hiç kullanıcı bulunamadı"
+                                                description="Henüz hiç kullanıcı oluşturulmamış. Yeni bir kullanıcı oluşturmak için aşağıdaki butona tıklayabilirsiniz."
+                                                icon={<i className="ti ti-user-plus"></i>}
+                                                actionUrl={route('admin.users.create')}
+                                                linkText="Yeni Kullanıcı Oluştur"
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -160,7 +166,7 @@ export default function Index({ users, filters }) {
 
                     {/* Pagination */}
                     {users.meta && users.meta.last_page > 1 && (
-                        <Pagination meta={users.meta} baseUrl={route('admin.users.index')} />
+                        <Pagination meta={users.meta} baseUrl={route('admin.users.index')} only={['users', 'filters']} />
                     )}
                 </div>
             </div>

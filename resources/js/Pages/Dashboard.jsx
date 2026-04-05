@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import ReactApexChart from 'react-apexcharts';
 
 export default function Dashboard({ stats, weeklySubmissions }) {
     const menuItems = [
@@ -34,19 +34,46 @@ export default function Dashboard({ stats, weeklySubmissions }) {
         { label: 'Departman', value: stats?.departments ?? 0, icon: '🏢', color: 'text-primary' },
     ];
 
-    const maxCount = Math.max(...(weeklySubmissions?.map(d => d.count) ?? [1]), 1);
+    const chartOptions = {
+        chart: {
+            type: 'bar',
+            height: 300,
+            toolbar: { show: false },
+        },
+        plotOptions: {
+            bar: {
+                borderRadius: 6,
+                columnWidth: '70%',
+                distributed: true,
+            }
+        },
+        dataLabels: { enabled: false },
+        legend: { show: false },
+        xaxis: {
+            categories: (weeklySubmissions || []).map(w => w.label),
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+        },
+        yaxis: {
+            title: { text: 'Başvuru Sayısı' },
+            min: 0,
+        },
+        colors: ['#3b82f6'],
+        grid: {
+            borderColor: '#e5e7eb',
+            strokeDashArray: 4,
+        },
+    };
+
+    const chartSeries = [
+        {
+            name: 'Başvurular',
+            data: (weeklySubmissions || []).map(w => w.count),
+        },
+    ];
 
     return (
-        <AuthenticatedLayout
-            pageHeader={{
-                title: 'Ana Ekran',
-                breadcrumbs: [
-                    { label: 'Ana Sayfa', url: route('dashboard') },
-                ],
-            }}
-        >
-            <Head title="Ana Ekran" />
-
+        <AuthenticatedLayout>
             <div className="py-5">
                 <div className="container-xl">
                     <div className="mb-4">
@@ -56,25 +83,12 @@ export default function Dashboard({ stats, weeklySubmissions }) {
 
                     {/* Haftalık Grafik */}
                     <div className="card border-0 shadow-sm p-4 mb-4">
-                        <h5 className="fw-medium">Son 7 Günlük Başvurular</h5>
-                        <div className="d-flex align-items-end justify-content-between" style={{ height: '192px' }}>
-                            {(weeklySubmissions || []).map((day, index) => (
-                                <div key={index} className="d-flex-1 text-center">
-                                    <div className="w-100 d-flex d-flex-column align-items-center justify-content-end" style={{ height: '144px' }}>
-                                        <span className="small fw-medium text-body-secondary mb-1">{day.count}</span>
-                                        <div
-                                            className="w-100 bg-primary rounded-top"
-                                            style={{ height: `${(day.count / maxCount) * 100}%`, minHeight: day.count > 0 ? '8px' : '2px' }}
-                                        />
-                                    </div>
-                                    <span className="small text-body-secondary mt-2">{day.day}</span>
-                                </div>
-                            ))}
-                        </div>
+                        <h5 className="fw-medium mb-3">Son 7 Haftalık Başvurular</h5>
+                        <ReactApexChart options={chartOptions} series={chartSeries} type="bar" height={300} />
                     </div>
 
                     <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 mb-4">
-                        {(statsData || []).map((stat, index) => {
+                        {(statsData || []).map((stat) => {
                             let href = '#';
                             if (stat.label === 'Toplam Başvuru' || stat.label.includes('Başvuru')) {
                                 href = '/admin/submissions';
@@ -87,7 +101,7 @@ export default function Dashboard({ stats, weeklySubmissions }) {
                             }
                             
                             return (
-                                <div key={index} className="col">
+                            <div key={stat.label} className="col">
                                     <Link href={href} className="card border-0 shadow-sm p-3">
                                         <div className="d-flex align-items-center">
                                             <div className="fs-4 me-3">{stat.icon}</div>
@@ -103,8 +117,8 @@ export default function Dashboard({ stats, weeklySubmissions }) {
                     </div>
 
                     <div className="row row-cols-1 row-cols-md-3 g-4">
-                        {(menuItems || []).map((item, index) => (
-                            <div key={index} className="col">
+                        {(menuItems || []).map((item) => (
+                            <div key={item.title} className="col">
                                 <Link
                                     href={item.href}
                                     className={`${item.color} card border-0 shadow-sm p-4 text-decoration-none`}

@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Employee;
 use App\Models\PayrollPeriod;
+use Illuminate\Http\Request;
 
 class PayrollReportService
 {
@@ -224,53 +226,32 @@ class PayrollReportService
         ];
     }
 
-        $totalSgkEmployee = 0;
-        $totalSgkEmployer = 0;
-        $totalIncomeTax = 0;
-        $totalStampTax = 0;
-        $totalGross = 0;
+    public function getMonthlyComparison(Request $request)
+    {
+        // Get monthly comparison data
+        $startDate = $request->get('start_date', now()->startOfYear()->toDateString());
+        $endDate = $request->get('end_date', now()->endOfYear()->toDateString());
 
-        foreach ($calculationsBatch as $calculation) {
-            $totalGross += $calculation['gross_salary'];
-            $totalSgkEmployee += $calculation['sgk_employee']['total'];
-            $totalIncomeTax += $calculation['income_tax'];
-            $totalStampTax += $calculation['stamp_tax'];
+        $periods = PayrollPeriod::whereBetween('start_date', [$startDate, $endDate])
+            ->orderBy('start_date')
+            ->get();
 
-            // İşveren payı (ayrı hesaplanır)
-            $employerCost = $this->salaryCalculationService->calculateEmployerCost($calculation['gross_salary']);
-            $totalSgkEmployer += $employerCost['sgk_employer']['total'];
+        $comparison = [];
+        foreach ($periods as $period) {
+            $summary = $this->getTaxSummary($period);
+            $comparison[] = [
+                'period' => $period,
+                'total_gross' => $summary['total_gross'],
+                'sgk' => $summary['sgk'],
+                'income_tax' => $summary['income_tax'],
+                'stamp_tax' => $summary['stamp_tax'],
+                'total_deductions' => $summary['total_deductions'],
+                'total_net' => $summary['total_net'],
+                'total_employer_cost' => $summary['total_employer_cost'],
+            ];
         }
 
-        return [
-            'period' => $period,
-            'total_gross' => $totalGross,
-            'sgk' => [
-                'employee_share' => $totalSgkEmployee,
-                'employer_share' => $totalSgkEmployer,
-                'total' => $totalSgkEmployee + $totalSgkEmployer,
-            ],
-            'income_tax' => $totalIncomeTax,
-            'stamp_tax' => $totalStampTax,
-            'total_deductions' => $totalSgkEmployee + $totalIncomeTax + $totalStampTax,
-            'total_net' => $totalGross - ($totalSgkEmployee + $totalIncomeTax + $totalStampTax),
-            'total_employer_cost' => $totalGross + $totalSgkEmployer,
-        ];
-    }
-
-        return [
-            'period' => $period,
-            'total_gross' => $totalGross,
-            'sgk' => [
-                'employee_share' => $totalSgkEmployee,
-                'employer_share' => $totalSgkEmployer,
-                'total' => $totalSgkEmployee + $totalSgkEmployer,
-            ],
-            'income_tax' => $totalIncomeTax,
-            'stamp_tax' => $totalStampTax,
-            'total_deductions' => $totalSgkEmployee + $totalIncomeTax + $totalStampTax,
-            'total_net' => $totalGross - ($totalSgkEmployee + $totalIncomeTax + $totalStampTax),
-            'total_employer_cost' => $totalGross + $totalSgkEmployer,
-        ];
+        return $comparison;
     }
 
     /**

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import EmptyState from '@/Components/EmptyState';
 import { confirmDelete } from '@/Utils/sweetAlert';
 import { showSuccess } from '@/Utils/toast';
 import Pagination from '@/Components/Pagination';
@@ -14,9 +15,6 @@ import {
 } from '@/Utils/attendanceHelpers.jsx';
 
 export default function Index({ attendances, filters = {}, employees = [] }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [localFilters, setLocalFilters] = useState({
         status: filters?.status || '',
@@ -31,7 +29,7 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
         router.get(route('admin.attendance.index'), {
             ...newFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['attendances', 'filters'] });
     };
 
     const handleDelete = (id) => {
@@ -162,19 +160,21 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                                         </td>
                                         <td className="px-4 py-3 text-end">
                                             <div className="d-flex gap-1 justify-content-end">
-                                                <Link
+                                                 <Link
                                                     href={route('admin.attendance.edit', attendance.id)}
                                                     className="btn btn-link p-0 text-primary"
                                                     title="Düzenle"
+                                                    aria-label={`Devam kaydını düzenle: ${attendance.employee?.first_name} ${attendance.employee?.last_name}, ${formatDate(attendance.date)}`}
                                                 >
-                                                    <i className="ti ti-edit"></i>
+                                                    <i className="ti ti-edit" aria-hidden="true"></i>
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(attendance.id)}
                                                     className="btn btn-link p-0 text-danger"
                                                     title="Sil"
+                                                    aria-label={`Devam kaydını sil: ${attendance.employee?.first_name} ${attendance.employee?.last_name}, ${formatDate(attendance.date)}`}
                                                 >
-                                                    <i className="ti ti-trash"></i>
+                                                    <i className="ti ti-trash" aria-hidden="true"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -182,8 +182,23 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="8" className="px-4 py-5 text-center text-muted">
-                                        Devam kaydı bulunamadı.
+                                    <td colSpan="8">
+                                        <EmptyState
+                                            title="Devam kaydı bulunamadı"
+                                            description={searchTerm || localFilters.employee_id || localFilters.status || localFilters.date_from || localFilters.date_to ? 
+                                                "Aradığınız kriterlere uygun devam kaydı bulunamadı." : 
+                                                "Henüz hiç devam kaydı oluşturulmamış. Devam kaydı eklemek için aşağıdaki butona tıklayabilirsiniz."
+                                            }
+                                            icon={<i className="ti ti-calendar-check" aria-hidden="true"></i>}
+                                            actionUrl={searchTerm || localFilters.employee_id || localFilters.status || localFilters.date_from || localFilters.date_to ?
+                                                route('admin.attendance.index') :
+                                                route('admin.attendance.scan')
+                                            }
+                                            linkText={searchTerm || localFilters.employee_id || localFilters.status || localFilters.date_from || localFilters.date_to ?
+                                                "Filtreleri Temizle" :
+                                                "Yeni Devam Kaydı Ekle"
+                                            }
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -192,7 +207,7 @@ export default function Index({ attendances, filters = {}, employees = [] }) {
                 </div>
             </div>
 
-            <Pagination meta={attendances} baseUrl={route('admin.attendance.index')} />
+            <Pagination meta={attendances} baseUrl={route('admin.attendance.index')} only={['attendances', 'filters']} />
         </AuthenticatedLayout>
     );
 }

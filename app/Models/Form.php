@@ -13,6 +13,8 @@ class Form extends Model
 {
     use HasFactory;
 
+    protected $table = 'forms';
+
     protected $fillable = [
         'department_id',
         'name',

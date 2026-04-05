@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { showSuccess as showToastSuccess, showError as showToastError } from '@/Utils/toast';
+import { Head, useForm } from '@inertiajs/react';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 const FIELD_TYPES = [
     { value: 'text', label: 'Metin' },
@@ -17,17 +17,7 @@ const FIELD_TYPES = [
 ];
 
 export default function Builder({ departments, form }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
-    useEffect(() => {
-        if (flash?.success) {
-            showToastSuccess(flash.success);
-        }
-        if (flash?.error) {
-            showToastError(flash.error);
-        }
-    }, [flash]);
+    const flash = useFlashWithToast();
 
     const { data, setData, post, put } = useForm({
         name: form?.name || '',
@@ -235,8 +225,8 @@ export default function Builder({ departments, form }) {
                                 <div className="mb-3">
                                     <label className="form-label">Bildirim E-postaları</label>
                                     <small className="text-muted d-block mb-2">Bu formdan başvuru geldiğinde bildirim gönderilecek e-postalar</small>
-                                    {(data.notification_emails || []).map((email, index) => (
-                                        <div key={index} className="d-flex gap-2 mb-2">
+                                    {(data.notification_emails || []).map((email, idx) => (
+                                        <div key={`${idx}-${email || 'empty'}`} className="d-flex gap-2 mb-2">
                                             <input className="form-control" type="email"
                                                 value={email || ''}
                                                 onChange={(e) => {
@@ -310,9 +300,9 @@ export default function Builder({ departments, form }) {
                             <div className="card-body">
                                 {data.fields.length > 0 ? (
                                     <div className="d-flex flex-column gap-3">
-                                        {data.fields.map((field, index) => (
-                                            <div
-                                                key={index}
+                                    {data.fields.map((field, index) => (
+                                        <div
+                                            key={field.name || `field-${index}`}
                                                 draggable
                                                 onDragStart={() => handleDragStart(index)}
                                                 onDragOver={(e) => handleDragOver(e, index)}
@@ -361,7 +351,7 @@ export default function Builder({ departments, form }) {
                                                                 checked={field.required}
                                                                 onChange={(e) => updateField(index, 'required', e.target.checked)}
                                                                 className="form-check-input"
-                                                                id={`required_${index}`}
+                                                                id={`required_${field.name || index}`}
                                                             />
                                                             <label className="form-check-label" htmlFor={`required_${index}`}>
                                                                 Zorunlu
@@ -374,7 +364,7 @@ export default function Builder({ departments, form }) {
                                                     <div className="mt-3">
                                                         <label className="form-label">Seçenekler</label>
                                                         {(field.options || []).map((option, optionIndex) => (
-                                                            <div key={optionIndex} className="d-flex gap-2 mb-2">
+                                                            <div key={`${optionIndex}-${option}`} className="d-flex gap-2 mb-2">
                                                                 <input className="form-control" type="text"
                                                                     value={option}
                                                                     onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}

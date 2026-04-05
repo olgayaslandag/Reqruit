@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import EmptyState from '@/Components/EmptyState';
 import { Head } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import { formatCurrency, formatPercentage } from '@/Utils/formatters';
@@ -9,7 +10,6 @@ import { tr } from 'date-fns/locale';
 import { getStatusBadgeClass } from '@/Utils/commonUtils';
 
 export default function Index({ components, filters }) {
-    const { props } = usePage();
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [typeFilter, setTypeFilter] = useState(filters?.type || '');
@@ -19,14 +19,14 @@ export default function Index({ components, filters }) {
         router.get(route('admin.salary-components.index'), {
             ...(typeFilter && { type: typeFilter }),
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['components', 'filters'] });
     };
 
     const handleFilterChange = (key, value) => {
         router.get(route('admin.salary-components.index'), {
             ...(key === 'type' ? { type: value } : { [key]: value }),
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['components', 'filters'] });
     };
 
     const handleDelete = (id) => {
@@ -239,9 +239,14 @@ export default function Index({ components, filters }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="text-center py-4 text-muted">
-                                            <i className="ti ti-plus-off fs-1 d-block mb-2"></i>
-                                            Ek ödeme kalemi bulunmuyor.
+                                        <td colSpan="6">
+                                            <EmptyState
+                                                title="Ek ödeme kalemi bulunmuyor"
+                                                description="Henüz hiç ek ödeme kalemi oluşturulmamış. Yeni bir kalem oluşturmak için aşağıdaki butona tıklayabilirsiniz."
+                                                icon={<i className="ti ti-plus-off"></i>}
+                                                actionUrl={route('admin.salary-components.create')}
+                                                linkText="Yeni Ek Ödeme Kalem Oluştur"
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -326,9 +331,14 @@ export default function Index({ components, filters }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="5" className="text-center py-4 text-muted">
-                                            <i className="ti ti-minus-off fs-1 d-block mb-2"></i>
-                                            Kesinti kalemi bulunmuyor.
+                                        <td colSpan="5">
+                                            <EmptyState
+                                                title="Kesinti kalemi bulunmuyor"
+                                                description="Henüz hiç kesinti kalemi oluşturulmamış. Yeni bir kesinti oluşturmak için aşağıdaki butona tıklayabilirsiniz."
+                                                icon={<i className="ti ti-minus-off"></i>}
+                                                actionUrl={route('admin.salary-components.create')}
+                                                linkText="Yeni Kesinti Kalem Oluştur"
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -349,11 +359,12 @@ export default function Index({ components, filters }) {
                         </div>
                         <nav>
                             <ul className="pagination pagination-sm mb-0">
-                                {components.meta.links.filter(link => link.url).map((link, index) => (
-                                    <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                {components.meta.links.filter(link => link.url).map(link => (
+                                    <li key={link.url || link.label} className={`page-item ${link.active ? 'active' : ''}`}>
                                         <Link
                                             href={link.url}
                                             className="page-link"
+                                            data={{ only: ['components', 'filters'] }}
                                             dangerouslySetInnerHTML={{
                                                 __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
                                             }}

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\AdvanceStatusEnum;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class AdvanceRequest extends Model
 {
     use HasFactory;
+
+    protected $table = 'advance_requests';
 
     protected $fillable = [
         'employee_id',

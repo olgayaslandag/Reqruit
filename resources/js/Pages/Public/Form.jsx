@@ -179,8 +179,8 @@ export default function Form({ form }) {
                 )}
 
                 <form onSubmit={handleSubmit} encType="multipart/form-data" className="dd-form">
-                    {form.fields.map((field, index) => (
-                        <div key={index} className="dd-field">
+                    {form.fields.map(field => (
+                        <div key={field.name} className="dd-field">
                             <label className="dd-label">
                                 {field.label}
                                 {field.required && <span className="dd-required">*</span>}

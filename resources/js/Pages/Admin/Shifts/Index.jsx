@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import EmptyState from '@/Components/EmptyState';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
+import { useFlashWithToast } from '@/Hooks/useFlash';
+import Pagination from '@/Components/Pagination';
 
 export default function Index({ shifts, employees = [], departments = [], filters = {} }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlashWithToast();
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [localFilters, setLocalFilters] = useState({
@@ -14,18 +16,12 @@ export default function Index({ shifts, employees = [], departments = [], filter
         status: filters?.status || ''
     });
 
-    useEffect(() => {
-        if (flash?.success) {
-            showSuccess(flash.success);
-        }
-    }, [flash]);
-
     const handleSearch = (e) => {
         e.preventDefault();
         router.get(route('admin.shifts.index'), {
             ...localFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['shifts', 'filters'] });
     };
 
     const handleFilterChange = (key, value) => {
@@ -34,7 +30,7 @@ export default function Index({ shifts, employees = [], departments = [], filter
         router.get(route('admin.shifts.index'), {
             ...newFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['shifts', 'filters'] });
     };
 
     const handleReset = () => {
@@ -43,7 +39,7 @@ export default function Index({ shifts, employees = [], departments = [], filter
             department_id: '',
             status: ''
         });
-        router.get(route('admin.shifts.index'), {}, { replace: true });
+        router.get(route('admin.shifts.index'), {}, { replace: true, only: ['shifts', 'filters'] });
     };
 
     const handleDelete = (id) => {
@@ -203,9 +199,23 @@ export default function Index({ shifts, employees = [], departments = [], filter
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center py-4 text-muted">
-                                            <i className="ti ti-clock fs-1 d-block mb-2"></i>
-                                            Vardiya bulunamadı.
+                                        <td colSpan="7">
+                                            <EmptyState
+                                                title="Vardiya bulunamadı"
+                                                description={filters.search || filters.department_id || filters.status ?
+                                                    "Aradığınız kriterlere uygun vardiya bulunamadı." :
+                                                    "Henüz hiç vardiya tanımlanmamış. Yeni bir vardiya oluşturmak için aşağıdaki butona tıklayabilirsiniz."
+                                                }
+                                                icon={<i className="ti ti-clock"></i>}
+                                                actionUrl={filters.search || filters.department_id || filters.status ?
+                                                    route('admin.shifts.index') :
+                                                    route('admin.shifts.create')
+                                                }
+                                                linkText={filters.search || filters.department_id || filters.status ?
+                                                    "Filtreleri temizle" :
+                                                    "Yeni Vardiya Tanımla"
+                                                }
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -215,23 +225,7 @@ export default function Index({ shifts, employees = [], departments = [], filter
                 </div>
             </div>
 
-            {shifts?.meta && shifts.meta.last_page > 1 && (
-                <div className="d-flex justify-content-center mt-4">
-                    <nav>
-                        <ul className="pagination mb-0">
-                            {(shifts?.meta?.links || []).map((link, index) => (
-                                <li key={index} className={`page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}`}>
-                                    <Link
-                                        href={link.url || '#'}
-                                        className="page-link"
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-                </div>
-            )}
+            <Pagination meta={shifts} baseUrl={route('admin.shifts.index')} />
         </AuthenticatedLayout>
     );
 }

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PayrollItem extends Model
 {
     use HasFactory;
+
+    protected $table = 'payroll_items';
 
     protected $fillable = [
         'payroll_period_id',

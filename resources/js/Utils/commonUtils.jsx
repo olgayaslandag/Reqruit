@@ -281,3 +281,12 @@ export const getApprovalStatusBadgeClass = (status) => {
 export const getWorkCalendarStatusBadgeClass = (isActive) => {
     return isActive ? 'bg-success' : 'bg-danger';
 };
+
+/**
+ * Get badge class for salary component type (earning/deduction)
+ * @param {string} type - Component type
+ * @returns {string} - CSS class string
+ */
+export const getTypeBadgeClass = (type) => {
+    return type === 'earning' ? 'bg-success' : 'bg-danger';
+};

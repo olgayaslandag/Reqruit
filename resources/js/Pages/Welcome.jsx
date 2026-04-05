@@ -33,7 +33,7 @@ export default function Welcome({ auth }) {
                         <h1 className="display-3 fw-bold mb-4">
                             Başvuru Yönetim Sistemi
                         </h1>
-                        <p className="lead mb-5 mx-auto" style={{ maxWidth: '720px' }}>
+                        <p className="lead mb-5 mx-auto welcome-lead-max-width">
                             Departmanlarınız için dinamik formlar oluşturun,
                             başvuruları yönetin ve iş akışınızı hızlandırın.
                         </p>

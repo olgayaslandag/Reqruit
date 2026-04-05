@@ -87,7 +87,7 @@ export default function Index({ departments }) {
         const rows = [
             <tr key={department.id}>
                 <td className="px-4 py-3 text-nowrap">
-                    <div className="d-flex align-items-center" style={{ paddingLeft: indent }}>
+                    <div className={`d-flex align-items-center ${department.parent_id ? 'department-tree-node': ''}`} style={department.parent_id ? {paddingLeft: `${level * 20}px`} : {}}>
                         {isParent && (
                             <i className="bi bi-chevron-down me-1 text-muted"></i>
                         )}
@@ -112,15 +112,17 @@ export default function Index({ departments }) {
                             onClick={() => openModal(department)}
                             className="btn btn-link text-primary p-0"
                             title="Düzenle"
+                            aria-label={`Departmanı düzenle: ${department.title}`}
                         >
-                            <i className="ti ti-edit"></i>
+                            <i className="ti ti-edit" aria-hidden="true"></i>
                         </button>
                         <button
                             onClick={() => handleDelete(department.id)}
                             className="btn btn-link text-danger p-0"
                             title="Sil"
+                            aria-label={`Departmanı sil: ${department.title}`}
                         >
-                            <i className="ti ti-trash"></i>
+                            <i className="ti ti-trash" aria-hidden="true"></i>
                         </button>
                     </div>
                 </td>
@@ -181,7 +183,7 @@ export default function Index({ departments }) {
                                     <h5 className="modal-title">
                                         {editingDepartment ? 'Departman Düzenle' : 'Yeni Departman'}
                                     </h5>
-                                    <button type="button" className="btn-close" onClick={closeModal}></button>
+                                    <button type="button" className="btn-close" onClick={closeModal} aria-label="Kapat"></button>
                                 </div>
                                 <div className="modal-body">
                                     <div className="mb-3">
@@ -211,21 +213,22 @@ export default function Index({ departments }) {
                                         />
                                     </div>
 
-                                    <div className="mb-0">
-                                        <label className="form-label fw-medium">E-postalar</label>
-                                        {data.emails.map((email, index) => (
-                                            <div key={index} className="input-group mb-2">
+                                        <div className="mb-0">
+                                            <label className="form-label fw-medium">E-postalar</label>
+                                            {data.emails.map((email, idx) => (
+                                                <div key={`${idx}-${email || 'empty'}`} className="input-group mb-2">
                                                 <input className="form-control" type="email"
                                                     value={email}
-                                                    onChange={(e) => handleEmailChange(index, e.target.value)}
+                                                    onChange={(e) => handleEmailChange(idx, e.target.value)}
                                                     placeholder="email@example.com"
                                                 />
                                                 <button
                                                     type="button"
-                                                    onClick={() => removeEmailField(index)}
+                                                    onClick={() => removeEmailField(idx)}
                                                     className="btn btn-outline-danger"
+                                                    aria-label="E-posta adresini kaldır"
                                                 >
-                                                    <i className="ti ti-x"></i>
+                                                    <i className="ti ti-x" aria-hidden="true"></i>
                                                 </button>
                                             </div>
                                         ))}
@@ -233,8 +236,9 @@ export default function Index({ departments }) {
                                             type="button"
                                             onClick={addEmailField}
                                             className="btn btn-link text-primary p-0"
+                                            aria-label="E-posta alanı ekle"
                                         >
-                                            <i className="ti ti-plus me-1"></i>
+                                            <i className="ti ti-plus me-1" aria-hidden="true"></i>
                                             E-posta ekle
                                         </button>
                                     </div>

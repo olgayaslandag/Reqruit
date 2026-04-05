@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
-export default function Index({ statistics = {}, reportsSummary = {}, filters = {} }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
+export default function Index({ statistics = {}, reportsSummary = {}, filters = {}, employees = [] }) {
     const [reportFilters, setReportFilters] = useState({
         period: filters?.period || 'current_month',
         date_range: filters?.date_range || {},
@@ -132,7 +129,7 @@ export default function Index({ statistics = {}, reportsSummary = {}, filters = 
                                             onChange={(e) => setReportFilters({...reportFilters, employee_id: e.target.value})}
                                         >
                                             <option value="">Tümü</option>
-                                            {props.employees?.map((emp) => (
+                                            {employees?.map((emp) => (
                                                 <option key={emp.id} value={emp.id}>
                                                     {emp.first_name} {emp.last_name}
                                                 </option>

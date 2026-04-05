@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import EmptyState from '@/Components/EmptyState';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import { formatDate } from '@/Utils/attendanceHelpers';
 import { getWorkCalendarStatusBadgeClass } from '@/Utils/commonUtils';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 
 export default function Index({ calendars, filters = {} }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlashWithToast();
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [localFilters, setLocalFilters] = useState({
@@ -22,7 +23,7 @@ export default function Index({ calendars, filters = {} }) {
         router.get(route('admin.work-calendars.index'), {
             ...localFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['calendars', 'filters'] });
     };
 
     // Filtre değişikliği
@@ -32,7 +33,7 @@ export default function Index({ calendars, filters = {} }) {
         router.get(route('admin.work-calendars.index'), {
             ...newFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['calendars', 'filters'] });
     };
 
     // Silme işlemi
@@ -77,7 +78,7 @@ export default function Index({ calendars, filters = {} }) {
                             <div className="row g-3">
                                 <div className="col-md-6">
                                     <label className="form-label fw-medium">
-                                        <i className="ti ti-search me-1"></i> Arama
+                                        <i className="ti ti-search me-1" aria-hidden="true"></i> Arama
                                     </label>
                                     <input
                                         className="form-control"
@@ -90,7 +91,7 @@ export default function Index({ calendars, filters = {} }) {
 
                                 <div className="col-md-4">
                                     <label className="form-label fw-medium">
-                                        <i className="ti ti-toggle-right me-1"></i> Durum
+                                        <i className="ti ti-toggle-right me-1" aria-hidden="true"></i> Durum
                                     </label>
                                     <select
                                         className="form-select"
@@ -104,9 +105,9 @@ export default function Index({ calendars, filters = {} }) {
                                 </div>
 
                                 <div className="col-md-2 d-flex align-items-end">
-                                    <button type="submit" className="btn btn-primary w-100">
-                                        <i className="ti ti-filter me-1"></i> Filtrele
-                                    </button>
+                                <button type="submit" className="btn btn-primary w-100" aria-label="Filtrele">
+                                    <i className="ti ti-filter me-1" aria-hidden="true"></i> Filtrele
+                                </button>
                                 </div>
                             </div>
                         </form>
@@ -119,7 +120,7 @@ export default function Index({ calendars, filters = {} }) {
                 <div className="col-md-3">
                     <div className="card border-primary">
                         <div className="card-body text-center">
-                            <i className="ti ti-calendar fs-2 text-primary mb-2"></i>
+                            <i className="ti ti-calendar fs-2 text-primary mb-2" aria-hidden="true"></i>
                             <h6 className="text-primary fw-medium">Toplam Takvim</h6>
                             <h3 className="fw-bold text-primary">{stats.total}</h3>
                         </div>
@@ -128,7 +129,7 @@ export default function Index({ calendars, filters = {} }) {
                 <div className="col-md-3">
                     <div className="card border-success">
                         <div className="card-body text-center">
-                            <i className="ti ti-check fs-2 text-success mb-2"></i>
+                            <i className="ti ti-check fs-2 text-success mb-2" aria-hidden="true"></i>
                             <h6 className="text-success fw-medium">Aktif Takvim</h6>
                             <h3 className="fw-bold text-success">{stats.active}</h3>
                         </div>
@@ -137,7 +138,7 @@ export default function Index({ calendars, filters = {} }) {
                 <div className="col-md-3">
                     <div className="card border-info">
                         <div className="card-body text-center">
-                            <i className="ti ti-briefcase fs-2 text-info mb-2"></i>
+                            <i className="ti ti-briefcase fs-2 text-info mb-2" aria-hidden="true"></i>
                             <h6 className="text-info fw-medium">Toplam İş Günü</h6>
                             <h3 className="fw-bold text-info">{stats.totalWorkingDays}</h3>
                         </div>
@@ -146,7 +147,7 @@ export default function Index({ calendars, filters = {} }) {
                 <div className="col-md-3">
                     <div className="card border-warning">
                         <div className="card-body text-center">
-                            <i className="ti ti-palm fs-2 text-warning mb-2"></i>
+                            <i className="ti ti-palm fs-2 text-warning mb-2" aria-hidden="true"></i>
                             <h6 className="text-warning fw-medium">Toplam Tatil Günü</h6>
                             <h3 className="fw-bold text-warning">{stats.totalHolidays}</h3>
                         </div>
@@ -158,10 +159,10 @@ export default function Index({ calendars, filters = {} }) {
             <div className="card">
                 <div className="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 className="mb-0 fw-bold">
-                        <i className="ti ti-calendar-event me-2"></i> Tanımlı Çalışma Takvimleri
+                        <i className="ti ti-calendar-event me-2" aria-hidden="true"></i> Tanımlı Çalışma Takvimleri
                     </h5>
-                    <Link href={route('admin.work-calendars.create')} className="btn btn-primary btn-sm">
-                        <i className="ti ti-plus me-1"></i> Yeni Takvim
+                    <Link href={route('admin.work-calendars.create')} className="btn btn-primary btn-sm" aria-label="Yeni çalışma takvimi oluştur">
+                        <i className="ti ti-plus me-1" aria-hidden="true"></i> Yeni Takvim
                     </Link>
                 </div>
                 <div className="card-body p-0">
@@ -223,22 +224,25 @@ export default function Index({ calendars, filters = {} }) {
                                                         href={route('admin.work-calendars.show', calendar.id)}
                                                         className="btn btn-sm btn-outline-info"
                                                         title="Görüntüle"
+                                                        aria-label={`Takvimi Görüntüle: ${calendar.name}`}
                                                     >
-                                                        <i className="ti ti-eye"></i>
+                                                        <i className="ti ti-eye" aria-hidden="true"></i>
                                                     </Link>
                                                     <Link
                                                         href={route('admin.work-calendars.edit', calendar.id)}
                                                         className="btn btn-sm btn-outline-primary"
                                                         title="Düzenle"
+                                                        aria-label={`Takvimi Düzenle: ${calendar.name}`}
                                                     >
-                                                        <i className="ti ti-edit"></i>
+                                                        <i className="ti ti-edit" aria-hidden="true"></i>
                                                     </Link>
                                                     <button
                                                         onClick={() => handleDelete(calendar.id)}
                                                         className="btn btn-sm btn-outline-danger"
                                                         title="Sil"
+                                                        aria-label={`Takvimi Sil: ${calendar.name}`}
                                                     >
-                                                        <i className="ti ti-trash"></i>
+                                                        <i className="ti ti-trash" aria-hidden="true"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -246,9 +250,23 @@ export default function Index({ calendars, filters = {} }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center py-4 text-muted">
-                                            <i className="ti ti-calendar-off fs-1 d-block mb-2"></i>
-                                            Takvim tanımı bulunamadı.
+                                        <td colSpan="7">
+                                            <EmptyState
+                                                title="Takvim tanımı bulunamadı"
+                                                description={filters.search || filters.status ? 
+                                                    "Aradığınız kriterlere uygun takvim tanımı bulunamadı." : 
+                                                    "Henüz hiç çalışma takvimi tanımlanmamış. Yeni bir takvim oluşturmak için aşağıdaki butona tıklayabilirsiniz."
+                                                }
+                                                icon={<i className="ti ti-calendar-event" aria-hidden="true"></i>}
+                                                actionUrl={filters.search || filters.status ?
+                                                    route('admin.work-calendars.index') :
+                                                    route('admin.work-calendars.create')
+                                                }
+                                                linkText={filters.search || filters.status ?
+                                                    "Filtreleri Temizle" :
+                                                    "Yeni Çalışma Takvimi Oluştur"
+                                                }
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -268,11 +286,12 @@ export default function Index({ calendars, filters = {} }) {
                             </div>
                             <nav>
                                 <ul className="pagination pagination-sm mb-0">
-                                    {calendars.meta.links.filter(link => link.url).map((link, index) => (
-                                        <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                    {calendars.meta.links.filter(link => link.url).map(link => (
+                                        <li key={link.url || link.label} className={`page-item ${link.active ? 'active' : ''}`}>
                                             <Link
                                                 href={link.url}
                                                 className="page-link"
+                                                data={{ only: ['calendars', 'filters'] }}
                                                 dangerouslySetInnerHTML={{
                                                     __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
                                                 }}

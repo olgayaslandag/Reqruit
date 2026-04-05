@@ -1,26 +1,35 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Employee;
 use App\Models\Shift;
 use App\Models\ShiftSchedule;
+use App\Repositories\ShiftRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class ShiftService
 {
+    protected ShiftRepository $shiftRepository;
+
+    public function __construct(ShiftRepository $shiftRepository)
+    {
+        $this->shiftRepository = $shiftRepository;
+    }
+
     public function createShift(array $data): Shift
     {
-        return Shift::create($data);
+        return $this->shiftRepository->create($data);
     }
 
     public function updateShift(Shift $shift, array $data): Shift
     {
         $shift->update($data);
 
-        return $shift;
+        return $shift->fresh();
     }
 
     public function assignShiftToEmployee(

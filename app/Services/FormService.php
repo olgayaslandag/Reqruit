@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Interfaces\IFormRepository;
-use Illuminate\Support\Str;
 
 class FormService
 {
@@ -52,28 +52,32 @@ class FormService
 
     public function create(array $data)
     {
-        $data['fields'] = $this->addDefaultFields($data['fields'] ?? []);
+        return \DB::transaction(function () use ($data) {
+            $data['fields'] = $this->addDefaultFields($data['fields'] ?? []);
 
-        foreach ($data['fields'] as &$field) {
-            if (! isset($field['name']) || empty($field['name'])) {
-                $field['name'] = Str::slug($field['label'], '_');
+            foreach ($data['fields'] as &$field) {
+                if (! isset($field['name']) || empty($field['name'])) {
+                    $field['name'] = \Illuminate\Support\Str::slug($field['label'], '_');
+                }
             }
-        }
 
-        return $this->formRepository->create($data);
+            return $this->formRepository->create($data);
+        });
     }
 
     public function update(int $id, array $data)
     {
-        $data['fields'] = $this->addDefaultFields($data['fields'] ?? []);
+        return \DB::transaction(function () use ($id, $data) {
+            $data['fields'] = $this->addDefaultFields($data['fields'] ?? []);
 
-        foreach ($data['fields'] as &$field) {
-            if (! isset($field['name']) || empty($field['name'])) {
-                $field['name'] = Str::slug($field['label'], '_');
+            foreach ($data['fields'] as &$field) {
+                if (! isset($field['name']) || empty($field['name'])) {
+                    $field['name'] = \Illuminate\Support\Str::slug($field['label'], '_');
+                }
             }
-        }
 
-        return $this->formRepository->update($id, $data);
+            return $this->formRepository->update($id, $data);
+        });
     }
 
     private function addDefaultFields(array $fields): array

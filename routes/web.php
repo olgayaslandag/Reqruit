@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-
 use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FileController;
@@ -24,8 +24,6 @@ use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -48,39 +46,7 @@ Route::post('/forms/{slug}/submit', [PublicFormController::class, 'submit'])
 // Authenticated Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // Dashboard with cached stats (5 minutes TTL)
-    Route::get('/dashboard', function () {
-        $stats = Cache::remember('dashboard.stats', 300, function () {
-            return [
-                'totalSubmissions' => DB::table('submissions')->count(),
-                'pendingSubmissions' => DB::table('submissions')->where('status', 'new')->count(),
-                'activeForms' => DB::table('forms')->count(),
-                'departments' => DB::table('departments')->count(),
-            ];
-        });
-
-        $weeklySubmissions = Cache::remember('dashboard.weekly_submissions', 300, function () {
-            return DB::table('submissions')
-                ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as count'))
-                ->where('created_at', '>=', now()->subDays(7))
-                ->groupBy('date')
-                ->orderBy('date')
-                ->get();
-        });
-
-        $days = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->format('Y-m-d');
-            $dayName = now()->subDays($i)->locale('tr')->dayName;
-            $count = $weeklySubmissions->firstWhere('date', $date)?->count ?? 0;
-            $days[] = [
-                'date' => $date,
-                'day' => $dayName,
-                'count' => $count,
-            ];
-        }
-
-        return Inertia::render('Dashboard', ['stats' => $stats, 'weeklySubmissions' => $days]);
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, '__invoke'])->name('dashboard');
 
     // Secure File Access (requires authentication)
     Route::prefix('files')->name('files.')->group(function () {
@@ -189,6 +155,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [AdvanceController::class, 'index'])->name('index');
         Route::get('/create', [AdvanceController::class, 'create'])->name('create');
         Route::post('/', [AdvanceController::class, 'store'])->name('store');
+        Route::get('/get-salary-info', [AdvanceController::class, 'getSalaryInfo'])->name('getSalaryInfo');
         Route::get('/{advance}', [AdvanceController::class, 'show'])->name('show');
         Route::get('/{advance}/edit', [AdvanceController::class, 'edit'])->name('edit');
         Route::put('/{advance}', [AdvanceController::class, 'update'])->name('update');
@@ -272,9 +239,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/', [AttendanceController::class, 'store'])->name('store');
         Route::put('/{attendance}', [AttendanceController::class, 'update'])->name('update');
         Route::delete('/{attendance}', [AttendanceController::class, 'destroy'])->name('destroy');
-        Route::post('/clock-in', [AttendanceController::class, 'clockIn'])->name('clockIn');
-        Route::post('/clock-out', [AttendanceController::class, 'clockOut'])->name('clockOut');
-        Route::post('/manual-clock', [AttendanceController::class, 'manualClock'])->name('manual-clock');
+        Route::post('/clock-in', [AttendanceController::class, 'clockIn'])
+            ->name('clockIn');
+        Route::post('/clock-out', [AttendanceController::class, 'clockOut'])
+            ->name('clockOut');
+        Route::post('/manual-clock', [AttendanceController::class, 'manualClock'])
+            ->name('manual-clock');
         Route::get('/employee/{employeeId}', [AttendanceController::class, 'forEmployee'])->name('employee');
     });
 
@@ -297,8 +267,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{shift}/edit', [ShiftController::class, 'edit'])->name('edit');
         Route::put('/{shift}', [ShiftController::class, 'update'])->name('update');
         Route::delete('/{shift}', [ShiftController::class, 'destroy'])->name('destroy');
-        Route::post('/assign', [ShiftController::class, 'assignToEmployee'])->name('assign');
-        Route::post('/assign-bulk', [ShiftController::class, 'assignBulk'])->name('assignBulk');
+        Route::post('/assign', [ShiftController::class, 'assignToEmployee'])
+            ->middleware('throttle:shift_assignment')  // Rate limit individual shift assignments to prevent abuse
+            ->name('assign');
+        Route::post('/assign-bulk', [ShiftController::class, 'assignBulk'])
+            ->middleware('throttle:shift_bulk_assignment')  // More restrictive for bulk operations
+            ->name('assignBulk');
         Route::get('/schedule/{employeeId}', [ShiftController::class, 'getEmployeeSchedule'])->name('schedule');
     });
 

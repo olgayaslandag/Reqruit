@@ -396,9 +396,9 @@ export default function Create({ departments = [], managers = [], errors: propEr
                                         Eğitim Ekle
                                     </button>
                                 </div>
-                                <div className="">
-                                    {education.map((edu, index) => (
-                                        <div key={index} className="card card-body bg-light mb-3">
+                            <div className="">
+                                {education.map((edu, index) => (
+                                    <div key={`edu-${index}`} className="card card-body bg-light mb-3">
                                             <div className="row g-3">
                                                 <div className="col-md-6">
                                                     <label className="form-label fw-medium">

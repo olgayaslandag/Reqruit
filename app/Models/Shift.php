@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\ShiftTypeEnum;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Shift extends Model
 {
     use HasFactory;
+
+    protected $table = 'shifts';
 
     protected $fillable = [
         'name',

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\Storage;
 
 class SubmissionDetail extends Model
 {
+    protected $table = 'submission_details';
+
     protected $fillable = [
         'submission_id',
         'field_name',

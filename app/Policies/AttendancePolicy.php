@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Enums\UserRoleEnum;
@@ -14,7 +15,7 @@ class AttendancePolicy
 
     public function viewAny(User $user): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function view(User $user, AttendanceRecord $attendance): bool
@@ -23,22 +24,22 @@ class AttendancePolicy
             return true;
         }
 
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function create(User $user): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function update(User $user, AttendanceRecord $attendance): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function delete(User $user, AttendanceRecord $attendance): bool
     {
-        return in_array($user->rank_id, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
+        return in_array($user->rank_id?->value, [UserRoleEnum::ADMIN->value, UserRoleEnum::IK_MANAGER->value]);
     }
 
     public function clockIn(User $user): bool

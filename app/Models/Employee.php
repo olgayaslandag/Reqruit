@@ -50,18 +50,6 @@ class Employee extends Model
         'position_history',
     ];
 
-    protected $casts = [
-        'birth_date' => 'date',
-        'hire_date' => 'date',
-        'termination_date' => 'date',
-        'children_count' => 'integer',
-    ];
-
-    protected $hidden = [
-        'deleted_at',
-        'position_history',
-    ];
-
     // Accessor for identity_no with masking
     public function getIdentityNoAttribute(?string $value): ?string
     {

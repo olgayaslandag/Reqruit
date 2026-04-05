@@ -1,17 +1,15 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import EmptyState from '@/Components/EmptyState';
 import { showError, showSuccess, confirmAction } from '@/Utils/sweetAlert';
-import { getStatusBadgeClass } from '@/Utils/commonUtils';
+import { getStatusBadgeClass, getTypeBadgeClass } from '@/Utils/commonUtils';
 import { formatDate, formatTime } from '@/Utils/attendanceHelpers';
-import { getStatusBadgeClass } from '@/Utils/commonUtils';
-import { getStatusBadgeClass } from '@/Utils/commonUtils';
-import { confirmAction } from '@/Utils/sweetAlert';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 export default function Index({ adjustments, filters = {} }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlashWithToast();
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [localFilters, setLocalFilters] = useState({
@@ -25,7 +23,7 @@ export default function Index({ adjustments, filters = {} }) {
         router.get(route('admin.adjustments.index'), {
             ...localFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['adjustments', 'filters'] });
     };
 
     // Filtre değişikliği
@@ -35,7 +33,7 @@ export default function Index({ adjustments, filters = {} }) {
         router.get(route('admin.adjustments.index'), {
             ...newFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['adjustments', 'filters'] });
     };
 
     // Talebi Güncelle (Approve/Reject)
@@ -304,9 +302,23 @@ export default function Index({ adjustments, filters = {} }) {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center py-4 text-muted">
-                                            <i className="ti ti-calendar-off fs-1 d-block mb-2"></i>
-                                            Devam düzeltme talebi bulunamadı.
+                                        <td colSpan="7">
+                                            <EmptyState
+                                                title="Devam düzeltme talebi bulunamadı"
+                                                description={filters.search || filters.status || filters.type ? 
+                                                    "Aradığınız kriterlere uygun devam düzeltme talebi bulunamadı." : 
+                                                    "Henüz hiç devam düzeltme talebi oluşturulmamış. Yeni bir talep başlatmak için aşağıdaki linki kullanabilirsiniz."
+                                                }
+                                                icon={<i className="ti ti-adjustments-alt"></i>}
+                                                actionUrl={filters.search || filters.status || filters.type ?
+                                                    route('admin.adjustments.index') :
+                                                    route('admin.adjustments.create')
+                                                }
+                                                linkText={filters.search || filters.status || filters.type ?
+                                                    "Filtreleri Temizle" :
+                                                    "Yeni Düzeltme Talebi Başlat"
+                                                }
+                                            />
                                         </td>
                                     </tr>
                                 )}
@@ -326,11 +338,12 @@ export default function Index({ adjustments, filters = {} }) {
                             </div>
                             <nav>
                                 <ul className="pagination pagination-sm mb-0">
-                                    {adjustments.meta.links.filter(link => link.url).map((link, index) => (
-                                        <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                    {adjustments.meta.links.filter(link => link.url).map(link => (
+                                        <li key={link.url || link.label} className={`page-item ${link.active ? 'active' : ''}`}>
                                             <Link
                                                 href={link.url}
                                                 className="page-link"
+                                                data={{ only: ['adjustments', 'filters'] }}
                                                 dangerouslySetInnerHTML={{
                                                     __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
                                                 }}

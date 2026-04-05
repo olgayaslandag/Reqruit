@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 
 export default function Daily({ dailyReport = {}, filters = {}, employees = [] }) {
-    const { props } = usePage();
-    const flash = props.flash;
     const [localFilters, setLocalFilters] = useState({
         date: filters?.date || new Date().toISOString().split('T')[0],
         employee_id: filters?.employee_id || ''

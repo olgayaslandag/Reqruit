@@ -397,7 +397,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                             </div>
                             <div className="space-y-4">
                                 {education.map((edu, index) => (
-                                    <div key={index} className="p-4 table-light rounded">
+                                    <div key={`edu-${index}`} className="p-4 table-light rounded">
                                         <div className="d-grid d-grid-cols-1 gap-3">
                                             <div>
                                                 <label className="d-block fs-sm fw-medium text-dark mb-1">

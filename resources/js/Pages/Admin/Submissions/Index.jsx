@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import EmptyState from '@/Components/EmptyState';
 import { Head, Link, router } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import Pagination from '@/Components/Pagination';
@@ -33,7 +34,7 @@ export default function Index({ submissions, forms, departments, filters }) {
         if (filterForm) params.form_id = filterForm;
         if (filterDepartment) params.department_id = filterDepartment;
 
-        router.get('/admin/submissions', params);
+        router.get('/admin/submissions', params, { only: ['submissions', 'filters'] });
     };
 
     const getStatusBadge = (status) => {
@@ -249,8 +250,23 @@ export default function Index({ submissions, forms, departments, filters }) {
                                 </tr>
                             ))) : (
                                 <tr>
-                                    <td colSpan="9" className="px-4 py-8 text-center text-muted">
-                                        Başvuru bulunamadı.
+                                    <td colSpan="9">
+                                        <EmptyState
+                                            title="Başvuru bulunamadı"
+                                            description={searchTerm ? 
+                                                "Aradığınız kriterlere uygun başvuru bulunamadı." : 
+                                                "Henüz hiç başvuru alınmamış. Başvurular formlar aracılığıyla yapılacaktır."
+                                            }
+                                            icon={<i className="ti ti-file-text"></i>}
+                                            actionUrl={searchTerm ?
+                                                route('admin.submissions.index') :
+                                                route('admin.forms.index')
+                                            }
+                                            linkText={searchTerm ?
+                                                "Aramayı Temizle" :
+                                                "Formlara Git"
+                                            }
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -259,7 +275,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                 </div>
             </div>
 
-            <Pagination meta={submissionList} baseUrl={route('admin.submissions.index')} />
+            <Pagination meta={submissions} baseUrl={route('admin.submissions.index')} only={['submissions', 'filters']} />
         </AuthenticatedLayout>
     );
 }

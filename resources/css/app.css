@@ -73,3 +73,210 @@
 .navbar {
     @apply flex w-full items-center p-4;
 }
+
+/* Classes for inline styles replacement */
+.inline-flex-align-center {
+    display: inline-flex;
+    align-items: center;
+}
+
+.relative-neg-top-1px {
+    position: relative;
+    top: -1.5px;
+}
+
+.margin-top-2px {
+    margin-top: 2px;
+}
+
+.font-size-1-3rem {
+    font-size: 1.3rem;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.text-transform-uppercase {
+    text-transform: uppercase;
+}
+
+.fixed-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast-item-container {
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    min-width: 280px;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+.toast-item-bg-success {
+    background: #d1e7dd;
+    border-left: 4px solid #0f5132;
+    color: #0f5132;
+}
+
+.toast-item-bg-error {
+    background: #f8d7da;
+    border-left: 4px solid #842029;
+    color: #842029;
+}
+
+.toast-item-bg-warning {
+    background: #fff3cd;
+    border-left: 4px solid #664d03;
+    color: #664d03;
+}
+
+.toast-item-bg-info {
+    background: #cff4fc;
+    border-left: 4px solid #055160;
+    color: #055160;
+}
+
+.toast-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.toast-icon-bg-success {
+    background: #0f5132;
+    color: #d1e7dd;
+}
+
+.toast-icon-bg-error {
+    background: #842029;
+    color: #f8d7da;
+}
+
+.toast-icon-bg-warning {
+    background: #664d03;
+    color: #fff3cd;
+}
+
+.toast-icon-bg-info {
+    background: #055160;
+    color: #cff4fc;
+}
+
+.tree-node-indent {
+    padding-left: var(--tree-indent, 0);
+}
+
+.camera-icon-large {
+    font-size: 3rem !important;
+}
+
+.scanner-region-max-width {
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.graph-height {
+    height: 300px;
+}
+
+.chart-height {
+    height: 192px;
+}
+
+.bar-chart-column {
+    height: 144px;
+}
+
+.bar-height-percent {
+    min-height: var(--min-height, 2px);
+}
+
+.department-tree-node {
+    padding-left: var(--indent-level, 0);
+}
+
+.payroll-approver-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.text-small {
+    font-size: 0.875rem;
+}
+
+.code-font-small {
+    font-size: 0.75rem !important;
+}
+
+.holiday-calendar-cell {
+    width: 50px;
+    height: 50px;
+}
+
+.shift-calendar-cell {
+    height: 150px;
+}
+
+.dashboard-calendar-height {
+    height: var(--day-height, 100%);
+}
+
+.payroll-progress-height {
+    height: 20px;
+}
+
+.payroll-progress-height-tall {
+    height: 24px;
+}
+
+.payroll-progress-height-tall {
+    height: 24px;
+}
+
+.payroll-report-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.welcome-lead-max-width {
+    max-width: 720px;
+}
+
+.guest-card-max-width {
+    width: 100%;
+    max-width: 400px;
+}
+
+.dropdown-open-style {
+    display: block;
+}
+
+.modal-overlay {
+    background-color: rgba(0,0,0,0.5);
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}

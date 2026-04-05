@@ -1,25 +1,34 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Holiday;
 use App\Models\WorkCalendar;
+use App\Repositories\CalendarRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class CalendarService
 {
+    protected CalendarRepository $calendarRepository;
+
+    public function __construct(CalendarRepository $calendarRepository)
+    {
+        $this->calendarRepository = $calendarRepository;
+    }
+
     public function createWorkCalendar(array $data): WorkCalendar
     {
-        return WorkCalendar::create($data);
+        return $this->calendarRepository->create($data);
     }
 
     public function updateWorkCalendar(WorkCalendar $calendar, array $data): WorkCalendar
     {
         $calendar->update($data);
 
-        return $calendar;
+        return $calendar->fresh();
     }
 
     public function addHoliday(int $calendarId, array $data): Holiday
@@ -109,11 +118,7 @@ class CalendarService
 
     public function toggleWorkCalendarStatus(int $calendarId, bool $status): WorkCalendar
     {
-        $calendar = WorkCalendar::findOrFail($calendarId);
-        $calendar->is_active = $status;
-        $calendar->save();
-
-        return $calendar;
+        return $this->calendarRepository->toggleStatus($calendarId, $status);
     }
 
     public function deleteHoliday(int $holidayId): bool

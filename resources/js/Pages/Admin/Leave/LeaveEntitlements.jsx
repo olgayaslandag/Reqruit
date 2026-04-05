@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showSuccess, showError, confirmDelete } from '@/Utils/sweetAlert';
 
 export default function LeaveEntitlements({ entitlements, employees, leaveTypes, filters }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
     const [searchTerm, setSearchTerm] = useState('');
     const [localFilters, setLocalFilters] = useState({
         employee_id: filters?.employee_id || '',

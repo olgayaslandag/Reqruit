@@ -1,11 +1,9 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showSuccess, confirmDelete } from '@/Utils/sweetAlert';
 
 export default function LeaveTypes({ leaveTypes }) {
-    const { props } = usePage();
-    const flash = props.flash;
 
     const handleDelete = (id) => {
         confirmDelete('Bu izin türünü silmek istediğinize emin misiniz?', () => {

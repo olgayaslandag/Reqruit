@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\AdjustmentStatusEnum;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AttendanceAdjustment extends Model
 {
     use HasFactory;
+
+    protected $table = 'attendance_adjustments';
 
     protected $fillable = [
         'employee_id',

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RejectAdvanceRequest;
@@ -42,7 +43,20 @@ class AdvanceController extends Controller
             $filters,
             ['employee'],
             $request->get('per_page', 15)
-        );
+        )->through(function ($advance) {
+            return [
+                'id' => $advance->id,
+                'employee_id' => $advance->employee_id,
+                'employee_name' => $advance->employee?->first_name.' '.$advance->employee?->last_name,
+                'employee_identity_no' => $advance->employee?->identity_no,
+                'type' => $advance->type ?? 'salary',
+                'amount' => $advance->amount,
+                'installments' => $advance->installments,
+                'status' => $advance->status,
+                'request_date' => $advance->requested_date ?? $advance->created_at,
+                'created_at' => $advance->created_at,
+            ];
+        });
 
         return Inertia::render('Admin/Advances/Index', [
             'advances' => $advances,
@@ -62,6 +76,29 @@ class AdvanceController extends Controller
             'employees' => \App\Models\Employee::whereNull('deleted_at')
                 ->orderBy('first_name')
                 ->get(['id', 'first_name', 'last_name']),
+        ]);
+    }
+
+    /**
+     * Get salary info for an employee (for advance calculation).
+     */
+    public function getSalaryInfo(Request $request)
+    {
+        $employee = \App\Models\Employee::with('employeeSalaries')->findOrFail($request->employee_id);
+
+        $latestSalary = $employee->employeeSalaries()->latest()->first();
+        $monthlySalary = $latestSalary?->amount ?? 0;
+
+        $pendingAdvances = \App\Models\AdvanceRequest::where('employee_id', $employee->id)
+            ->whereIn('status', ['pending', 'approved'])
+            ->sum('amount');
+
+        return response()->json([
+            'salaryInfo' => [
+                'monthlySalary' => $monthlySalary,
+                'maxAdvance' => $monthlySalary * 0.3,
+                'pendingAdvances' => $pendingAdvances,
+            ],
         ]);
     }
 

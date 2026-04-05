@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import EmptyState from '@/Components/EmptyState';
 import { showError, showSuccess, confirmDelete } from '@/Utils/sweetAlert';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 export default function Index({ holidays, filters = {} }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlashWithToast();
 
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [localFilters, setLocalFilters] = useState({
@@ -18,7 +19,7 @@ export default function Index({ holidays, filters = {} }) {
         router.get(route('admin.holidays.index'), {
             ...localFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['holidays', 'filters'] });
     };
 
     const handleFilterChange = (key, value) => {
@@ -27,7 +28,7 @@ export default function Index({ holidays, filters = {} }) {
         router.get(route('admin.holidays.index'), {
             ...newFilters,
             search: searchTerm,
-        }, { replace: true });
+        }, { replace: true, only: ['holidays', 'filters'] });
     };
 
     const handleDelete = (id) => {
@@ -127,7 +128,7 @@ export default function Index({ holidays, filters = {} }) {
                             <div className="row g-3">
                                 <div className="col-md-6">
                                     <label className="form-label fw-medium">
-                                        <i className="ti ti-search me-1"></i> Arama
+                                        <i className="ti ti-search me-1" aria-hidden="true"></i> Arama
                                     </label>
                                     <input
                                         className="form-control"
@@ -140,7 +141,7 @@ export default function Index({ holidays, filters = {} }) {
 
                                 <div className="col-md-4">
                                     <label className="form-label fw-medium">
-                                        <i className="ti ti-tag me-1"></i> Tür
+                                        <i className="ti ti-tag me-1" aria-hidden="true"></i> Tür
                                     </label>
                                     <select
                                         className="form-select"
@@ -157,9 +158,9 @@ export default function Index({ holidays, filters = {} }) {
                                 </div>
 
                                 <div className="col-md-2 d-flex align-items-end">
-                                    <button type="submit" className="btn btn-primary w-100">
-                                        <i className="ti ti-filter me-1"></i> Filtrele
-                                    </button>
+                                <button type="submit" className="btn btn-primary w-100" aria-label="Filtrele">
+                                    <i className="ti ti-filter me-1" aria-hidden="true"></i> Filtrele
+                                </button>
                                 </div>
                             </div>
                         </form>
@@ -175,7 +176,7 @@ export default function Index({ holidays, filters = {} }) {
                         <div className="col-md-4">
                             <div className="card border-primary">
                                 <div className="card-body text-center">
-                                    <i className="ti ti-calendar fs-2 text-primary mb-2"></i>
+                                    <i className="ti ti-calendar fs-2 text-primary mb-2" aria-hidden="true"></i>
                                     <h6 className="text-primary fw-medium">Toplam Tatil</h6>
                                     <h3 className="fw-bold text-primary">{stats.total}</h3>
                                 </div>
@@ -184,7 +185,7 @@ export default function Index({ holidays, filters = {} }) {
                         <div className="col-md-4">
                             <div className="card border-danger">
                                 <div className="card-body text-center">
-                                    <i className="ti ti-flag fs-2 text-danger mb-2"></i>
+                                    <i className="ti ti-flag fs-2 text-danger mb-2" aria-hidden="true"></i>
                                     <h6 className="text-danger fw-medium">Resmi Tatil</h6>
                                     <h3 className="fw-bold text-danger">{stats.official}</h3>
                                 </div>
@@ -193,7 +194,7 @@ export default function Index({ holidays, filters = {} }) {
                         <div className="col-md-4">
                             <div className="card border-success">
                                 <div className="card-body text-center">
-                                    <i className="ti ti-repeat fs-2 text-success mb-2"></i>
+                                    <i className="ti ti-repeat fs-2 text-success mb-2" aria-hidden="true"></i>
                                     <h6 className="text-success fw-medium">Yıllık Tekrar</h6>
                                     <h3 className="fw-bold text-success">{stats.recurring}</h3>
                                 </div>
@@ -205,10 +206,10 @@ export default function Index({ holidays, filters = {} }) {
                     <div className="card">
                         <div className="card-header bg-light d-flex justify-content-between align-items-center">
                             <h5 className="mb-0 fw-bold">
-                                <i className="ti ti-calendar-event me-2"></i> Tatil Listesi
+                                <i className="ti ti-calendar-event me-2" aria-hidden="true"></i> Tatil Listesi
                             </h5>
-                            <Link href={route('admin.holidays.create')} className="btn btn-primary btn-sm">
-                                <i className="ti ti-plus me-1"></i> Yeni Tatil
+                            <Link href={route('admin.holidays.create')} className="btn btn-primary btn-sm" aria-label="Yeni tatil oluştur">
+                                <i className="ti ti-plus me-1" aria-hidden="true"></i> Yeni Tatil
                             </Link>
                         </div>
                         <div className="card-body p-0">
@@ -261,22 +262,25 @@ export default function Index({ holidays, filters = {} }) {
                                                                 onClick={() => addToCalendar(holiday.id)}
                                                                 className="btn btn-sm btn-outline-success"
                                                                 title="Takvime Ekle"
+                                                                aria-label={`Tatili takvime ekle: ${holiday.name}`}
                                                             >
-                                                                <i className="ti ti-calendar-plus"></i>
+                                                                <i className="ti ti-calendar-plus" aria-hidden="true"></i>
                                                             </button>
                                                             <Link
                                                                 href={route('admin.holidays.edit', holiday.id)}
                                                                 className="btn btn-sm btn-outline-primary"
                                                                 title="Düzenle"
+                                                                aria-label={`Tatili düzenle: ${holiday.name}`}
                                                             >
-                                                                <i className="ti ti-edit"></i>
+                                                                <i className="ti ti-edit" aria-hidden="true"></i>
                                                             </Link>
                                                             <button
                                                                 onClick={() => handleDelete(holiday.id)}
                                                                 className="btn btn-sm btn-outline-danger"
                                                                 title="Sil"
+                                                                aria-label={`Tatili sil: ${holiday.name}`}
                                                             >
-                                                                <i className="ti ti-trash"></i>
+                                                                <i className="ti ti-trash" aria-hidden="true"></i>
                                                             </button>
                                                         </div>
                                                     </td>
@@ -284,9 +288,23 @@ export default function Index({ holidays, filters = {} }) {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="5" className="text-center py-4 text-muted">
-                                                    <i className="ti ti-calendar-off fs-1 d-block mb-2"></i>
-                                                    Tatil tanımı bulunamadı.
+                                                <td colSpan="5">
+                                                    <EmptyState
+                                                        title="Tatil tanımı bulunamadı"
+                                                        description={filters.search || filters.type ? 
+                                                            "Aradığınız kriterlere uygun resmi tatil bulunamadı." : 
+                                                            "Henüz hiç resmi tatil tanımlanmamış. Yeni bir tatil tanımlamak için aşağıdaki butona tıklayabilirsiniz."
+                                                        }
+                                                        icon={<i className="ti ti-calendar-event" aria-hidden="true"></i>}
+                                                        actionUrl={filters.search || filters.type ?
+                                                            route('admin.holidays.index') :
+                                                            route('admin.holidays.create')
+                                                        }
+                                                        linkText={filters.search || filters.type ?
+                                                            "Filtreleri Temizle" :
+                                                            "Yeni Resmi Tatil Tanımla"
+                                                        }
+                                                    />
                                                 </td>
                                             </tr>
                                         )}
@@ -306,11 +324,12 @@ export default function Index({ holidays, filters = {} }) {
                                     </div>
                                     <nav>
                                         <ul className="pagination pagination-sm mb-0">
-                                            {holidays.meta.links.filter(link => link.url).map((link, index) => (
-                                                <li key={index} className={`page-item ${link.active ? 'active' : ''}`}>
+                                            {holidays.meta.links.filter(link => link.url).map(link => (
+                                                <li key={link.url || link.label} className={`page-item ${link.active ? 'active' : ''}`}>
                                                     <Link
                                                         href={link.url}
                                                         className="page-link"
+                                                        data={{ only: ['holidays', 'filters'] }}
                                                         dangerouslySetInnerHTML={{
                                                             __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
                                                         }}
@@ -331,7 +350,7 @@ export default function Index({ holidays, filters = {} }) {
                     <div className="card border-info mb-4">
                         <div className="card-header bg-info text-white">
                             <h6 className="mb-0 fw-bold">
-                                <i className="ti ti-calendar-time me-1"></i> Yaklaşan Tatiller
+                                <i className="ti ti-calendar-time me-1" aria-hidden="true"></i> Yaklaşan Tatiller
                             </h6>
                         </div>
                         <div className="card-body">
@@ -340,7 +359,7 @@ export default function Index({ holidays, filters = {} }) {
                                     {upcomingHolidays.map(holiday => (
                                         <div key={holiday.id} className="list-group-item d-flex align-items-center gap-3">
                                             <div className="flex-shrink-0">
-                                                <div className="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '50px', height: '50px' }}>
+                                                <div className="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center holiday-calendar-cell">
                                                     <span className="fw-bold text-danger fs-5">
                                                         {new Date(holiday.date).getDate()}
                                                     </span>
@@ -363,8 +382,14 @@ export default function Index({ holidays, filters = {} }) {
                                 </div>
                             ) : (
                                 <div className="text-center text-muted py-4">
-                                    <i className="ti ti-calendar-off fs-1 mb-2"></i>
-                                    <p className="mb-0">Yaklaşan tatil bulunamadı.</p>
+                                    <EmptyState
+                                        title="Yaklaşan tatil bulunamadı"
+                                        description="Gelecek dönemde yaklaşan resmi tatiller bulunmamaktadır. Yeni tatil tanımlamak için aşağıdaki butona tıklayabilirsiniz."
+                                         icon={<i className="ti ti-calendar-time" aria-hidden="true"></i>}
+                                        actionUrl={route('admin.holidays.create')}
+                                        linkText="Yeni Tatil Ekle"
+                                        className="py-0"
+                                    />
                                 </div>
                             )}
                         </div>
@@ -374,7 +399,7 @@ export default function Index({ holidays, filters = {} }) {
                     <div className="card">
                         <div className="card-header bg-light">
                             <h6 className="mb-0 fw-bold">
-                                <i className="ti ti-filter me-1"></i> Yıllara Göre
+                                <i className="ti ti-filter me-1" aria-hidden="true"></i> Yıllara Göre
                             </h6>
                         </div>
                         <div className="card-body">
@@ -388,6 +413,7 @@ export default function Index({ holidays, filters = {} }) {
                                             <Link
                                                 href={route('admin.holidays.index', { year })}
                                                 className="btn btn-outline-primary w-100"
+                                                data={{ only: ['holidays', 'filters'] }}
                                             >
                                                 <div className="fw-bold">{year}</div>
                                                 <small>{yearHolidays.length} tatil</small>

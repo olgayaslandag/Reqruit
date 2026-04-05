@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showError, showSuccess } from '@/Utils/sweetAlert';
+import { useFlashWithToast } from '@/Hooks/useFlash';
 
 export default function Create({ departments, shifts }) {
-    const { props } = usePage();
-    const flash = props.flash;
+    const flash = useFlashWithToast();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -20,12 +20,6 @@ export default function Create({ departments, shifts }) {
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (flash?.success) {
-            showSuccess(flash.success);
-        }
-    }, [flash]);
 
     const handleChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));

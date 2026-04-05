@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Enums\AttendanceSourceEnum;
@@ -14,6 +15,11 @@ use App\Models\ShiftSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
+/**
+ * Holiday cache TTL: 24 hours (holidays don't change frequently).
+ */
+const HOLIDAY_CACHE_TTL = 86400;
+
 class AttendanceService
 {
     public function recordAttendance(
@@ -24,26 +30,28 @@ class AttendanceService
         AttendanceSourceEnum $source,
         array $metadata = []
     ): AttendanceRecord {
-        $attendance = new AttendanceRecord([
-            'employee_id' => $employeeId,
-            'date' => $date,
-            'time' => $time->format('H:i'),
-            'type' => $type,
-            'source' => $source,
-            'status' => AttendanceStatusEnum::PRESENT,
-            'geolocation' => $metadata['geolocation'] ?? null,
-            'ip_address' => $metadata['ip_address'] ?? null,
-            'device_id' => $metadata['device_id'] ?? null,
-            'notes' => $metadata['notes'] ?? null,
-            'processed_at' => now(),
-        ]);
+        return \DB::transaction(function () use ($employeeId, $date, $time, $type, $source, $metadata) {
+            $attendance = new AttendanceRecord([
+                'employee_id' => $employeeId,
+                'date' => $date,
+                'time' => $time->format('H:i'),
+                'type' => $type,
+                'source' => $source,
+                'status' => AttendanceStatusEnum::PRESENT,
+                'geolocation' => $metadata['geolocation'] ?? null,
+                'ip_address' => $metadata['ip_address'] ?? null,
+                'device_id' => $metadata['device_id'] ?? null,
+                'notes' => $metadata['notes'] ?? null,
+                'processed_at' => now(),
+            ]);
 
-        $attendance->save();
+            $attendance->save();
 
-        // Update or create summary after recording attendance
-        $this->updateAttendanceSummary($employeeId, $date);
+            // Update or create summary after recording attendance
+            $this->updateAttendanceSummary($employeeId, $date);
 
-        return $attendance;
+            return $attendance;
+        });
     }
 
     public function processDailyAttendance(Carbon $date): void
@@ -85,17 +93,8 @@ class AttendanceService
             ->orderBy('time')
             ->get();
 
-        // Determine if it's a holiday
-        $isHoliday = Holiday::where('work_calendar_id', $employee->work_calendar_id ?? 1)
-            ->where(function ($query) use ($date) {
-                $query->whereDate('date', $date)
-                    ->orWhere(function ($q) use ($date) {
-                        $q->where('is_recurring', true)
-                            ->whereMonth('date', $date->month)
-                            ->whereDay('date', $date->day);
-                    });
-            })
-            ->exists();
+        // Determine if it's a holiday (cached for 24 hours)
+        $isHoliday = $this->isHoliday($employee->work_calendar_id ?? 1, $date);
 
         // Calculate attendance metrics
         $summaryData = $this->calculateAttendanceMetrics(
@@ -230,6 +229,28 @@ class AttendanceService
             'was_absent' => false,
             'status' => $status,
         ];
+    }
+
+    /**
+     * Check if a given date is a holiday for the work calendar.
+     * Results are cached for 24 hours as holidays don't change frequently.
+     */
+    private function isHoliday(int $workCalendarId, Carbon $date): bool
+    {
+        $cacheKey = "holidays:{$workCalendarId}:{$date->format('Y-m-d')}";
+
+        return \Cache::remember($cacheKey, HOLIDAY_CACHE_TTL, function () use ($workCalendarId, $date) {
+            return Holiday::where('work_calendar_id', $workCalendarId)
+                ->where(function ($query) use ($date) {
+                    $query->whereDate('date', $date)
+                        ->orWhere(function ($q) use ($date) {
+                            $q->where('is_recurring', true)
+                                ->whereMonth('date', $date->month)
+                                ->whereDay('date', $date->day);
+                        });
+                })
+                ->exists();
+        });
     }
 
     public function getAttendanceReport(int $employeeId, Carbon $startDate, Carbon $endDate): Collection

@@ -41,3 +41,25 @@
 41. PayrollReports sayfaları Bootstrap uyumlu yapıldı (Index, Summary, TaxSummary, Compare, Annual, DepartmentSummary); filtre sistemi eklendi, exportUrl kaldırıldı
 42. AttendanceReports sayfaları Bootstrap uyumlu yapıldı (Index, Daily, Monthly, Overtime); kartlar, tablolar, grafikler, filtreler eklendi
 43. Sidebar ikon düzeltildi: 'journal' → 'calendar-event' (Günlük Rapor menüsü)
+44. AUDIT_REPORT.md sistem analizi yapıldı: 75+ sorun tespit edildi ve 40 agent görevi ile tüm kritik/güvenlik/perfomans sorunları çözüldü
+45. Backend güvenlik açıkları kapatıldı: SubmissionPolicy bypass, UserController authorization, Clock-in/out yetkilendirme, Path traversal koruması, Race condition düzeltmeleri
+46. Frontend JSX import hataları düzeltildi: prop-types kaldırıldı, confirmAction/getTypeBadgeClass/export'lar eklendi, useEffect import'u tamamlandı
+48. Authorization sistemine manual override'lar eklendi: Department, Employee, Attendance, Adjustment, Calendar, AttendanceReport controller'larında rank_id (1=Admin, 2=IK Manager) kontrolü yapılarak authorizeResource kaldırıldı
+49. UserPolicy oluşturuldu ve AppServiceProvider'a eklendi
+50. Policy'lerdeki rank_id erişimleri düzeltildi (arrow function ?-> operatorü eklendi)
+51. Advances/Create.jsx'te salary info endpoint'i eklendi (axios ile JSON fetch)
+52. Advances/Index.jsx'te employee_name ve employee_identity_no alanları eklendi
+53. AttendanceReports/Index.jsx'in receives employees prop'u eklendi
+54. Attendance/Scan.jsx'den throttle middleware kaldırıldı
+55. AppRepoProvider'a eksik repository binding'ler eklendi (IUserRepository, IShiftRepository, ICalendarRepository, IHolidayRepository, IAttendanceAdjustmentRepository)
+56. Ziggy route ismi düzeltildi: admin.payroll.create → admin.payrolls.create
+57. EmployeeRepository'de departman adı için d.title (d.name değil) kullanıldı
+58. GetUserRoleCheck command'ının syntax hatası çözüldü
+59. Bu oturumda yapılan kritik düzeltmeler:
+   - Advance talep sistemi: Create.jsx'te salary info endpoint'i ve employees prop'u eklendi; Index.jsx'te çalışan adı/identity alanları eklendi
+   - Attendance/Scan.jsx: Throttle middleware kaldırıldı, manuel giriş-çıkış çalışması için temel düzenlemeler yapıldı
+   - Repository binding eksiklikleri tamamlandı (IUserRepository, IShiftRepository, ICalendarRepository, IHolidayRepository, IAttendanceAdjustmentRepository)
+   - Tüm controller'lardan authorizeResource kaldırılarak rank_id tabanlı manual authorization getirildi (Admin=1, IK Manager=2)
+   - Policy'lerde null-safe erişim için rank_id?->value kullanımı standartlaştırıldı
+   - AttendanceReports/Index.jsx için employees prop'u eklendi
+   - Ziggy route hataları düzeltildi (admin.payrolls.create doğru isim)

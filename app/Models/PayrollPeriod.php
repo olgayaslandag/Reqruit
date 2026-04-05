@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\PayrollStatusEnum;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class PayrollPeriod extends Model
 {
     use HasFactory;
+
+    protected $table = 'payroll_periods';
 
     protected $fillable = [
         'name',

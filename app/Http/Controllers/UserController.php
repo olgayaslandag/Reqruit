@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -14,11 +15,16 @@ class UserController extends Controller
     public function __construct(\App\Services\UserService $userService)
     {
         $this->userService = $userService;
-        $this->authorizeResource(User::class, 'user');
     }
 
     public function index(Request $request)
     {
+        // Simple authorization check using rank_id enum
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         // Arama
         $filters = [];
         if ($request->filled('search')) {

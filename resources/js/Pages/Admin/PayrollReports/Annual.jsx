@@ -122,7 +122,7 @@ export default function Annual({ summary }) {
                                         <span className="fw-medium">{months[parseInt(month.month) - 1] || month.month}</span>
                                         <span className="text-muted">{formatCurrency(month.gross)}</span>
                                     </div>
-                                    <div className="progress" style={{ height: '24px' }}>
+                                    <div className="progress payrall-progress-height-tall">
                                         <div className="progress-bar bg-success" style={{ width: `${percent}%` }}>
                                             {formatCurrency(month.gross)}
                                         </div>

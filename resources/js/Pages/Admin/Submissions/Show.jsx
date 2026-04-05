@@ -172,12 +172,12 @@ export default function Show({ submission }) {
                             <h5 className="mb-0">Başvuru Bilgileri</h5>
                         </div>
                         <div className="card-body">
-                            {submission.details?.map((detail, index) => {
+                            {submission.details?.map(detail => {
                                 const field = submission.form?.fields?.find(f => f.name === detail.field_name);
                                 const isFile = field?.type === 'file';
 
                                 return (
-                                    <div key={index} className="mb-3">
+                                    <div key={`${detail.field_name}-${submission.id}`} className="mb-3">
                                         <label className="form-label text-muted">
                                             {isFile && <i className="ti ti-file me-1"></i>}
                                             {detail.field_label || detail.field_name}

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\AttendanceSourceEnum;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AttendanceRecord extends Model
 {
     use HasFactory;
+
+    protected $table = 'attendance_records';
 
     protected $fillable = [
         'employee_id',

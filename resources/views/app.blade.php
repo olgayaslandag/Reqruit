@@ -34,6 +34,7 @@
 
 <!-- Scripts needed for admin template (jQuery may still be used by some plugins) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/js/plugins/popper.min.js"></script>
 <script src="/assets/js/plugins/simplebar.min.js"></script>
 <script src="/assets/js/fonts/custom-font.js"></script>

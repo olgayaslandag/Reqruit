@@ -1,12 +1,15 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCalendarRequest;
 use App\Http\Requests\UpdateCalendarRequest;
+use App\Interfaces\ICalendarRepository;
 use App\Models\WorkCalendar;
 use App\Services\CalendarService;
+use App\Services\HolidayService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -14,28 +17,43 @@ class CalendarController extends Controller
 {
     protected CalendarService $calendarService;
 
-    protected \App\Services\HolidayService $holidayService;
+    protected HolidayService $holidayService;
 
-    public function __construct(CalendarService $calendarService, \App\Services\HolidayService $holidayService)
-    {
+    protected ICalendarRepository $calendarRepository;
+
+    public function __construct(
+        CalendarService $calendarService,
+        HolidayService $holidayService,
+        ICalendarRepository $calendarRepository
+    ) {
         $this->calendarService = $calendarService;
         $this->holidayService = $holidayService;
-        $this->authorizeResource(\App\Models\WorkCalendar::class, 'calendar');
+        $this->calendarRepository = $calendarRepository;
+    }
+
+    private function checkAdminAccess(): void
+    {
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
     }
 
     public function index(Request $request)
     {
-        $query = WorkCalendar::query();
+        $this->checkAdminAccess();
+
+        $filters = [];
 
         if ($request->has('active')) {
-            $query->where('is_active', $request->active);
+            $filters['is_active'] = $request->boolean('active');
         }
 
         if ($request->has('search')) {
-            $query->where('name', 'like', '%'.$request->search.'%');
+            $filters['search'] = $request->search;
         }
 
-        $calendars = $query->paginate(15);
+        $calendars = $this->calendarRepository->paginate($filters, [], 15);
 
         return inertia('Admin/WorkCalendars/Index', [
             'calendars' => $calendars,
@@ -44,6 +62,8 @@ class CalendarController extends Controller
 
     public function show(WorkCalendar $calendar)
     {
+        $this->checkAdminAccess();
+
         return inertia('Admin/WorkCalendars/Show', [
             'calendar' => $calendar,
         ]);
@@ -51,11 +71,14 @@ class CalendarController extends Controller
 
     public function create()
     {
+        $this->checkAdminAccess();
+
         return inertia('Admin/WorkCalendars/Create');
     }
 
     public function store(StoreCalendarRequest $request)
     {
+        $this->checkAdminAccess();
         $data = $request->validated();
 
         $calendar = $this->calendarService->createWorkCalendar($data);
@@ -65,6 +88,8 @@ class CalendarController extends Controller
 
     public function edit(WorkCalendar $calendar)
     {
+        $this->checkAdminAccess();
+
         return inertia('Admin/WorkCalendars/Edit', [
             'calendar' => $calendar,
         ]);
@@ -72,6 +97,7 @@ class CalendarController extends Controller
 
     public function update(UpdateCalendarRequest $request, WorkCalendar $calendar)
     {
+        $this->checkAdminAccess();
         $data = $request->validated();
 
         $updatedCalendar = $this->calendarService->updateWorkCalendar($calendar, $data);
@@ -81,6 +107,7 @@ class CalendarController extends Controller
 
     public function destroy(WorkCalendar $calendar)
     {
+        $this->checkAdminAccess();
         $calendar->delete();
 
         return redirect()->route('admin.work-calendars.index')->with('success', 'Çalışma takvimi başarıyla silindi.');
@@ -88,6 +115,7 @@ class CalendarController extends Controller
 
     public function toggleStatus(Request $request, int $calendarId)
     {
+        $this->checkAdminAccess();
         $request->validate([
             'status' => 'required|boolean',
         ]);
@@ -103,6 +131,7 @@ class CalendarController extends Controller
 
     public function addHoliday(Request $request)
     {
+        $this->checkAdminAccess();
         $request->validate([
             'calendar_id' => 'required|exists:work_calendars,id',
             'name' => 'required|string|max:255',
@@ -200,6 +229,7 @@ class CalendarController extends Controller
     // Holiday Management
     public function holidayIndex(Request $request)
     {
+        $this->checkAdminAccess();
         $query = \App\Models\Holiday::query()->with('workCalendar');
 
         if ($request->has('year')) {
@@ -219,7 +249,8 @@ class CalendarController extends Controller
 
     public function holidayCreate(Request $request)
     {
-        $calendars = \App\Models\WorkCalendar::orderBy('name')->get(['id', 'name']);
+        $this->checkAdminAccess();
+        $calendars = $this->calendarRepository->all([], ['id', 'name']);
 
         return inertia('Admin/Holidays/Create', [
             'calendars' => $calendars,
@@ -228,6 +259,7 @@ class CalendarController extends Controller
 
     public function holidayStore(Request $request)
     {
+        $this->checkAdminAccess();
         $request->validate([
             'work_calendar_id' => 'required|exists:work_calendars,id',
             'name' => 'required|string|max:255',
@@ -251,7 +283,8 @@ class CalendarController extends Controller
 
     public function holidayEdit(\App\Models\Holiday $holiday)
     {
-        $calendars = \App\Models\WorkCalendar::orderBy('name')->get(['id', 'name']);
+        $this->checkAdminAccess();
+        $calendars = $this->calendarRepository->all([], ['id', 'name']);
 
         return inertia('Admin/Holidays/Edit', [
             'holiday' => $holiday,
@@ -261,6 +294,7 @@ class CalendarController extends Controller
 
     public function holidayUpdate(Request $request, \App\Models\Holiday $holiday)
     {
+        $this->checkAdminAccess();
         $request->validate([
             'work_calendar_id' => 'required|exists:work_calendars,id',
             'name' => 'required|string|max:255',
@@ -284,6 +318,7 @@ class CalendarController extends Controller
 
     public function holidayDestroy(\App\Models\Holiday $holiday)
     {
+        $this->checkAdminAccess();
         $deleted = $this->holidayService->delete($holiday->id);
 
         return redirect()->route('admin.holidays.index')->with('success', 'Tatil başarıyla silindi.');

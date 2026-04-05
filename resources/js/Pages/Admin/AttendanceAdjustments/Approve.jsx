@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { router, Link, usePage } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { showError, showSuccess } from '@/Utils/sweetAlert';
 
 export default function Approve({ pendingRequests }) {
-    const { props } = usePage();
-    const flash = props.flash;
-
     const [bulkAction, setBulkAction] = useState({
         action: 'approve',
         selectedIds: [],

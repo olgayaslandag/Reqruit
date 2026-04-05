@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Interfaces\IEmployeeRepository;
@@ -8,7 +9,6 @@ use App\Models\Employee;
 use App\Models\EmployeeDocument;
 use App\Models\EmployeeEducation;
 use App\Models\EmployeePositionHistory;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -56,12 +56,14 @@ class EmployeeService
      */
     public function create(array $data): Employee
     {
-        // TC Kimlik no unique kontrolü
-        if ($this->employeeRepository->getByIdentityNo($data['identity_no'])) {
-            throw new \Exception('Bu TC Kimlik numarasına sahip bir çalışan zaten mevcut.');
-        }
+        return \DB::transaction(function () use ($data) {
+            // TC Kimlik no unique kontrolü
+            if ($this->employeeRepository->getByIdentityNo($data['identity_no'])) {
+                throw new \Exception('Bu TC Kimlik numarasına sahip bir çalışan zaten mevcut.');
+            }
 
-        return $this->employeeRepository->create($data);
+            return $this->employeeRepository->create($data);
+        });
     }
 
     /**
@@ -69,15 +71,17 @@ class EmployeeService
      */
     public function update(int $id, array $data): Employee
     {
-        // TC Kimlik no unique kontrolü (kendi hariç)
-        if (isset($data['identity_no'])) {
-            $existing = $this->employeeRepository->getByIdentityNo($data['identity_no']);
-            if ($existing && $existing->id !== $id) {
-                throw new \Exception('Bu TC Kimlik numarasına sahip başka bir çalışan mevcut.');
+        return \DB::transaction(function () use ($id, $data) {
+            // TC Kimlik no unique kontrolü (kendi hariç)
+            if (isset($data['identity_no'])) {
+                $existing = $this->employeeRepository->getByIdentityNo($data['identity_no']);
+                if ($existing && $existing->id !== $id) {
+                    throw new \Exception('Bu TC Kimlik numarasına sahip başka bir çalışan mevcut.');
+                }
             }
-        }
 
-        return $this->employeeRepository->update($id, $data);
+            return $this->employeeRepository->update($id, $data);
+        });
     }
 
     /**
@@ -85,7 +89,9 @@ class EmployeeService
      */
     public function delete(int $id): bool
     {
-        return $this->employeeRepository->delete($id);
+        return \DB::transaction(function () use ($id) {
+            return $this->employeeRepository->delete($id);
+        });
     }
 
     /**
@@ -109,34 +115,36 @@ class EmployeeService
      *
      * @throws \Exception
      */
-    public function uploadDocument(int $employeeId, UploadedFile $file, string $documentType): EmployeeDocument
+    public function uploadDocument(int $employeeId, \Illuminate\Http\UploadedFile $file, string $documentType): \App\Models\EmployeeDocument
     {
-        // Dosya tipi kontrolü
-        if (! in_array($file->getMimeType(), $this->allowedMimeTypes)) {
-            throw new \Exception('Sadece PDF, JPG ve PNG dosyaları yüklenebilir.');
-        }
+        return \DB::transaction(function () use ($employeeId, $file, $documentType) {
+            // Dosya tipi kontrolü
+            if (! in_array($file->getMimeType(), $this->allowedMimeTypes)) {
+                throw new \Exception('Sadece PDF, JPG ve PNG dosyaları yüklenebilir.');
+            }
 
-        // Dosya boyutu kontrolü
-        if ($file->getSize() > $this->maxFileSize) {
-            throw new \Exception('Dosya boyutu maksimum 5MB olabilir.');
-        }
+            // Dosya boyutu kontrolü
+            if ($file->getSize() > $this->maxFileSize) {
+                throw new \Exception('Dosya boyutu maksimum 5MB olabilir.');
+            }
 
-        $employee = $this->employeeRepository->getById($employeeId);
-        if (! $employee) {
-            throw new \Exception('Çalışan bulunamadı.');
-        }
+            $employee = $this->employeeRepository->getById($employeeId);
+            if (! $employee) {
+                throw new \Exception('Çalışan bulunamadı.');
+            }
 
-        // Storage path: storage/app/employees/{employee_id}/documents/
-        $path = $file->store("employees/{$employeeId}/documents", 'local');
+            // Storage path: storage/app/employees/{employee_id}/documents/
+            $path = $file->store("employees/{$employeeId}/documents", 'local');
 
-        return EmployeeDocument::create([
-            'employee_id' => $employeeId,
-            'document_type' => $documentType,
-            'file_path' => $path,
-            'file_name' => $file->getClientOriginalName(),
-            'file_size' => $file->getSize(),
-            'mime_type' => $file->getMimeType(),
-        ]);
+            return EmployeeDocument::create([
+                'employee_id' => $employeeId,
+                'document_type' => $documentType,
+                'file_path' => $path,
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $file->getSize(),
+                'mime_type' => $file->getMimeType(),
+            ]);
+        });
     }
 
     /**
@@ -146,37 +154,41 @@ class EmployeeService
      */
     public function deleteDocument(int $documentId): bool
     {
-        $document = EmployeeDocument::find($documentId);
-        if (! $document) {
-            throw new \Exception('Doküman bulunamadı.');
-        }
+        return \DB::transaction(function () use ($documentId) {
+            $document = \App\Models\EmployeeDocument::find($documentId);
+            if (! $document) {
+                throw new \Exception('Doküman bulunamadı.');
+            }
 
-        // Dosyayı storage'dan sil
-        if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {
-            Storage::disk('local')->delete($document->file_path);
-        }
+            // Dosyayı storage'dan sil
+            if ($document->file_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($document->file_path)) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($document->file_path);
+            }
 
-        return $document->delete();
+            return $document->delete();
+        });
     }
 
     /**
      * Pozisyon geçmişi ekler.
      */
-    public function addPosition(int $employeeId, array $data): EmployeePositionHistory
+    public function addPosition(int $employeeId, array $data): \App\Models\EmployeePositionHistory
     {
-        $employee = $this->employeeRepository->getById($employeeId);
-        if (! $employee) {
-            throw new \Exception('Çalışan bulunamadı.');
-        }
+        return \DB::transaction(function () use ($employeeId, $data) {
+            $employee = $this->employeeRepository->getById($employeeId);
+            if (! $employee) {
+                throw new \Exception('Çalışan bulunamadı.');
+            }
 
-        return EmployeePositionHistory::create([
-            'employee_id' => $employeeId,
-            'position_title' => $data['position_title'],
-            'department_id' => $data['department_id'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'] ?? null,
-            'description' => $data['description'] ?? null,
-        ]);
+            return EmployeePositionHistory::create([
+                'employee_id' => $employeeId,
+                'position_title' => $data['position_title'],
+                'department_id' => $data['department_id'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'] ?? null,
+                'description' => $data['description'] ?? null,
+            ]);
+        });
     }
 
     /**
@@ -186,19 +198,21 @@ class EmployeeService
      */
     public function terminate(int $employeeId, array $data): Employee
     {
-        $employee = $this->employeeRepository->getById($employeeId);
-        if (! $employee) {
-            throw new \Exception('Çalışan bulunamadı.');
-        }
+        return \DB::transaction(function () use ($employeeId, $data) {
+            $employee = $this->employeeRepository->getById($employeeId);
+            if (! $employee) {
+                throw new \Exception('Çalışan bulunamadı.');
+            }
 
-        if ($employee->trashed()) {
-            throw new \Exception('Bu çalışan zaten işten çıkarılmış.');
-        }
+            if ($employee->trashed()) {
+                throw new \Exception('Bu çalışan zaten işten çıkarılmış.');
+            }
 
-        return $this->employeeRepository->update($employeeId, [
-            'termination_date' => $data['termination_date'],
-            'termination_reason' => $data['termination_reason'],
-        ]);
+            return $this->employeeRepository->update($employeeId, [
+                'termination_date' => $data['termination_date'],
+                'termination_reason' => $data['termination_reason'],
+            ]);
+        });
     }
 
     /**
@@ -206,20 +220,22 @@ class EmployeeService
      *
      * @throws \Exception
      */
-    public function storeEducation(int $employeeId, array $data): EmployeeEducation
+    public function storeEducation(int $employeeId, array $data): \App\Models\EmployeeEducation
     {
-        $employee = $this->employeeRepository->getById($employeeId);
-        if (! $employee) {
-            throw new \Exception('Çalışan bulunamadı.');
-        }
+        return \DB::transaction(function () use ($employeeId, $data) {
+            $employee = $this->employeeRepository->getById($employeeId);
+            if (! $employee) {
+                throw new \Exception('Çalışan bulunamadı.');
+            }
 
-        return EmployeeEducation::create([
-            'employee_id' => $employeeId,
-            'school_name' => $data['school_name'],
-            'department' => $data['department'] ?? null,
-            'degree' => $data['degree'],
-            'graduation_year' => $data['graduation_year'] ?? null,
-        ]);
+            return EmployeeEducation::create([
+                'employee_id' => $employeeId,
+                'school_name' => $data['school_name'],
+                'department' => $data['department'] ?? null,
+                'degree' => $data['degree'],
+                'graduation_year' => $data['graduation_year'] ?? null,
+            ]);
+        });
     }
 
     /**
@@ -229,23 +245,25 @@ class EmployeeService
      */
     public function storeEducations(int $employeeId, array $educations): array
     {
-        $employee = $this->employeeRepository->getById($employeeId);
-        if (! $employee) {
-            throw new \Exception('Çalışan bulunamadı.');
-        }
+        return \DB::transaction(function () use ($employeeId, $educations) {
+            $employee = $this->employeeRepository->getById($employeeId);
+            if (! $employee) {
+                throw new \Exception('Çalışan bulunamadı.');
+            }
 
-        $created = [];
-        foreach ($educations as $edu) {
-            $created[] = EmployeeEducation::create([
-                'employee_id' => $employeeId,
-                'school_name' => $edu['school_name'],
-                'department' => $edu['department'] ?? null,
-                'degree' => $edu['degree'],
-                'graduation_year' => $edu['graduation_year'] ?? null,
-            ]);
-        }
+            $created = [];
+            foreach ($educations as $edu) {
+                $created[] = EmployeeEducation::create([
+                    'employee_id' => $employeeId,
+                    'school_name' => $edu['school_name'],
+                    'department' => $edu['department'] ?? null,
+                    'degree' => $edu['degree'],
+                    'graduation_year' => $edu['graduation_year'] ?? null,
+                ]);
+            }
 
-        return $created;
+            return $created;
+        });
     }
 
     /**
@@ -255,42 +273,29 @@ class EmployeeService
      */
     public function updateEducations(int $employeeId, array $educations): array
     {
-        $employee = $this->employeeRepository->getById($employeeId);
-        if (! $employee) {
-            throw new \Exception('Çalışan bulunamadı.');
-        }
+        return \DB::transaction(function () use ($employeeId, $educations) {
+            $employee = $this->employeeRepository->getById($employeeId);
+            if (! $employee) {
+                throw new \Exception('Çalışan bulunamadı.');
+            }
 
-        // Mevcut eğitimleri sil
-        $employee->education()->delete();
+            // Mevcut eğitimleri sil
+            $employee->education()->delete();
 
-        // Yeni eğitimleri ekle
-        $created = [];
-        foreach ($educations as $edu) {
-            $created[] = EmployeeEducation::create([
-                'employee_id' => $employeeId,
-                'school_name' => $edu['school_name'],
-                'department' => $edu['department'] ?? null,
-                'degree' => $edu['degree'],
-                'graduation_year' => $edu['graduation_year'] ?? null,
-            ]);
-        }
+            // Yeni eğitimleri ekle
+            $created = [];
+            foreach ($educations as $edu) {
+                $created[] = EmployeeEducation::create([
+                    'employee_id' => $employeeId,
+                    'school_name' => $edu['school_name'],
+                    'department' => $edu['department'] ?? null,
+                    'degree' => $edu['degree'],
+                    'graduation_year' => $edu['graduation_year'] ?? null,
+                ]);
+            }
 
-        return $created;
-    }
-
-    /**
-     * Employee'ın eğitim bilgisini siler.
-     *
-     * @throws \Exception
-     */
-    public function deleteEducation(int $educationId): bool
-    {
-        $education = EmployeeEducation::find($educationId);
-        if (! $education) {
-            throw new \Exception('Eğitim bilgisi bulunamadı.');
-        }
-
-        return $education->delete();
+            return $created;
+        });
     }
 
     /**

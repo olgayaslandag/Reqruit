@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Enums\ApprovalRoleEnum;
@@ -20,20 +21,22 @@ class PayrollApprovalService
      */
     public function initiateApproval(int $periodId, int $userId): PayrollPeriod
     {
-        $period = $this->payrollRepository->getById($periodId);
+        return \DB::transaction(function () use ($periodId) {
+            $period = $this->payrollRepository->getById($periodId);
 
-        if (! $period) {
-            throw new \Exception('Bordro dönemi bulunamadı.');
-        }
+            if (! $period) {
+                throw new \Exception('Bordro dönemi bulunamadı.');
+            }
 
-        if ($period->status !== PayrollStatusEnum::DRAFT->value) {
-            throw new \Exception('Sadece taslak durumundaki bordrolar onaya sunulabilir.');
-        }
+            if ($period->status !== PayrollStatusEnum::DRAFT->value) {
+                throw new \Exception('Sadece taslak durumundaki bordrolar onaya sunulabilir.');
+            }
 
-        // İlk onay olarak manager onayını bekle
-        $period->update(['status' => PayrollStatusEnum::MANAGER_APPROVED->value]);
+            // İlk onay olarak manager onayını bekle
+            $period->update(['status' => PayrollStatusEnum::MANAGER_APPROVED->value]);
 
-        return $period->fresh();
+            return $period->fresh();
+        });
     }
 
     /**
@@ -41,39 +44,41 @@ class PayrollApprovalService
      */
     public function approve(int $periodId, int $userId, ApprovalRoleEnum $role, ?string $comment = null): PayrollPeriod
     {
-        $period = $this->payrollRepository->getById($periodId);
+        return \DB::transaction(function () use ($periodId, $userId, $role, $comment) {
+            $period = $this->payrollRepository->getById($periodId);
 
-        if (! $period) {
-            throw new \Exception('Bordro dönemi bulunamadı.');
-        }
+            if (! $period) {
+                throw new \Exception('Bordro dönemi bulunamadı.');
+            }
 
-        $currentStatus = PayrollStatusEnum::from($period->status);
+            $currentStatus = PayrollStatusEnum::from($period->status);
 
-        // Uygun onay rolü kontrolü
-        $expectedStatus = $role->correspondingPayrollStatus();
+            // Uygun onay rolü kontrolü
+            $expectedStatus = $role->correspondingPayrollStatus();
 
-        if ($currentStatus !== $expectedStatus) {
-            throw new \Exception("Bu aşamada {$role->label()} onayı beklenmiyor.");
-        }
+            if ($currentStatus !== $expectedStatus) {
+                throw new \Exception("Bu aşamada {$role->label()} onayı beklenmiyor.");
+            }
 
-        // Onay kaydı oluştur
-        PayrollApproval::create([
-            'payroll_period_id' => $periodId,
-            'approver_id' => $userId,
-            'role' => $role->value,
-            'status' => 'approved',
-            'comment' => $comment,
-            'approved_at' => now(),
-        ]);
+            // Onay kaydı oluştur
+            PayrollApproval::create([
+                'payroll_period_id' => $periodId,
+                'approver_id' => $userId,
+                'role' => $role->value,
+                'status' => 'approved',
+                'comment' => $comment,
+                'approved_at' => now(),
+            ]);
 
-        // Sonraki duruma geç
-        $nextStatus = $currentStatus->nextStatus();
+            // Sonraki duruma geç
+            $nextStatus = $currentStatus->nextStatus();
 
-        if ($nextStatus) {
-            $period->update(['status' => $nextStatus->value]);
-        }
+            if ($nextStatus) {
+                $period->update(['status' => $nextStatus->value]);
+            }
 
-        return $period->fresh();
+            return $period->fresh();
+        });
     }
 
     /**
@@ -81,26 +86,28 @@ class PayrollApprovalService
      */
     public function reject(int $periodId, int $userId, ApprovalRoleEnum $role, string $reason): PayrollPeriod
     {
-        $period = $this->payrollRepository->getById($periodId);
+        return \DB::transaction(function () use ($periodId, $userId, $role, $reason) {
+            $period = $this->payrollRepository->getById($periodId);
 
-        if (! $period) {
-            throw new \Exception('Bordro dönemi bulunamadı.');
-        }
+            if (! $period) {
+                throw new \Exception('Bordro dönemi bulunamadı.');
+            }
 
-        // Red kaydı oluştur
-        PayrollApproval::create([
-            'payroll_period_id' => $periodId,
-            'approver_id' => $userId,
-            'role' => $role->value,
-            'status' => 'rejected',
-            'comment' => $reason,
-            'approved_at' => now(),
-        ]);
+            // Red kaydı oluştur
+            PayrollApproval::create([
+                'payroll_period_id' => $periodId,
+                'approver_id' => $userId,
+                'role' => $role->value,
+                'status' => 'rejected',
+                'comment' => $reason,
+                'approved_at' => now(),
+            ]);
 
-        // Taslak durumuna geri al
-        $period->update(['status' => PayrollStatusEnum::DRAFT->value]);
+            // Taslak durumuna geri al
+            $period->update(['status' => PayrollStatusEnum::DRAFT->value]);
 
-        return $period->fresh();
+            return $period->fresh();
+        });
     }
 
     /**
@@ -183,24 +190,26 @@ class PayrollApprovalService
      */
     public function publish(int $periodId): PayrollPeriod
     {
-        $period = $this->payrollRepository->getById($periodId);
+        return \DB::transaction(function () use ($periodId) {
+            $period = $this->payrollRepository->getById($periodId);
 
-        if (! $period) {
-            throw new \Exception('Bordro dönemi bulunamadı.');
-        }
+            if (! $period) {
+                throw new \Exception('Bordro dönemi bulunamadı.');
+            }
 
-        $currentStatus = PayrollStatusEnum::from($period->status);
+            $currentStatus = PayrollStatusEnum::from($period->status);
 
-        if ($currentStatus !== PayrollStatusEnum::ACCOUNTING_APPROVED) {
-            throw new \Exception('Muhasebe onayı verilmeden bordro yayınlanamaz.');
-        }
+            if ($currentStatus !== PayrollStatusEnum::ACCOUNTING_APPROVED) {
+                throw new \Exception('Muhasebe onayı verilmeden bordro yayınlanamaz.');
+            }
 
-        $period->update(['status' => PayrollStatusEnum::PUBLISHED->value]);
+            $period->update(['status' => PayrollStatusEnum::PUBLISHED->value]);
 
-        // Çalışanlara e-posta gönder
-        $this->sendPublishedEmails($period);
+            // Works correctly since it's in transaction scope
+            $this->sendPublishedEmails($period);
 
-        return $period->fresh();
+            return $period->fresh();
+        });
     }
 
     /**

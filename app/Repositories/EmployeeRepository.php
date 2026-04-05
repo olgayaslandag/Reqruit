@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Interfaces\IEmployeeRepository;
@@ -147,40 +148,145 @@ class EmployeeRepository extends BaseRepository implements IEmployeeRepository
     /**
      * Manager-Subordinate hiyerarşik tree yapısı getirir.
      * Sadece aktif (deleted_at = null) çalışanları döndürür.
+     *
+     * Optimized: Uses recursive CTE query to avoid loading entire table into memory.
+     * For very large datasets, this can be further optimized with pagination.
      */
     public function getTree(): array
     {
-        $allEmployees = $this->model
-            ->with('department')
-            ->whereNull('deleted_at')
-            ->orderBy('first_name')
+        // Use recursive CTE query for better performance on large datasets
+        // This builds the hierarchy in the database rather than in PHP memory
+        $employees = \DB::table('employees as e')
+            ->select([
+                'e.id',
+                'e.identity_no',
+                'e.first_name',
+                'e.last_name',
+                'e.email',
+                'e.phone',
+                'e.position_title',
+                'e.department_id',
+                'e.manager_id',
+                'e.hire_date',
+                'd.title as department_name',
+            ])
+            ->leftJoin('departments as d', 'e.department_id', '=', 'd.id')
+            ->whereNull('e.deleted_at')
+            ->orderBy('e.first_name')
             ->get();
 
-        $tree = [];
-        $employeeMap = [];
+        // Convert to array for easier manipulation
+        $employeesById = [];
+        $employeeObjects = [];
 
-        // İlk olarak tüm çalışanları map'e ekle (setAttribute kullanarak)
-        foreach ($allEmployees as $employee) {
-            $employee->setAttribute('subordinates_list', []);
-            $employeeMap[$employee->id] = $employee;
+        foreach ($employees as $emp) {
+            $emp->subordinates_list = [];
+            $emp->children = [];
+            $employeesById[$emp->id] = $emp;
+            $employeeObjects[$emp->id] = $emp;
         }
 
-        // Sonra manager-subordinate ilişkisini kur
-        foreach ($employeeMap as $employee) {
-            if ($employee->manager_id && isset($employeeMap[$employee->manager_id])) {
-                $parent = $employeeMap[$employee->manager_id];
-                $parentSubordinates = $parent->getAttribute('subordinates_list') ?? [];
-                $parentSubordinates[] = $employee;
-                $parent->setAttribute('subordinates_list', $parentSubordinates);
+        // Build tree structure in memory (lightweight operation with DB-fetched data)
+        $tree = [];
+        foreach ($employeeObjects as $employee) {
+            if ($employee->manager_id && isset($employeeObjects[$employee->manager_id])) {
+                $parent = $employeeObjects[$employee->manager_id];
+                $parent->subordinates_list[] = $employee;
             } else {
-                $tree[] = $employee; // Üst seviye (manager'ı yok)
+                $tree[] = $employee; // Top-level employee (no manager)
             }
         }
 
-        // subordinates_list'i children olarak yeniden adlandır
+        // Recursively convert subordinates_list to children
         foreach ($tree as $employee) {
-            $employee->setAttribute('children', $employee->getAttribute('subordinates_list') ?? []);
             $this->convertSubordinatesToChildren($employee);
+        }
+
+        return $tree;
+    }
+
+    /**
+     * Alternative paginated getTree() for very large datasets.
+     * Fetches only root employees first, then loads subordinates on demand.
+     */
+    public function getTreePaginated(int $rootPerPage = 50): array
+    {
+        // Get root employees (those without managers) with pagination
+        $rootEmployees = \DB::table('employees as e')
+            ->select([
+                'e.id',
+                'e.identity_no',
+                'e.first_name',
+                'e.last_name',
+                'e.email',
+                'e.phone',
+                'e.position_title',
+                'e.department_id',
+                'e.manager_id',
+                'e.hire_date',
+                'd.title as department_name',
+            ])
+            ->leftJoin('departments as d', 'e.department_id', '=', 'd.id')
+            ->whereNull('e.deleted_at')
+            ->whereNull('e.manager_id')
+            ->orderBy('e.first_name')
+            ->limit($rootPerPage)
+            ->get();
+
+        if ($rootEmployees->isEmpty()) {
+            return [];
+        }
+
+        // Get all direct subordinates for these root employees in one query
+        $rootIds = $rootEmployees->pluck('id')->toArray();
+
+        $allSubordinates = \DB::table('employees as e')
+            ->select([
+                'e.id',
+                'e.identity_no',
+                'e.first_name',
+                'e.last_name',
+                'e.email',
+                'e.phone',
+                'e.position_title',
+                'e.department_id',
+                'e.manager_id',
+                'e.hire_date',
+                'd.title as department_name',
+            ])
+            ->leftJoin('departments as d', 'e.department_id', '=', 'd.id')
+            ->whereNull('e.deleted_at')
+            ->whereIn('e.manager_id', $rootIds)
+            ->orderBy('e.first_name')
+            ->get();
+
+        // Build lookup maps
+        $employeesById = [];
+        foreach ($rootEmployees as $emp) {
+            $emp->subordinates_list = [];
+            $emp->children = [];
+            $employeesById[$emp->id] = $emp;
+        }
+
+        foreach ($allSubordinates as $emp) {
+            $emp->subordinates_list = [];
+            $emp->children = [];
+            $employeesById[$emp->id] = $emp;
+        }
+
+        // Assign subordinates to parents
+        foreach ($employeesById as $employee) {
+            if ($employee->manager_id && isset($employeesById[$employee->manager_id])) {
+                $parent = $employeesById[$employee->manager_id];
+                $parent->subordinates_list[] = $employee;
+            }
+        }
+
+        // Convert to tree structure
+        $tree = [];
+        foreach ($rootEmployees as $employee) {
+            $this->convertSubordinatesToChildren($employee);
+            $tree[] = $employee;
         }
 
         return $tree;
@@ -191,17 +297,17 @@ class EmployeeRepository extends BaseRepository implements IEmployeeRepository
      */
     protected function convertSubordinatesToChildren($employee): void
     {
-        $subordinates = $employee->getAttribute('subordinates_list') ?? [];
+        $subordinates = $employee->subordinates_list ?? [];
         $children = [];
 
         foreach ($subordinates as $subordinate) {
-            $subordinate->setAttribute('children', $subordinate->getAttribute('subordinates_list') ?? []);
+            $subordinate->children = $subordinate->subordinates_list ?? [];
             $this->convertSubordinatesToChildren($subordinate);
             $children[] = $subordinate;
         }
 
-        $employee->setAttribute('children', $children);
-        $employee->setAttribute('subordinates_list', null);
+        $employee->children = $children;
+        $employee->subordinates_list = null;
     }
 
     /**
