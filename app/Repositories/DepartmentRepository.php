@@ -1,11 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
 namespace App\Repositories;
 
 use App\Interfaces\IDepartmentRepository;
 use App\Models\Department;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class DepartmentRepository extends BaseRepository implements IDepartmentRepository
 {
@@ -21,7 +23,7 @@ class DepartmentRepository extends BaseRepository implements IDepartmentReposito
     {
         if (empty($filters)) {
             // Cache frequently accessed department list - TTL: 1 hour
-            return \Cache::remember('departments.list', 3600, function () {
+            return Cache::remember('departments.list', 3600, function () {
                 return Department::select('id', 'title')->orderBy('title')->get();
             });
         }

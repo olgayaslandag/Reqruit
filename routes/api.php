@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 use App\Http\Controllers\Api\WidgetController;
 use App\Http\Controllers\Api\WidgetFormController;
 use Illuminate\Support\Facades\Route;

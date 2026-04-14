@@ -436,6 +436,18 @@
                             });
                             state.departments = [];
                             updateUrl(dept.slug);
+                        } else {
+                            // Ne child departmanı ne de formu olan durum
+                            state.breadcrumb.push({
+                                id: id,
+                                title: dept.title,
+                                slug: dept.slug
+                            });
+                            state.departments = [];
+                            state.form = null;
+                            updateUrl(dept.slug);
+                            // Bu departman için özel bir mesaj gösterilebilir, frontend'de state ile tutabiliriz
+                            state.no_content_message = dept.no_content_message || 'Bu departmanda alt departman veya başvuru formu bulunmamaktadır.';
                         }
                         state.error = null;
                     } else {
@@ -478,6 +490,18 @@
                             });
                             state.departments = [];
                             updateUrl(dept.slug);
+                        } else {
+                            // Ne child departmanı ne de formu olan durum
+                            state.breadcrumb.push({
+                                id: dept.id,
+                                title: dept.title,
+                                slug: dept.slug
+                            });
+                            state.departments = [];
+                            state.form = null;
+                            updateUrl(dept.slug);
+                            // Bu departman için özel bir mesaj gösterilebilir, frontend'de state ile tutabiliriz
+                            state.no_content_message = dept.no_content_message || 'Bu departmanda alt departman veya başvuru formu bulunmamaktadır.';
                         }
                         state.error = null;
                     } else {
@@ -580,6 +604,9 @@
                     `;
                 });
                 html += '</div>';
+            } else if (state.no_content_message) {
+                // Eğer departman yoksa ama special mesaj varsa onu göster
+                html += '<p class="reqruit-subtitle">' + escapeHtml(state.no_content_message) + '</p>';
             } else {
                 html += '<p class="reqruit-subtitle">Bu departmanda alt departman veya form bulunamadı.</p>';
             }

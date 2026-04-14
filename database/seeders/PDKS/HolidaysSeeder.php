@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Database\Seeders\PDKS;
 
 use App\Enums\HolidayTypeEnum;

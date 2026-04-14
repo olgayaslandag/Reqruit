@@ -10,6 +10,7 @@ use App\Jobs\SendSubmissionNotification;
 use App\Models\Department;
 use App\Models\Form;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class WidgetService
 {
@@ -93,7 +94,7 @@ class WidgetService
 
     public function handleSubmission(Form $form, array $data, array $files = []): mixed
     {
-        return \DB::transaction(function () use ($form, $data, $files) {
+        return DB::transaction(function () use ($form, $data, $files) {
             $uploadedFiles = [];
             foreach ($files as $key => $file) {
                 if ($file && $file->isValid()) {

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Aynı tarih aralığında sadece bir dönem olabilir
-            $table->unique(['start_date', 'end_date', 'payment_frequency']);
+            $table->unique(['start_date', 'end_date', 'payment_frequency'], 'payroll_period_unique');
         });
     }
 

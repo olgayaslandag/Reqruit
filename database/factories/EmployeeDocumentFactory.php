@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Database\Factories;
 
 use App\Enums\DocumentTypeEnum;
@@ -19,8 +18,8 @@ class EmployeeDocumentFactory extends Factory
         return [
             'employee_id' => Employee::factory(),
             'document_type' => DocumentTypeEnum::CONTRACT->value,
-            'file_name' => fake()->word() . '.pdf',
-            'file_path' => 'documents/' . fake()->uuid() . '.pdf',
+            'file_name' => fake()->word().'.pdf',
+            'file_path' => 'documents/'.fake()->uuid().'.pdf',
             'file_size' => fake()->numberBetween(1024, 1024000),
             'mime_type' => 'application/pdf',
         ];

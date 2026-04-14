@@ -14,7 +14,7 @@ return new class extends Migration
             $table->date('date');
             $table->time('time');
             $table->enum('type', ['check_in', 'check_out', 'break_start', 'break_end']);
-            $table->enum('source', ['device', 'mobile', 'web', 'api']);
+            $table->enum('source', ['device', 'mobile', 'web', 'api', 'manual']);
             $table->enum('status', ['present', 'absent', 'late', 'early_leave', 'overtime'])->default('present');
             $table->json('geolocation')->nullable(); // Format: {"lat": xx.xxxx, "lng": yy.yyyy}
             $table->string('ip_address', 45)->nullable();

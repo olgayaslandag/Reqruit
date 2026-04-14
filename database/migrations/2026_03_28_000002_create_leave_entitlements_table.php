@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('max_carry_over_days')->default(182); // Maks devir günü (6 ay)
             $table->timestamps();
 
-            $table->unique(['employee_id', 'leave_type_id', 'calculation_year_start']);
+            $table->unique(['employee_id', 'leave_type_id', 'calculation_year_start'], 'leave_entitlements_unique');
         });
     }
 

@@ -82,14 +82,18 @@ class SubmissionService
             $details = [];
             $labels = $data['labels'] ?? [];
 
+            // Get form fields to map field labels when not provided via $labels
+            $formFields = $form->fields->keyBy('name');
+
             foreach ($data as $key => $value) {
                 if (in_array($key, ['_token', 'labels'])) {
                     continue;
                 }
 
+                $formField = $formFields[$key] ?? null;
                 $details[] = [
                     'field_name' => $key,
-                    'field_label' => $labels[$key] ?? $key,
+                    'field_label' => $labels[$key] ?? ($formField ? $formField->label : $key),
                     'field_value' => is_array($value) ? implode(', ', $value) : $value,
                 ];
             }

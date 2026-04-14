@@ -45,9 +45,9 @@ return new class extends Migration
             $table->string('guard_name');
             $table->timestamps();
             if ($teams || config('permission.testing')) {
-                $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
+                $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name'], 'roles_team_name_guard_unique');
             } else {
-                $table->unique(['name', 'guard_name']);
+                $table->unique(['name', 'guard_name'], 'roles_name_guard_unique');
             }
         });
 

@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Interfaces\IEmployeeSalaryRepository;
 use App\Models\Employee;
-use App\Models\PayrollPeriod;
 
 /**
  * Maaş Hesaplama Servisi

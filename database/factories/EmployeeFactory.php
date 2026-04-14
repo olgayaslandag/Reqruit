@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Database\Factories;
 
 use App\Enums\ContractTypeEnum;
@@ -24,11 +23,11 @@ class EmployeeFactory extends Factory
             'last_name' => fake()->lastName(),
             'birth_date' => fake()->date('Y-m-d', '-18 years'),
             'gender' => GenderEnum::MALE->value,
-            'phone' => '5' . fake()->numerify('### ### ## ##'), // 5321234567 formatı
+            'phone' => '5'.fake()->numerify('### ### ## ##'), // 5321234567 formatı
             'email' => fake()->unique()->safeEmail(),
             'address' => fake()->address(),
             'emergency_contact_name' => fake()->name(),
-            'emergency_contact_phone' => '5' . fake()->numerify('### ### ## ##'),
+            'emergency_contact_phone' => '5'.fake()->numerify('### ### ## ##'),
             'emergency_contact_relation' => 'Eş',
             'marital_status' => 'single',
             'children_count' => 0,

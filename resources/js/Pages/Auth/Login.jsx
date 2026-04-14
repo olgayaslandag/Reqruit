@@ -31,16 +31,23 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="E-posta" />
+            <div className="text-center mb-4">
+                <h2>Giriş Yap</h2>
+                <Link href={route('register')} className="d-none text-decoration-none">
+                    Hesabın yok mu?
+                </Link>
+            </div>
 
+            <form onSubmit={submit}>
+                <div className="form-group mb-3">
+                    <InputLabel htmlFor="email" value="E-posta" className="form-label" />
+                    
                     <TextInput
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="form-control"
+                        className="form-control input-primary"
                         autoComplete="username"
                         isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
@@ -49,15 +56,15 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Şifre" />
+                <div className="form-group mb-3">
+                    <InputLabel htmlFor="password" value="Şifre" className="form-label" />
 
                     <TextInput
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
-                        className="form-control"
+                        className="form-control input-primary"
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
                     />
@@ -65,36 +72,44 @@ export default function Login({ status, canResetPassword }) {
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="mt-4 d-block">
-                    <label className="d-flex align-items-center">
-                        <Checkbox
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="form-check">
+                        <input
+                            id="remember"
+                            type="checkbox"
                             name="remember"
+                            className="form-check-input"
                             checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
+                            onChange={(e) => setData('remember', e.target.checked)}
                         />
-                        <span className="ms-2 small text-muted">
+                        <label htmlFor="remember" className="form-check-label ms-2">
                             Beni hatırla
-                        </span>
-                    </label>
-                </div>
-
-                <div className="mt-4 d-flex justify-content-end">
+                        </label>
+                    </div>
+                    
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="small text-muted-link"
+                            className="link-primary text-decoration-none"
                         >
-                            Şifremi unuttum?
+                            Şifremi unuttum
                         </Link>
                     )}
+                </div>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                <div className="d-grid mb-4">
+                    <PrimaryButton className="btn btn-primary w-100" disabled={processing}>
                         Giriş Yap
                     </PrimaryButton>
                 </div>
             </form>
+
+            <div className="d-none">
+                <p className="text-center">Veya şununla giriş yapın</p>
+                <div className="d-flex justify-content-center gap-3">
+                    {/* Social login buttons will go here */}
+                </div>
+            </div>
         </GuestLayout>
     );
 }

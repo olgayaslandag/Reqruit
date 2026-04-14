@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Database\Seeders;
 
 use App\Models\Employee;
@@ -113,10 +112,10 @@ class LeaveRequestsSeeder extends Seeder
                     'status' => $status,
                     'reason' => $this->generateReason($leaveType, $status),
                     'rejection_reason' => in_array($status, ['rejected']) ? $this->generateRejectionReason() : null,
-                    'approved_at' => $approvedAt?->toISOString(),
+                    'approved_at' => $approvedAt?->format('Y-m-d H:i:s'),
                     'requires_hr_approval' => in_array($leaveType->code, ['UCRETSIZ']), // Free leave may need extra approval
-                    'created_at' => $requestDate->toISOString(),
-                    'updated_at' => $now->toISOString(),
+                    'created_at' => $requestDate->format('Y-m-d H:i:s'),
+                    'updated_at' => $now->format('Y-m-d H:i:s'),
                 ];
             }
         }

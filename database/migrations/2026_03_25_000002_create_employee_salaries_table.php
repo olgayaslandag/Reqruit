@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Aynı employee için aynı component'in birden fazla aktif olamayacağı kuralı
-            $table->unique(['employee_id', 'salary_component_id', 'start_date']);
+            $table->unique(['employee_id', 'salary_component_id', 'start_date'], 'emp_sal_unique');
         });
     }
 
