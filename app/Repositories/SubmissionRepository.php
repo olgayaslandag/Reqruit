@@ -7,7 +7,8 @@ namespace App\Repositories;
 use App\Interfaces\ISubmissionRepository;
 use App\Models\Submission;
 use App\Models\SubmissionDetail;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
@@ -151,7 +152,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
         $submissionIds = $submissions->pluck('id')->toArray();
 
         // Fetch comment stats in a single query
-        $commentStats = \DB::table('submission_comments')
+        $commentStats = DB::table('submission_comments')
             ->whereIn('submission_id', $submissionIds)
             ->selectRaw('submission_id, COUNT(*) as comment_count, AVG(rating) as avg_rating')
             ->groupBy('submission_id')
@@ -182,7 +183,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
         $submissionIds = $paginator->getCollection()->pluck('id')->toArray();
 
         // Fetch comment counts and avg ratings manually
-        $commentStats = \DB::table('submission_comments')
+        $commentStats = DB::table('submission_comments')
             ->whereIn('submission_id', $submissionIds)
             ->selectRaw('submission_id, COUNT(*) as comment_count, AVG(rating) as avg_rating')
             ->groupBy('submission_id')

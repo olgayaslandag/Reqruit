@@ -72,7 +72,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
     // İlk mount kontrolü için ref
     const isInitialized = React.useRef(false);
 
-    // Aktif menüyü otomatik aç
+    // Aktif menüyü her renderda kontrol et ve güncelle
     useEffect(() => {
         const initialOpen = {};
         menuGroups.forEach((group) => {
@@ -82,12 +82,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             }
         });
 
-        // Sadece ilk mount'ta veya route değiştiğinde çalış
-        if (!isInitialized.current || currentRoute !== usePage().url) {
-            setOpenMenus((prev) => ({ ...prev, ...initialOpen }));
-            isInitialized.current = true;
-        }
-    }, [currentRoute]);
+        // Menü durumunu güncelle
+        setOpenMenus(prev => ({ ...prev, ...initialOpen }));
+    }, [currentRoute, menuGroups]);  
 
     const toggleMenu = (title) => {
         setOpenMenus((prev) => ({

@@ -31,8 +31,8 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
-            <div className="text-center mb-4">
-                <h2>Giriş Yap</h2>
+            <div className="mb-4">
+                <h2 className="h3">Giriş Yap</h2>
                 <Link href={route('register')} className="d-none text-decoration-none">
                     Hesabın yok mu?
                 </Link>
@@ -41,7 +41,7 @@ export default function Login({ status, canResetPassword }) {
             <form onSubmit={submit}>
                 <div className="form-group mb-3">
                     <InputLabel htmlFor="email" value="E-posta" className="form-label" />
-                    
+
                     <TextInput
                         id="email"
                         type="email"
@@ -86,7 +86,7 @@ export default function Login({ status, canResetPassword }) {
                             Beni hatırla
                         </label>
                     </div>
-                    
+
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}

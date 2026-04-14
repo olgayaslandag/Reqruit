@@ -20,6 +20,7 @@ use App\Policies\LeaveEntitlementPolicy;
 use App\Policies\LeaveRequestPolicy;
 use App\Policies\LeaveTypePolicy;
 use App\Policies\PayrollPolicy;
+use App\Policies\UserPolicy;
 use App\Repositories\LeaveEntitlementRepository;
 use App\Repositories\LeaveRequestRepository;
 use App\Repositories\LeaveTypeRepository;

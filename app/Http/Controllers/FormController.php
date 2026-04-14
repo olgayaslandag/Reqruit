@@ -47,7 +47,7 @@ class FormController extends Controller
 
     public function create()
     {
-        $departments = $this->departmentService->getAll();
+        $departments = $this->departmentService->getTree();
 
         return Inertia::render('Admin/Forms/Builder', [
             'departments' => $departments,
@@ -68,7 +68,7 @@ class FormController extends Controller
         $this->authorize('update', $form);
 
         $form->load('fields');
-        $departments = $this->departmentService->getAll();
+        $departments = $this->departmentService->getTree();
 
         return Inertia::render('Admin/Forms/Builder', [
             'departments' => $departments,

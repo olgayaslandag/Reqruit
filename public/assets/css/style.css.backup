@@ -16136,11 +16136,7 @@ pre[class*=language-] > code {
   height: 100%;
   transition: all 0.08s cubic-bezier(0.37, 0.24, 0.53, 0.99);
 }
-.pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link {
-  font-weight: 500;
-}
-/* Active dropdown parent item keeps its font weight but no color change */
-.pc-sidebar .pc-navbar > .pc-item.pc-hasmenu.pc-trigger > .pc-link {
+.pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.pc-trigger > .pc-link, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link {
   font-weight: 500;
 }
 .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item:hover > .pc-link {
@@ -16150,19 +16146,14 @@ pre[class*=language-] > code {
   opacity: 0.05;
   background: var(--pc-sidebar-color);
 }
-.pc-sidebar .pc-navbar > .pc-item.pc-hasmenu.pc-trigger > .pc-link { 
-  /* Replaced by general font-weight rule */ 
-}
-/* Active state only applies to submenu items, not the menu trigger */
-.pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link,
-.pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item:focus > .pc-link {
+.pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.pc-trigger > .pc-link, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item:focus > .pc-link {
   color: var(--pc-sidebar-active-color);
 }
-.pc-sidebar .pc-navbar > .pc-item.pc-hasmenu.pc-trigger > .pc-link:before, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link:before, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item:focus > .pc-link:before {
+.pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.pc-trigger > .pc-link:before, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link:before, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item:focus > .pc-link:before {
   opacity: 0.1;
   background: var(--pc-sidebar-active-color);
 }
-.pc-sidebar .pc-navbar > .pc-item.pc-hasmenu.pc-trigger > .pc-link:after, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link:after, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item:focus > .pc-link:after {
+.pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.pc-trigger > .pc-link:after, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item.active > .pc-link:after, .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-item:focus > .pc-link:after {
   background: var(--pc-sidebar-active-color);
 }
 .pc-sidebar .pc-navbar > .pc-item .pc-submenu .pc-link {

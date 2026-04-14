@@ -70,13 +70,33 @@ class DepartmentRepository extends BaseRepository implements IDepartmentReposito
     }
 
     /**
-     * Get department tree (hierarchical).
+     * Get department tree (hierarchical with unlimited levels).
      */
     public function getTree(): Collection
     {
-        return Department::with('children')
-            ->whereNull('parent_id')
-            ->orderBy('title')
-            ->get();
+        // Tüm departmanları çek ve manuel olarak hiyerarşik yapı oluştur
+        $allDepartments = Department::with('forms')->get()->sortBy('title')->values();
+
+        return $this->buildRecursiveTree($allDepartments);
+    }
+
+    /**
+     * Build recursive tree structure from flat list of departments.
+     */
+    private function buildRecursiveTree($departments, $parentId = null): Collection
+    {
+        $branch = new Collection;
+
+        foreach ($departments as $department) {
+            if ($department->parent_id == $parentId) {
+                $children = $this->buildRecursiveTree($departments, $department->id);
+
+                // Children collection'ını ilişkiye bağla
+                $department->setRelation('children', $children);
+                $branch->push($department);
+            }
+        }
+
+        return $branch;
     }
 }

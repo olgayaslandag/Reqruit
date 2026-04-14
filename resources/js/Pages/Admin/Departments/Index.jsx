@@ -87,11 +87,8 @@ export default function Index({ departments }) {
         const rows = [
             <tr key={department.id}>
                 <td className="px-4 py-3 text-nowrap">
-                    <div className={`d-flex align-items-center ${department.parent_id ? 'department-tree-node': ''}`} style={department.parent_id ? {paddingLeft: `${level * 20}px`} : {}}>
-                        {isParent && (
-                            <i className="bi bi-chevron-down me-1 text-muted"></i>
-                        )}
-                        {!isParent && level > 0 && (
+                     <div className={`d-flex align-items-center ${department.parent_id ? 'department-tree-node': ''}`} style={department.parent_id ? {paddingLeft: `${level * 20}px`} : {}}>
+                        {(isParent || !isParent) && level > 0 && (
                             <span className="me-1 text-muted">└</span>
                         )}
                         <span className={level > 0 ? 'text-muted' : 'fw-medium text-dark'}>

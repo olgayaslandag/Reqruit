@@ -3,6 +3,29 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useFlashWithToast } from '@/Hooks/useFlash';
 
+/**
+ * Recursively builds a flat list from hierarchical departments with indentation
+ * @param {Array} departments Recursive department list
+ * @param {number} level Current nesting level
+ * @returns {Array} Flattened list with level indicators
+ */
+function flattenHierarchicalDepartments(departments, level = 0) {
+    let result = [];
+    
+    departments.forEach(dept => {
+        result.push({
+            ...dept,
+            level: level
+        });
+        
+        if (dept.children && dept.children.length > 0) {
+            result.push(...flattenHierarchicalDepartments(dept.children, level + 1));
+        }
+    });
+    
+    return result;
+}
+
 const FIELD_TYPES = [
     { value: 'text', label: 'Metin' },
     { value: 'email', label: 'E-posta' },
@@ -32,6 +55,9 @@ export default function Builder({ departments, form }) {
             { name: 'email', label: 'E-posta', type: 'email', required: true, options: [] },
         ]),
     });
+    
+    // Build flattened hierarchical list from nested data structure
+    const hierarchicalDepartments = flattenHierarchicalDepartments(departments || []);
 
     const [draggedIndex, setDraggedIndex] = useState(null);
 
@@ -206,9 +232,9 @@ export default function Builder({ departments, form }) {
                                         required
                                     >
                                         <option value="">Seçiniz</option>
-                                        {departments.map((dept) => (
+                                        {hierarchicalDepartments.map((dept) => (
                                             <option key={dept.id} value={dept.id}>
-                                                {dept.title}
+                                                {'└'.repeat(dept.level) + ' ' + dept.title}
                                             </option>
                                         ))}
                                     </select>
@@ -231,7 +257,7 @@ export default function Builder({ departments, form }) {
                                                 value={email || ''}
                                                 onChange={(e) => {
                                                     const newEmails = [...(data.notification_emails || [])];
-                                                    newEmails[index] = e.target.value;
+                                                    newEmails[idx] = e.target.value;
                                                     setData('notification_emails', newEmails);
                                                 }}
                                                 placeholder="email@example.com"
@@ -240,7 +266,7 @@ export default function Builder({ departments, form }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        const newEmails = (data.notification_emails || []).filter((_, i) => i !== index);
+                                                        const newEmails = (data.notification_emails || []).filter((_, i) => i !== idx);
                                                         setData('notification_emails', newEmails);
                                                     }}
                                                     className="btn btn-outline-danger btn-sm"
@@ -353,7 +379,7 @@ export default function Builder({ departments, form }) {
                                                                 className="form-check-input"
                                                                 id={`required_${field.name || index}`}
                                                             />
-                                                            <label className="form-check-label" htmlFor={`required_${index}`}>
+                                                            <label className="form-check-label" htmlFor={`required_${field.name || index}`}>
                                                                 Zorunlu
                                                             </label>
                                                         </div>
