@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\SubmissionDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,9 +30,12 @@ class FileController extends Controller
         }
 
         // Only authenticated users can generate signed URLs
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             abort(401, 'Unauthorized');
         }
+
+        // Validate submission ownership
+        $this->validateSubmissionOwnership($path);
 
         // Check if file exists
         if (! Storage::disk('local')->exists($path)) {
@@ -65,9 +71,12 @@ class FileController extends Controller
         }
 
         // Only authenticated users can download files
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             abort(401, 'Unauthorized');
         }
+
+        // Validate submission ownership
+        $this->validateSubmissionOwnership($path);
 
         // Check if file exists
         if (! Storage::disk('local')->exists($path)) {
@@ -97,9 +106,12 @@ class FileController extends Controller
         }
 
         // Only authenticated users can view files
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             abort(401, 'Unauthorized');
         }
+
+        // Validate submission ownership
+        $this->validateSubmissionOwnership($path);
 
         // Check if file exists
         if (! Storage::disk('local')->exists($path)) {
@@ -126,5 +138,36 @@ class FileController extends Controller
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline',
         ]);
+    }
+
+    /**
+     * Validate that the requested file path belongs to a submission
+     * owned by the authenticated user
+     */
+    private function validateSubmissionOwnership(string $path): void
+    {
+        // Check if path belongs to submissions directory
+        if (! str_starts_with($path, 'submissions/')) {
+            abort(403, 'Access denied: Invalid file type');
+        }
+
+        // Find submission details containing this file path
+        $submissionDetail = SubmissionDetail::where('field_value', $path)->first();
+
+        if (! $submissionDetail) {
+            abort(403, 'File does not belong to any submission');
+        }
+
+        // Find parent submission
+        $submission = $submissionDetail->submission;
+        if (! $submission) {
+            abort(403, 'Submission not found for this file');
+        }
+
+        // Verify user has permission to access this submission via policy
+        $currentUser = Auth::user();
+
+        // Apply policy check - this respects the roles defined in SubmissionPolicy
+        Gate::authorize('view', $submission);
     }
 }

@@ -7,9 +7,10 @@ namespace App\Repositories;
 use App\Interfaces\ISubmissionRepository;
 use App\Models\Submission;
 use App\Models\SubmissionDetail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class SubmissionRepository extends BaseRepository implements ISubmissionRepository
@@ -449,13 +450,25 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
         $submission = Submission::with(['form.department', 'form.fields', 'details', 'comments.user'])
             ->findOrFail($id);
 
-        // Add file URLs to details
-        $submission->details->transform(function ($detail) {
+        $currentUser = auth()->user();
+
+        // Add file URLs to details - but only for files the user can access based on policies
+        $submission->details->transform(function ($detail) use ($currentUser, $submission) {
             $detail->is_file = $detail->isFile();
-            $detail->file_url = $detail->file_url;
-            $detail->download_url = $detail->download_url;
-            $detail->file_extension = $detail->file_extension;
-            $detail->file_name = $detail->file_name;
+
+            // Set file URLs only if the user has appropriate permissions
+            if ($detail->isFile() && $currentUser && Gate::check('viewFile', $submission)) {
+                $detail->file_url = $detail->file_url;
+                $detail->download_url = $detail->download_url;
+                $detail->file_extension = $detail->file_extension;
+                $detail->file_name = $detail->file_name;
+            } else {
+                // Hide file attributes if user doesn't have permissions
+                $detail->file_url = null;
+                $detail->download_url = null;
+                $detail->file_extension = null;
+                $detail->file_name = null;
+            }
 
             return $detail;
         });

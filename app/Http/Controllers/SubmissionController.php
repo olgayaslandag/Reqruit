@@ -12,6 +12,7 @@ use App\Services\FormService;
 use App\Services\SubmissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class SubmissionController extends Controller
@@ -42,7 +43,22 @@ class SubmissionController extends Controller
 
     public function show(Submission $submission)
     {
+        // The authorization is already handled in __construct() with authorizeResource(),
+        // but let's add file-level authorization too
+        $this->authorize('view', $submission);
+
         $submission = $this->submissionService->getById($submission->id);
+
+        // Filter details further in the controller to ensure only files the user can view are exposed on frontend
+        $submission->details = $submission->details->filter(function ($detail) use ($submission) {
+            // Allow non-file details to be visible
+            if (! $detail->isFile()) {
+                return true;
+            }
+
+            // For files, check if the user can actually access them
+            return auth()->user() && Gate::check('viewFile', $submission);
+        });
 
         return Inertia::render('Admin/Submissions/Show', [
             'submission' => $submission,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useFlashWithToast } from '@/Hooks/useFlash';
@@ -57,11 +57,11 @@ export default function Builder({ departments, form }) {
     });
     
     // Build flattened hierarchical list from nested data structure
-    const hierarchicalDepartments = flattenHierarchicalDepartments(departments || []);
+    const hierarchicalDepartments = useMemo(() => flattenHierarchicalDepartments(departments || []), [departments]);
 
     const [draggedIndex, setDraggedIndex] = useState(null);
 
-    const generateUniqueName = (baseName, excludeIndex = -1) => {
+    const generateUniqueName = useCallback((baseName, excludeIndex = -1) => {
         const existingNames = data.fields
             .map((f, i) => i !== excludeIndex ? f.name : null)
             .filter(Boolean);
@@ -73,7 +73,7 @@ export default function Builder({ departments, form }) {
             counter++;
         }
         return name;
-    };
+    }, [data.fields]);
 
     const addField = (type = 'default') => {
         if (type === 'name') {
@@ -109,74 +109,119 @@ export default function Builder({ departments, form }) {
         setData('fields', [...data.fields, newField]);
     };
 
-    const updateField = (index, key, value) => {
-        const newFields = [...data.fields];
+    const updateField = useCallback((index, key, value) => {
+        setData(prevData => {
+            const newFields = [...prevData.fields];
+            const fieldToUpdate = newFields[index];
 
-        if (key === 'label' && !newFields[index].name) {
-            newFields[index].name = generateUniqueName(newFields[index].label.toLowerCase().replace(/\s+/g, '_'), index);
-        }
+            if (key === 'label' && !fieldToUpdate.name) {
+                // Prevent regenerating field name when just editing label
+                fieldToUpdate.label = value;
+                fieldToUpdate.name = generateUniqueName(fieldToUpdate.label.toLowerCase().replace(/\s+/g, '_'), index);
+            } else if (key === 'name') {
+                const uniqueName = generateUniqueName(value, index);
+                fieldToUpdate.name = uniqueName;
+            } else {
+                fieldToUpdate[key] = value;
+            }
 
-        if (key === 'name') {
-            const uniqueName = generateUniqueName(value, index);
-            newFields[index].name = uniqueName;
-        } else {
-            newFields[index][key] = value;
-        }
+            return {
+                ...prevData,
+                fields: newFields
+            };
+        });
+    }, [setData, generateUniqueName]);
 
-        setData('fields', newFields);
-    };
-
-    const removeField = (index) => {
+    const removeField = useCallback((index) => {
         const field = data.fields[index];
         if (field.name === 'name' || field.name === 'email') {
             return;
         }
-        const newFields = data.fields.filter((_, i) => i !== index);
-        setData('fields', newFields);
-    };
+        setData(prevData => {
+            const newFields = prevData.fields.filter((_, i) => i !== index);
+            return {
+                ...prevData,
+                fields: newFields
+            };
+        });
+    }, [setData, data.fields]);
 
-    const handleDragStart = (index) => {
+    const handleDragStart = useCallback((index) => {
         setDraggedIndex(index);
-    };
+    }, []);
 
-    const handleDragOver = (e, index) => {
+    const handleDragOver = useCallback((e, index) => {
         e.preventDefault();
         if (draggedIndex === null || draggedIndex === index) return;
 
-        const newFields = [...data.fields];
-        const draggedField = newFields[draggedIndex];
-        newFields.splice(draggedIndex, 1);
-        newFields.splice(index, 0, draggedField);
+        setData(prevData => {
+            const newFields = [...prevData.fields];
+            const draggedField = newFields[draggedIndex];
+            newFields.splice(draggedIndex, 1);
+            newFields.splice(index, 0, draggedField);
 
-        setData('fields', newFields);
+            return {
+                ...prevData,
+                fields: newFields
+            };
+        });
+        
         setDraggedIndex(index);
-    };
+    }, [draggedIndex, setData]);
 
-    const handleDragEnd = () => {
+    const handleDragEnd = useCallback(() => {
         setDraggedIndex(null);
-    };
+    }, []);
 
-    const handleOptionChange = (fieldIndex, optionIndex, value) => {
-        const newFields = [...data.fields];
-        newFields[fieldIndex].options = [...(newFields[fieldIndex].options || [])];
-        newFields[fieldIndex].options[optionIndex] = value;
-        setData('fields', newFields);
-    };
+    const handleOptionChange = useCallback((fieldIndex, optionIndex, value) => {
+        setData(prevData => {
+            const newFields = [...prevData.fields];
+            const fieldWithOptions = newFields[fieldIndex];
+            if (!fieldWithOptions.options) {
+                fieldWithOptions.options = [];
+            }
+            const newOptions = [...fieldWithOptions.options];
+            newOptions[optionIndex] = value;
+            fieldWithOptions.options = newOptions;
 
-    const addOption = (fieldIndex) => {
-        const newFields = [...data.fields];
-        if (!newFields[fieldIndex].options) {
-            newFields[fieldIndex].options = [];
-        }
-        newFields[fieldIndex].options.push('Yeni Seçenek');
-        setData('fields', newFields);
-    };
+            return {
+                ...prevData,
+                fields: newFields
+            };
+        });
+    }, [setData]);
 
-    const removeOption = (fieldIndex, optionIndex) => {
-        const newFields = [...data.fields];
-        newFields[fieldIndex].options = newFields[fieldIndex].options.filter((_, i) => i !== optionIndex);
-        setData('fields', newFields);
-    };
+    const addOption = useCallback((fieldIndex) => {
+        setData(prevData => {
+            const newFields = [...prevData.fields];
+            const fieldWithOptions = newFields[fieldIndex];
+            if (!fieldWithOptions.options) {
+                fieldWithOptions.options = [];
+            }
+            fieldWithOptions.options = [...fieldWithOptions.options, 'Yeni Seçenek'];
+
+            return {
+                ...prevData,
+                fields: newFields
+            };
+        });
+    }, [setData]);
+
+    const removeOption = useCallback((fieldIndex, optionIndex) => {
+        setData(prevData => {
+            const newFields = [...prevData.fields];
+            const fieldWithOptions = newFields[fieldIndex];
+            if (!fieldWithOptions.options) {
+                fieldWithOptions.options = [];
+            }
+            fieldWithOptions.options = fieldWithOptions.options.filter((_, i) => i !== optionIndex);
+
+            return {
+                ...prevData,
+                fields: newFields
+            };
+        });
+    }, [setData]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -194,6 +239,105 @@ export default function Builder({ departments, form }) {
             post('/admin/forms', formData);
         }
     };
+
+    // Memoized fields rendering to prevent unnecessary re-renders
+    const memoizedFieldList = useMemo(() => (
+        <div className="d-flex flex-column gap-3">
+            {data.fields.map((field, index) => (
+                <div
+                    key={field.id || `field-${index}`} // Using field.id or index based key to stabilize DOM elements
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragEnd={handleDragEnd}
+                    className={`border rounded p-3 ${draggedIndex === index ? 'opacity-50' : ''}`}
+                >
+                    <div className="d-flex justify-content-between align-items-start mb-3">
+                        <span className="text-muted"><i className="ti ti-draggable"></i></span>
+                        {field.name !== 'name' && field.name !== 'email' && (
+                            <button
+                                type="button"
+                                onClick={() => removeField(index)}
+                                className="btn btn-outline-danger btn-sm"
+                            >
+                                <i className="ti ti-trash"></i> Sil
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label">Etiket</label>
+                            <input 
+                                className="form-control" 
+                                type="text"
+                                value={field.label}
+                                onChange={(e) => updateField(index, 'label', e.target.value.trim()) || e.target.value}
+                            />
+                        </div>
+
+                        <div className="col-md-6 mb-3">
+                            <label className="form-label">Tür</label>
+                            <select 
+                                className="form-select" 
+                                value={field.type}
+                                onChange={(e) => updateField(index, 'type', e.target.value)}
+                            >
+                                {FIELD_TYPES.map((type) => (
+                                    <option key={type.value} value={type.value}>
+                                        {type.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="col-md-12">
+                            <div className="form-check">
+                                <input
+                                    type="checkbox"
+                                    checked={field.required}
+                                    onChange={(e) => updateField(index, 'required', e.target.checked)}
+                                    className="form-check-input"
+                                    id={`required_${field.name || index}`}
+                                />
+                                <label className="form-check-label" htmlFor={`required_${field.name || index}`}>
+                                    Zorunlu
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {['select', 'checkbox', 'radio'].includes(field.type) && (
+                        <div className="mt-3">
+                            <label className="form-label">Seçenekler</label>
+                            {(field.options || []).map((option, optionIndex) => (
+                                <div key={`${index}-${optionIndex}`} className="d-flex gap-2 mb-2"> {/* Made key more stable */}
+                                    <input className="form-control" type="text"
+                                        value={option}
+                                        onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeOption(index, optionIndex)}
+                                        className="btn btn-outline-danger btn-sm"
+                                    >
+                                        <i className="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={() => addOption(index)}
+                                className="btn btn-link btn-sm p-0"
+                            >
+                                + Seçenek ekle
+                            </button>
+                        </div>
+                    )}
+                </div>
+            ))}
+        </div>
+    ), [data.fields, draggedIndex, updateField, handleDragStart, handleDragOver, handleDragEnd, removeField, handleOptionChange, removeOption, addOption]);
 
     return (
         <AuthenticatedLayout
@@ -325,97 +469,7 @@ export default function Builder({ departments, form }) {
                             </div>
                             <div className="card-body">
                                 {data.fields.length > 0 ? (
-                                    <div className="d-flex flex-column gap-3">
-                                    {data.fields.map((field, index) => (
-                                        <div
-                                            key={field.name || `field-${index}`}
-                                                draggable
-                                                onDragStart={() => handleDragStart(index)}
-                                                onDragOver={(e) => handleDragOver(e, index)}
-                                                onDragEnd={handleDragEnd}
-                                                className={`border rounded p-3 ${draggedIndex === index ? 'opacity-50' : ''}`}
-                                            >
-                                                <div className="d-flex justify-content-between align-items-start mb-3">
-                                                    <span className="text-muted"><i className="ti ti-draggable"></i></span>
-                                                    {field.name !== 'name' && field.name !== 'email' && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => removeField(index)}
-                                                            className="btn btn-outline-danger btn-sm"
-                                                        >
-                                                            <i className="ti ti-trash"></i> Sil
-                                                        </button>
-                                                    )}
-                                                </div>
-
-                                                <div className="row">
-                                                    <div className="col-md-6 mb-3">
-                                                        <label className="form-label">Etiket</label>
-                                                        <input className="form-control" type="text"
-                                                            value={field.label}
-                                                            onChange={(e) => updateField(index, 'label', e.target.value)}
-                                                        />
-                                                    </div>
-
-                                                    <div className="col-md-6 mb-3">
-                                                        <label className="form-label">Tür</label>
-                                                        <select className="form-select" value={field.type}
-                                                            onChange={(e) => updateField(index, 'type', e.target.value)}
-                                                        >
-                                                            {FIELD_TYPES.map((type) => (
-                                                                <option key={type.value} value={type.value}>
-                                                                    {type.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-
-                                                    <div className="col-md-12">
-                                                        <div className="form-check">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={field.required}
-                                                                onChange={(e) => updateField(index, 'required', e.target.checked)}
-                                                                className="form-check-input"
-                                                                id={`required_${field.name || index}`}
-                                                            />
-                                                            <label className="form-check-label" htmlFor={`required_${field.name || index}`}>
-                                                                Zorunlu
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {['select', 'checkbox', 'radio'].includes(field.type) && (
-                                                    <div className="mt-3">
-                                                        <label className="form-label">Seçenekler</label>
-                                                        {(field.options || []).map((option, optionIndex) => (
-                                                            <div key={`${optionIndex}-${option}`} className="d-flex gap-2 mb-2">
-                                                                <input className="form-control" type="text"
-                                                                    value={option}
-                                                                    onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
-                                                                />
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => removeOption(index, optionIndex)}
-                                                                    className="btn btn-outline-danger btn-sm"
-                                                                >
-                                                                    <i className="ti ti-trash"></i>
-                                                                </button>
-                                                            </div>
-                                                        ))}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => addOption(index)}
-                                                            className="btn btn-link btn-sm p-0"
-                                                        >
-                                                            + Seçenek ekle
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
+                                    memoizedFieldList
                                 ) : (
                                     <div className="text-center text-muted py-5">
                                         Henüz alan eklenmedi. "Alan Ekle" butonuna tıklayarak başlayabilirsiniz.

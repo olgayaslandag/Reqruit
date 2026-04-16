@@ -174,7 +174,7 @@ export default function Show({ submission }) {
                         <div className="card-body">
                             {submission.details?.map(detail => {
                                 const field = submission.form?.fields?.find(f => f.name === detail.field_name);
-                                const isFile = field?.type === 'file';
+                                const isFile = field?.type === 'file' && detail.file_url; // Only files with accessible URLs
 
                                 return (
                                     <div key={`${detail.field_name}-${submission.id}`} className="mb-3">
@@ -183,9 +183,9 @@ export default function Show({ submission }) {
                                             {detail.field_label || detail.field_name}
                                         </label>
                                         <div>
-                                            {isFile && detail.field_value?.startsWith('http') ? (
+                                            {isFile ? (
                                                 <a
-                                                    href={detail.field_value}
+                                                    href={detail.file_url} // Use the authorized file URL from backend
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-primary"
@@ -201,7 +201,7 @@ export default function Show({ submission }) {
                                                     className="text-primary"
                                                 >
                                                     <i className="ti ti-external-link me-1"></i>
-                                                    Dosyayı Görüntüle
+                                                    Bağlantıyı Aç
                                                 </a>
                                             ) : (
                                                 <span>{detail.field_value}</span>

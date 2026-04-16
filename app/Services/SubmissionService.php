@@ -7,7 +7,9 @@ namespace App\Services;
 use App\Interfaces\IFormRepository;
 use App\Interfaces\ISubmissionRepository;
 use App\Jobs\SendSubmissionNotification;
+use App\Models\Submission;
 use App\Models\SubmissionComment;
+use Illuminate\Support\Facades\Gate;
 
 class SubmissionService
 {
@@ -50,12 +52,33 @@ class SubmissionService
 
     public function getById(int $id)
     {
-        return $this->submissionRepository->getWithDetails($id);
+        $submission = $this->submissionRepository->getWithDetails($id);
+
+        // Check using policy if the user can view the submission
+        Gate::authorize('view', $submission); // This will throw an exception if unauthorized
+
+        // Filter details based on user's permissions
+        $submission->details = $this->filterFileDetailsForUser($submission->details, $submission);
+
+        return $submission;
     }
 
     public function getByReferenceNo(string $referenceNo)
     {
         return $this->submissionRepository->getByReferenceNo($referenceNo);
+    }
+
+    public function getWithDetails(int $id)
+    {
+        $submission = $this->submissionRepository->getWithDetails($id);
+
+        // Authorize access to submission using policy
+        Gate::authorize('view', $submission); // This will throw an exception if unauthorized
+
+        // Filter details based on user's file access permissions
+        $submission->details = $this->filterFileDetailsForUser($submission->details, $submission);
+
+        return $submission;
     }
 
     public function handleSubmission(string $formSlug, array $data, array $files = [])
@@ -141,5 +164,42 @@ class SubmissionService
     public function delete(int $id)
     {
         return $this->submissionRepository->delete($id);
+    }
+
+    /**
+     * Filters submission details based on user permissions, showing files only for authorized users
+     * and restricting file-related properties.
+     */
+    private function filterFileDetailsForUser($details, Submission $submission)
+    {
+        // Check with policy if user can view files in this submission
+        $canViewFiles = Gate::allows('viewFile', $submission);
+
+        return $details->map(function ($detail) use ($canViewFiles) {
+            $isFile = $detail->isFile();
+
+            // Only add file-specific attributes if the user has permission to see files
+            if ($canViewFiles && $isFile) {
+                $detail->is_file = $isFile;
+                $detail->file_url = $detail->getFileUrlAttribute();
+                $detail->download_url = $detail->getDownloadUrlAttribute();
+                $detail->file_extension = $detail->getFileExtensionAttribute();
+                $detail->file_name = $detail->getFileNameAttribute();
+            } else {
+                // Add minimal information if user doesn't have file rights, or for non-file details
+                $detail->is_file = $isFile;
+
+                // Hide URLs for users without permissions
+                if ($isFile) {
+                    $detail->file_url = null;
+                    $detail->download_url = null;
+                    $detail->file_extension = $detail->getFileExtensionAttribute();
+                    $detail->file_name = $detail->getFileNameAttribute();
+                }
+            }
+
+            // Ensure the detail object can be accessed securely
+            return $detail;
+        });
     }
 }
