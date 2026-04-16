@@ -43,8 +43,6 @@ class SubmissionController extends Controller
 
     public function show(Submission $submission)
     {
-        // The authorization is already handled in __construct() with authorizeResource(),
-        // but let's add file-level authorization too
         $this->authorize('view', $submission);
 
         $submission = $this->submissionService->getById($submission->id);
