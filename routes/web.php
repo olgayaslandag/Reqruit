@@ -55,6 +55,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/signed-url/{path}', [FileController::class, 'generateSignedUrl'])->where('path', '.*')->name('signed-url');
     });
 
+    // Test route - TEMPORARY for debugging
+    Route::get('/test-files/{path}', function ($path) {
+        $fullPath = storage_path('app/private/'.$path);
+
+        return response()->json([
+            'path' => $path,
+            'fullPath' => $fullPath,
+            'exists' => file_exists($fullPath),
+            'realPath' => realpath($fullPath),
+            'baseDir' => storage_path('app/private'),
+        ]);
+    })->where('path', '.*');
+
     // Admin - Departments
     Route::prefix('admin/departments')->name('admin.departments.')->group(function () {
         Route::get('/', [DepartmentController::class, 'index'])->name('index');

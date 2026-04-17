@@ -6,13 +6,17 @@ namespace App\Http\Controllers;
 
 use App\Models\SubmissionDetail;
 use Illuminate\Http\Request;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class FileController extends Controller
 {
+    private function localDisk(): FilesystemAdapter
+    {
+        return Storage::disk('local');
+    }
     /**
      * Generate a signed URL for file download (valid for 1 hour).
      */
@@ -23,8 +27,8 @@ class FileController extends Controller
             abort(403, 'Invalid path');
         }
 
-        $realPath = realpath(storage_path('app/'.$path));
-        $basePath = realpath(storage_path('app'));
+        $realPath = realpath(storage_path('app/private/'.$path));
+        $basePath = realpath(storage_path('app/private'));
         if (! $realPath || ! str_starts_with($realPath, $basePath)) {
             abort(403, 'Invalid path');
         }
@@ -37,13 +41,15 @@ class FileController extends Controller
         // Validate submission ownership
         $this->validateSubmissionOwnership($path);
 
+        $disk = $this->localDisk();
+
         // Check if file exists
-        if (! Storage::disk('local')->exists($path)) {
+        if (! $disk->exists($path)) {
             abort(404, 'File not found');
         }
 
         // Generate temporary signed URL (valid for 1 hour)
-        $url = Storage::disk('local')->temporaryUrl(
+        $url = $disk->temporaryUrl(
             $path,
             now()->addHour()
         );
@@ -64,8 +70,8 @@ class FileController extends Controller
             abort(403, 'Invalid path');
         }
 
-        $realPath = realpath(storage_path('app/'.$path));
-        $basePath = realpath(storage_path('app'));
+        $realPath = realpath(storage_path('app/private/'.$path));
+        $basePath = realpath(storage_path('app/private'));
         if (! $realPath || ! str_starts_with($realPath, $basePath)) {
             abort(403, 'Invalid path');
         }
@@ -78,15 +84,17 @@ class FileController extends Controller
         // Validate submission ownership
         $this->validateSubmissionOwnership($path);
 
+        $disk = $this->localDisk();
+
         // Check if file exists
-        if (! Storage::disk('local')->exists($path)) {
+        if (! $disk->exists($path)) {
             abort(404, 'File not found');
         }
 
         // Get the original filename from path
         $filename = basename($path);
 
-        return Storage::disk('local')->download($path, $filename);
+        return $disk->download($path, $filename);
     }
 
     /**
@@ -94,13 +102,14 @@ class FileController extends Controller
      */
     public function show(Request $request, string $path): Response
     {
+        $disk = $this->localDisk();
         // Prevent path traversal attacks
         if (str_contains($path, '../') || str_contains($path, '..\\')) {
             abort(403, 'Invalid path');
         }
 
-        $realPath = realpath(storage_path('app/'.$path));
-        $basePath = realpath(storage_path('app'));
+        $realPath = realpath(storage_path('app/private/'.$path));
+        $basePath = realpath(storage_path('app/private'));
         if (! $realPath || ! str_starts_with($realPath, $basePath)) {
             abort(403, 'Invalid path');
         }
@@ -113,12 +122,14 @@ class FileController extends Controller
         // Validate submission ownership
         $this->validateSubmissionOwnership($path);
 
+        $disk = $this->localDisk();
+
         // Check if file exists
-        if (! Storage::disk('local')->exists($path)) {
+        if (! $disk->exists($path)) {
             abort(404, 'File not found');
         }
 
-        $mimeType = Storage::disk('local')->mimeType($path);
+        $mimeType = $disk->mimeType($path);
 
         // Only allow safe file types for inline viewing
         $allowedMimeTypes = [
@@ -131,10 +142,10 @@ class FileController extends Controller
 
         if (! in_array($mimeType, $allowedMimeTypes)) {
             // For non-previewable files, force download
-            return Storage::disk('local')->download($path);
+            return $disk->download($path);
         }
 
-        return Storage::disk('local')->response($path, null, [
+        return $disk->response($path, null, [
             'Content-Type' => $mimeType,
             'Content-Disposition' => 'inline',
         ]);
@@ -148,14 +159,14 @@ class FileController extends Controller
     {
         // Check if path belongs to submissions directory
         if (! str_starts_with($path, 'submissions/')) {
-            abort(403, 'Access denied: Invalid file type');
+            abort(403, 'Access denied: Path must start with submissions/');
         }
 
         // Find submission details containing this file path
         $submissionDetail = SubmissionDetail::where('field_value', $path)->first();
 
         if (! $submissionDetail) {
-            abort(403, 'File does not belong to any submission');
+            abort(403, 'File does not belong to any submission. Path: '.$path);
         }
 
         // Find parent submission
@@ -168,6 +179,6 @@ class FileController extends Controller
         $currentUser = Auth::user();
 
         // Apply policy check - this respects the roles defined in SubmissionPolicy
-        Gate::authorize('view', $submission);
+        $this->authorize('view', $submission);
     }
 }
