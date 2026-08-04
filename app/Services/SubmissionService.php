@@ -143,6 +143,14 @@ class SubmissionService
     {
         return $this->submissionRepository->updateInvestigation($id, $investigation, $notes);
     }
+    
+    /**
+     * Create a new intelligence report for a submission
+     */
+    public function createIntelligenceReport(int $submissionId, string $status, ?string $notes = null, ?\DateTime $date = null, ?int $userId = null)
+    {
+        return $this->submissionRepository->createIntelligenceReport($submissionId, $status, $notes, $date, $userId);
+    }
 
     public function addComment(int $submissionId, array $data, ?int $userId = null)
     {

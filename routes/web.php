@@ -94,6 +94,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{submission}', [SubmissionController::class, 'show'])->name('show');
         Route::put('/{submission}/status', [SubmissionController::class, 'updateStatus'])->name('updateStatus');
         Route::put('/{submission}/investigation', [SubmissionController::class, 'updateInvestigation'])->name('updateInvestigation');
+        Route::post('/{submission}/intelligence-reports', [SubmissionController::class, 'storeIntelligenceReport'])->name('storeIntelligenceReport');
+        Route::delete('/{submission}/intelligence-reports/{report}', [SubmissionController::class, 'destroyIntelligenceReport'])->name('destroyIntelligenceReport');
         Route::post('/{submission}/comments', [SubmissionController::class, 'addComment'])->name('addComment');
         Route::delete('/{submission}', [SubmissionController::class, 'destroy'])->name('destroy');
     });

@@ -5,12 +5,47 @@ import Sidebar from '@/Components/Sidebar';
 export default function AuthenticatedLayout({ header, children, pageHeader }) {
     const user = usePage().props.auth.user;
     const appName = usePage().props.appName || 'Reqruit';
+    const flash = usePage().props.flash;
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [toasts, setToasts] = useState([]);
     const toastIdRef = useRef(0);
+    
+    // Render flash messages as toast notifications
+    useEffect(() => {
+        // Process flash messages when they come
+        if (flash && flash.success) {
+            const id = ++toastIdRef.current;
+            setToasts((prev) => [...prev, { id, message: flash.success, type: 'success' }]);
+            // Auto-remove it after 3000ms
+            setTimeout(() => {
+                setToasts((prev) => prev.filter(t => t.id !== id));
+            }, 3000);
+        }
+        if (flash && flash.error) {
+            const id = ++toastIdRef.current;
+            setToasts((prev) => [...prev, { id, message: flash.error, type: 'error' }]);
+            setTimeout(() => {
+                setToasts((prev) => prev.filter(t => t.id !== id));
+            }, 3000);
+        }
+        if (flash && flash.warning) {
+            const id = ++toastIdRef.current;
+            setToasts((prev) => [...prev, { id, message: flash.warning, type: 'warning' }]);
+            setTimeout(() => {
+                setToasts((prev) => prev.filter(t => t.id !== id));
+            }, 3000);
+        }
+        if (flash && flash.info) {
+            const id = ++toastIdRef.current;
+            setToasts((prev) => [...prev, { id, message: flash.info, type: 'info' }]);
+            setTimeout(() => {
+                setToasts((prev) => prev.filter(t => t.id !== id));
+            }, 3000);
+        }
+    }, [flash]);
 
     useEffect(() => {
-        const handleToast = (e) => {
+        const handleCustomToast = (e) => {
             const { message, type } = e.detail;
             const id = ++toastIdRef.current;
             setToasts((prev) => [...prev, { id, message, type }]);
@@ -18,8 +53,8 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                 setToasts((prev) => prev.filter((t) => t.id !== id));
             }, 3000);
         };
-        window.addEventListener('toast:show', handleToast);
-        return () => window.removeEventListener('toast:show', handleToast);
+        window.addEventListener('toast:show', handleCustomToast);
+        return () => window.removeEventListener('toast:show', handleCustomToast);
     }, []);
 
     const removeToast = (id) => {
@@ -305,6 +340,55 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                 })}
             </div>
             <style>{`
+                .fixed-toast-container {
+                    position: fixed;
+                    top: 80px; /* Change from 80px to 20px to appear lower */
+                    right: 20px;
+                    z-index: 9999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                }
+                
+                .toast-item-container {
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    min-width: 250px;
+                    max-width: 400px;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    opacity: 0.95;
+                    animation: slideIn 0.3s ease-out;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                }
+                
+                .toast-icon {
+                    font-weight: bold;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    flex-shrink: 0;
+                }
+                
+                .toast-item-bg-success { background-color: #155724; }
+                .toast-icon-bg-success { background-color: #157347; }
+                
+                .toast-item-bg-error { background-color: #7a1c1c; }
+                .toast-icon-bg-error { background-color: #dc3545; }
+                
+                .toast-item-bg-warning { background-color: #856404; }
+                .toast-icon-bg-warning { background-color: #ffc107; color: black; }
+                
+                .toast-item-bg-info { background-color: #0c5460; }
+                .toast-icon-bg-info { background-color: #17a2b8; }
+                
                 @keyframes slideIn {
                     from { transform: translateX(100%); opacity: 0; }
                     to { transform: translateX(0); opacity: 1; }

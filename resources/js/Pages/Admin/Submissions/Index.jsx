@@ -14,7 +14,8 @@ const STATUSES = [
     { value: 'rejected', label: 'Reddedildi', color: 'red' },
 ];
 
-const INVESTIGATIONS = [
+// Investigation status filter options
+const INVESTIGATION_FILTER_OPTIONS = [
     { value: 'pending', label: 'Bekliyor', color: 'yellow' },
     { value: 'completed', label: 'Tamamlandı', color: 'green' },
     { value: 'none', label: 'Yapılmadı', color: 'gray' },
@@ -54,7 +55,7 @@ export default function Index({ submissions, forms, departments, filters }) {
     };
 
     const getInvestigationBadge = (investigation) => {
-        const info = INVESTIGATIONS.find(i => i.value === investigation);
+        const info = INVESTIGATION_FILTER_OPTIONS.find(i => i.value === investigation);
         const colors = {
             yellow: 'badge bg-warning bg-opacity-10 text-warning',
             green: 'badge bg-success bg-opacity-10 text-success',
@@ -87,6 +88,14 @@ export default function Index({ submissions, forms, departments, filters }) {
                 </span>
             </div>
         );
+    };
+
+    // Helper to determine display investigation status based on intelligence reports
+    const getDisplayInvestigationStatus = (submission) => {
+        // Check if there are related intelligence reports that are loaded
+        // If so, use the latest investigation status from the related data
+        // Otherwise, fall back to the original 'investigation' field
+        return submission.current_investigation || submission.investigation || 'none';
     };
 
     return (
@@ -129,7 +138,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                                 onChange={(e) => setFilterInvestigation(e.target.value)}
                             >
                                 <option value="">Tümü</option>
-                                {INVESTIGATIONS.map((inv) => (
+                                {INVESTIGATION_FILTER_OPTIONS.map((inv) => (
                                     <option key={inv.value} value={inv.value}>
                                         {inv.label}
                                     </option>
@@ -199,70 +208,75 @@ export default function Index({ submissions, forms, departments, filters }) {
                     </thead>
                         <tbody>
                             {submissionList.length > 0 ? (
-                                submissionList.map((submission) => (
-                                <tr key={submission.id}>
-                                    <td className="px-4 py-3">
-                                        <Link
-                                            href={`/admin/submissions/${submission.id}`}
-                                            className="text-decoration-none text-dark fw-medium"
-                                        >
-                                            {submission.applicant_name}
-                                            <span className="ms-1">{getStatusBadge(submission.status)}</span>
-                                        </Link>
-                                        <div className="text-muted small">{submission.applicant_email}</div>
-                                    </td>
-                                    <td className="px-4 py-3 text-nowrap">
-                                        {new Date(submission.created_at).toLocaleDateString('tr-TR')}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        {submission.form?.name}
-                                    </td>
-                                    <td className="px-4 py-3 text-nowrap">
-                                        {submission.form?.department?.title || '-'}
-                                    </td>
-                                    <td className="px-4 py-3 text-nowrap">
-                                        {getInvestigationBadge(submission.investigation)}
-                                    </td>
-                                    <td className="px-4 py-3 text-center">
-                                        {submission.comment_count || '-'}
-                                    </td>
-                                    <td className="px-4 py-3 text-center">
-                                        {renderStars(submission.avg_rating)}
-                                    </td>
-                                    <td className="px-4 py-3 text-nowrap text-end">
-                                        <div className="d-flex gap-2 justify-content-end">
-                                            <Link
-                                                href={`/admin/submissions/${submission.id}`}
-                                                className="btn btn-link text-primary p-0"
-                                                title="Görüntüle"
-                                            >
-                                                <i className="ti ti-eye"></i>
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(submission.id)}
-                                                className="btn btn-link text-danger p-0"
-                                                title="Sil"
-                                            >
-                                                <i className="ti ti-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))) : (
+                                submissionList.map((submission) => {
+                                    const investigationStatus = getDisplayInvestigationStatus(submission);
+                                    
+                                    return (
+                                        <tr key={submission.id}>
+                                            <td className="px-4 py-3">
+                                                <Link
+                                                    href={`/admin/submissions/${submission.id}`}
+                                                    className="text-decoration-none text-dark fw-medium"
+                                                >
+                                                    {submission.applicant_name}
+                                                    <span className="ms-1">{getStatusBadge(submission.status)}</span>
+                                                </Link>
+                                                <div className="text-muted small">{submission.applicant_email}</div>
+                                            </td>
+                                            <td className="px-4 py-3 text-nowrap">
+                                                {new Date(submission.created_at).toLocaleDateString('tr-TR')}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                {submission.form?.name}
+                                            </td>
+                                            <td className="px-4 py-3 text-nowrap">
+                                                {submission.form?.department?.title || '-'}
+                                            </td>
+                                            <td className="px-4 py-3 text-nowrap">
+                                                {getInvestigationBadge(investigationStatus)}
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {submission.comment_count || '-'}
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {renderStars(submission.avg_rating)}
+                                            </td>
+                                            <td className="px-4 py-3 text-nowrap text-end">
+                                                <div className="d-flex gap-2 justify-content-end">
+                                                    <Link
+                                                        href={`/admin/submissions/${submission.id}`}
+                                                        className="btn btn-link text-primary p-0"
+                                                        title="Görüntüle"
+                                                    >
+                                                        <i className="ti ti-eye"></i>
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleDelete(submission.id)}
+                                                        className="btn btn-link text-danger p-0"
+                                                        title="Sil"
+                                                    >
+                                                        <i className="ti ti-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
                                 <tr>
                                     <td colSpan="9">
                                         <EmptyState
                                             title="Başvuru bulunamadı"
-                                            description={searchTerm ? 
+                                            description={filterStatus || filterInvestigation || filterForm || filterDepartment ? 
                                                 "Aradığınız kriterlere uygun başvuru bulunamadı." : 
                                                 "Henüz hiç başvuru alınmamış. Başvurular formlar aracılığıyla yapılacaktır."
                                             }
                                             icon={<i className="ti ti-file-text"></i>}
-                                            actionUrl={searchTerm ?
+                                            actionUrl={filterStatus || filterInvestigation || filterForm || filterDepartment ?
                                                 route('admin.submissions.index') :
                                                 route('admin.forms.index')
                                             }
-                                            linkText={searchTerm ?
+                                            linkText={filterStatus || filterInvestigation || filterForm || filterDepartment ?
                                                 "Aramayı Temizle" :
                                                 "Formlara Git"
                                             }

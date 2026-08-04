@@ -175,7 +175,6 @@ export default function LeaveRequests({ leaveRequests, employees, leaveTypes, fi
                     { label: 'İzin Yönetimi', url: '#' },
                     { label: 'İzin Talepleri', url: route('admin.leave.requests.index') },
                 ],
-                newUrl: '#',
                 filterCollapse: true,
             }}
         >
@@ -236,10 +235,15 @@ export default function LeaveRequests({ leaveRequests, employees, leaveTypes, fi
 
                             <div className="col-md-2 d-flex align-items-end">
                                 <button
-                                    onClick={() => setShowModal(true)}
+                                    onClick={() => {
+                                        router.get(route('admin.leave.requests.index'), {
+                                            ...localFilters,
+                                            search: searchTerm,
+                                        }, { replace: true, only: ['leaveRequests', 'filters'] });
+                                    }}
                                     className="btn btn-primary w-100"
                                 >
-                                    <i className="ti ti-plus me-1"></i> Yeni Talep
+                                    <i className="ti ti-filter me-1"></i> Filtrele
                                 </button>
                             </div>
                         </div>
@@ -280,10 +284,16 @@ export default function LeaveRequests({ leaveRequests, employees, leaveTypes, fi
 
             {/* Talepler Tablosu */}
             <div className="card">
-                <div className="card-header bg-light">
+                <div className="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 className="mb-0 fw-bold">
                         <i className="ti ti-calendar-event me-2"></i> İzin Talepleri Listesi
                     </h5>
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className="btn btn-primary btn-sm"
+                    >
+                        <i className="ti ti-plus me-1"></i> Yeni Talep
+                    </button>
                 </div>
                 <div className="card-body p-0">
                     <div className="table-responsive">

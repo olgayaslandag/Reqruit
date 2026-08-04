@@ -58,9 +58,34 @@ class SubmissionController extends Controller
             return auth()->user() && Gate::check('viewFile', $submission);
         });
 
+        // Load intelligence reports for this submission
+        $intelligenceReports = $submission->intelligenceReports()->get();
+        
         return Inertia::render('Admin/Submissions/Show', [
             'submission' => $submission,
+            'intelligenceReports' => $intelligenceReports,
         ]);
+    }
+
+    public function storeIntelligenceReport(Request $request, Submission $submission)
+    {
+        $this->authorize('update', $submission);
+
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:pending,completed,none'],
+            'notes' => ['required', 'string', 'max:2000'], // increased max length for more detailed messages
+        ]);
+
+        // Create a new intelligence report  
+        $intelligenceReport = $this->submissionService->createIntelligenceReport(
+            $submission->id,
+            $validated['status'],
+            $validated['notes'],
+            now(), // use current timestamp
+            auth()->id() // Use the authenticated user as the creator
+        );
+
+        return back()->with('success', 'İstihbarat raporu oluşturuldu.');
     }
 
     public function updateStatus(UpdateSubmissionStatusRequest $request, Submission $submission)
@@ -77,17 +102,25 @@ class SubmissionController extends Controller
         $this->authorize('update', $submission);
 
         $validated = $request->validate([
-            'investigation' => ['required', 'string', 'in:pending,completed,none'],
-            'notes' => ['nullable', 'string', 'max:1000'],
+            'status' => ['required', 'string', 'in:pending,completed,none'],
+            'notes' => ['required', 'string', 'max:1000'],
+            'date_of_investigation' => ['required', 'date'],
+            'investigation_type' => ['required', 'string', 'in:background,criminal,financial,employment,education,others'],
+            'priority_level' => ['required', 'string', 'in:low,medium,high,critical'],
         ]);
 
-        $this->submissionService->updateInvestigation(
+        // Create a new intelligence report
+        $this->submissionService->createIntelligenceReport(
             $submission->id,
-            $validated['investigation'],
-            $validated['notes'] ?? null
+            $validated['status'],
+            $validated['notes'],
+            $validated['date_of_investigation'],
+            auth()->id(),
+            $validated['investigation_type'],
+            $validated['priority_level']
         );
 
-        return back()->with('success', 'İstihbarat durumu güncellendi.');
+        return back()->with('success', 'İstihbarat raporu oluşturuldu.');
     }
 
     public function addComment(AddSubmissionCommentRequest $request, Submission $submission)
@@ -105,5 +138,19 @@ class SubmissionController extends Controller
 
         return redirect()->route('admin.submissions.index')
             ->with('success', 'Başvuru başarıyla silindi.');
+    }
+    
+    public function destroyIntelligenceReport(Request $request, $submissionId, $reportId)
+    {
+        $submission = Submission::findOrFail($submissionId);
+        $this->authorize('update', $submission);
+
+        $report = \App\Models\IntelligenceReport::where('id', $reportId)
+            ->where('submission_id', $submissionId)
+            ->firstOrFail();
+
+        $report->delete();
+
+        return back()->with('success', 'İstihbarat raporu başarıyla silindi.');
     }
 }

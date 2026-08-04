@@ -45,6 +45,8 @@ interface ISubmissionRepository
 
     public function updateInvestigation(int $id, string $investigation, ?string $notes = null);
 
+    public function createIntelligenceReport(int $submissionId, string $status, ?string $notes = null, ?\DateTime $date = null, ?int $userId = null);
+
     public function delete(int $id);
 
     public function getWithDetails(int $id);

@@ -42,9 +42,56 @@ class Submission extends Model
         return $this->hasMany(SubmissionComment::class);
     }
 
+    public function intelligenceReports(): HasMany
+    {
+        return $this->hasMany(IntelligenceReport::class);
+    }
+
     public function getInvestigationLabelAttribute(): string
     {
-        return match ($this->investigation) {
+        // For backward compatibility, still check the old investigation field first
+        if (!empty($this->investigation)) {
+            return match ($this->investigation) {
+                'pending' => 'Bekliyor',
+                'completed' => 'Tamamlandı',
+                'none' => 'Yapılmadı',
+                default => 'Belirsiz',
+            };
+        }
+
+        // If no old investigation data exists, get from the latest IntelligenceReport
+        $latestReport = $this->intelligenceReports()->latest('created_at')->first();
+        
+        return $latestReport ? $this->getStatusLabel($latestReport->status) : 'Belirsiz';
+    }
+
+    public function getCurrentInvestigationAttribute()
+    {
+        $latestReport = $this->intelligenceReports()->latest('created_at')->first();
+
+        if (!$latestReport) {
+            // Fallback to the old investigation field for backward compatibility
+            return $this->investigation ?? null;
+        }
+
+        return $latestReport->status;
+    }
+
+    public function getCurrentInvestigationNotesAttribute()
+    {
+        $latestReport = $this->intelligenceReports()->latest('created_at')->first();
+        
+        if (!$latestReport) {
+            // Since there is no corresponding old field for notes, return null
+            return null;
+        }
+
+        return $latestReport->notes;
+    }
+
+    private function getStatusLabel(string $status): string
+    {
+        return match ($status) {
             'pending' => 'Bekliyor',
             'completed' => 'Tamamlandı',
             'none' => 'Yapılmadı',

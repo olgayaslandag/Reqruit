@@ -4,67 +4,83 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
+use App\Enums\UserRoleEnum;
 use App\Models\LeaveEntitlement;
 use App\Models\User;
 
 class LeaveEntitlementPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+    private function hasAnyRole(User $user, array $validRoles): bool
+    {
+        $userEnumValue = $user->rank_id->value ?? $user->rank_id ?? 0;
+
+        $enumToRole = [
+            UserRoleEnum::ADMIN->value => 'admin',
+            UserRoleEnum::IK_MANAGER->value => 'hr',
+            UserRoleEnum::RECRUITER->value => 'employee',
+            UserRoleEnum::DEPARTMENT_HEAD->value => 'manager',
+            UserRoleEnum::OBSERVER->value => 'observer',
+        ];
+
+        $userRoleName = $enumToRole[$userEnumValue] ?? null;
+
+        if ($userRoleName && in_array($userRoleName, $validRoles)) {
+            return true;
+        }
+
+        foreach ($validRoles as $role) {
+            if ($user->hasRole($role)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('super_admin') || $user->hasRole('ik_manager') || $user->hasRole('department_head') || $user->hasRole('recruiter');
+        return $this->hasAnyRole($user, ['admin', 'hr', 'manager', 'employee', 'super_admin', 'ik_manager', 'department_head', 'recruiter']);
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, LeaveEntitlement $leaveEntitlement): bool
     {
-        return $user->hasRole('super_admin') ||
-               $user->hasRole('ik_manager') ||
-               ($user->hasRole('department_head') && $leaveEntitlement->employee->department_id === $user->employee->department_id) ||
-               ($user->hasRole('recruiter') && in_array($user->employee->department_id, $user->assignedDepartments()->pluck('id')->toArray()));
+        if ($this->hasAnyRole($user, ['admin', 'hr', 'super_admin', 'ik_manager'])) {
+            return true;
+        }
+
+        if ($this->hasAnyRole($user, ['manager', 'department_head']) && $leaveEntitlement->employee->department_id === $user->employee->department_id) {
+            return true;
+        }
+
+        if ($this->hasAnyRole($user, ['employee', 'recruiter']) && in_array($user->employee->department_id, $user->assignedDepartments()->pluck('id')->toArray())) {
+            return true;
+        }
+
+        return false;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->hasRole('super_admin') || $user->hasRole('ik_manager') || $user->hasRole('recruiter');
+        return $this->hasAnyRole($user, ['admin', 'hr', 'employee', 'super_admin', 'ik_manager', 'recruiter']);
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, LeaveEntitlement $leaveEntitlement): bool
     {
-        return $user->hasRole('super_admin') || $user->hasRole('ik_manager');
+        return $this->hasAnyRole($user, ['admin', 'hr', 'super_admin', 'ik_manager']);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, LeaveEntitlement $leaveEntitlement): bool
     {
-        return $user->hasRole('super_admin') || $user->hasRole('ik_manager');
+        return $this->hasAnyRole($user, ['admin', 'hr', 'super_admin', 'ik_manager']);
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, LeaveEntitlement $leaveEntitlement): bool
     {
-        return $user->hasRole('super_admin') || $user->hasRole('ik_manager');
+        return $this->hasAnyRole($user, ['admin', 'hr', 'super_admin', 'ik_manager']);
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, LeaveEntitlement $leaveEntitlement): bool
     {
-        return $user->hasRole('super_admin');
+        return $this->hasAnyRole($user, ['admin', 'super_admin']);
     }
 }

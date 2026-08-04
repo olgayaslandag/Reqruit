@@ -3,6 +3,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import { showSuccess as showToastSuccess, showWarning as showToastWarning } from '@/Utils/toast';
+import IntelligenceReportForm from '@/Components/IntelligenceReportForm';
+import IntelligenceReportList from '@/Components/IntelligenceReportList';
 
 const STATUSES = [
     { value: 'new', label: 'Yeni', color: 'blue' },
@@ -13,13 +15,32 @@ const STATUSES = [
     { value: 'rejected', label: 'Reddedildi', color: 'red' },
 ];
 
+// Investigation statuses for backward compatibility
 const INVESTIGATIONS = [
     { value: 'pending', label: 'Bekliyor', color: 'yellow' },
     { value: 'completed', label: 'Tamamlandı', color: 'green' },
     { value: 'none', label: 'Yapılmadı', color: 'gray' },
 ];
 
-export default function Show({ submission }) {
+// Investigation types for new multi-report system
+const INVESTIGATION_TYPES = [
+    { value: 'background', label: 'Arka Plan' },
+    { value: 'criminal', label: 'Ceza Sicili' },
+    { value: 'financial', label: 'Finansal' },
+    { value: 'employment', label: 'İstihdam Geçmişi' },
+    { value: 'education', label: 'Eğitim Geçmişi' },
+    { value: 'others', label: 'Diğerleri' },
+];
+
+// Priority levels
+const PRIORITY_LEVELS = [
+    { value: 'low', label: 'Düşük' },
+    { value: 'medium', label: 'Orta' },
+    { value: 'high', label: 'Yüksek' },
+    { value: 'critical', label: 'Kritik' },
+];
+
+export default function Show({ submission, intelligenceReports = [], investigators = [] }) {
     const { data: commentData, setData: setCommentData, post } = useForm({
         comment: '',
         rating: '',
@@ -27,8 +48,6 @@ export default function Show({ submission }) {
     });
 
     const [newStatus, setNewStatus] = useState(submission.status);
-    const [newInvestigation, setNewInvestigation] = useState(submission.investigation || 'none');
-    const [investigationNotes, setInvestigationNotes] = useState('');
 
     const handleStatusChange = () => {
         router.put(`/admin/submissions/${submission.id}/status`, {
@@ -38,27 +57,14 @@ export default function Show({ submission }) {
         });
     };
 
-    const handleInvestigationChange = () => {
-        router.put(`/admin/submissions/${submission.id}/investigation`, {
-            investigation: newInvestigation,
-            notes: investigationNotes,
-        }, {
-            onSuccess: () => {
-                showToastSuccess('İstihbarat durumu güncellendi.');
-                setInvestigationNotes('');
-                router.reload({ only: ['submission'] });
-            },
-        });
-    };
-
     const handleCommentSubmit = (e) => {
         e.preventDefault();
-        
+
         if (!commentData.rating) {
             showToastWarning('Lütfen puan seçiniz.');
             return;
         }
-        
+
         post(`/admin/submissions/${submission.id}/comments`, {
             onSuccess: () => {
                 setCommentData({ comment: '', rating: '', is_private: true });
@@ -86,7 +92,7 @@ export default function Show({ submission }) {
     const getInvestigationBadge = (investigation) => {
         const info = INVESTIGATIONS.find(i => i.value === investigation);
         const colors = {
-            yellow: 'badge bg-warning',
+            yellow: 'badge bg_warning',
             green: 'badge bg-success',
             gray: 'badge bg-secondary',
         };
@@ -105,6 +111,41 @@ export default function Show({ submission }) {
         });
     };
 
+    // Calculate investigation status for backward compatibility
+    const getDisplayInvestigationStatus = () => {
+        if (intelligenceReports && intelligenceReports.length > 0) {
+            // Get the status from the latest report
+            const newestReport = [...intelligenceReports].sort((a, b) => new Date(b.date_of_investigation) - new Date(a.date_of_investigation))[0];
+            return newestReport.status;
+        }
+        return submission.investigation;
+    };
+
+    const calculateOverallStatus = () => {
+        if (!intelligenceReports || intelligenceReports.length === 0) {
+            return submission.investigation || 'none';
+        }
+
+        const completedCount = intelligenceReports.filter(report => report.status === 'completed').length;
+        const pendingCount = intelligenceReports.filter(report => report.status === 'pending').length;
+
+        // If all reports are completed, set to completed
+        if (completedCount === intelligenceReports.length) {
+            return 'completed';
+        }
+        // If some reports are pending, set to pending
+        else if (pendingCount > 0) {
+            return 'pending';
+        }
+        // If none are completed or pending, return 'none'
+        else {
+            return 'none';
+        }
+    };
+
+    const displayInvestigationStatus = getDisplayInvestigationStatus();
+    const overallInvestigationStatus = calculateOverallStatus();
+
     return (
         <AuthenticatedLayout
             pageHeader={{
@@ -119,24 +160,10 @@ export default function Show({ submission }) {
             <Head title={`Başvuru: ${submission.reference_no}`} />
 
             <div className="row">
-                <div className="col-lg-8">
+                <div className="col-lg-4">
                     <div className="card mb-4">
-                        <div className="card-header d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 className="mb-0">Başvuru Detayları</h5>
-                                <small className="text-muted">
-                                    {submission.form?.name} - {submission.form?.department?.title}
-                                </small>
-                            </div>
-                            <div className="d-flex align-items-center gap-2">
-                                <button
-                                    onClick={handleDelete}
-                                    className="btn btn-outline-danger btn-sm"
-                                    title="Sil"
-                                >
-                                    <i className="ti ti-trash"></i>
-                                </button>
-                            </div>
+                        <div className="card-header">
+                            <h5 className="mb-0">Başvuru Detayı</h5>
                         </div>
                         <div className="card-body">
                             <div className="mb-3">
@@ -168,104 +195,22 @@ export default function Show({ submission }) {
                     </div>
 
                     <div className="card mb-4">
-                        <div className="card-header">
-                            <h5 className="mb-0">Başvuru Bilgileri</h5>
-                        </div>
-                        <div className="card-body">
-                            {submission.details?.map(detail => {
-                                const field = submission.form?.fields?.find(f => f.name === detail.field_name);
-                                const isFile = field?.type === 'file' && detail.file_url; // Only files with accessible URLs
-
-                                return (
-                                    <div key={`${detail.field_name}-${submission.id}`} className="mb-3">
-                                        <label className="form-label text-muted">
-                                            {isFile && <i className="ti ti-file me-1"></i>}
-                                            {detail.field_label || detail.field_name}
-                                        </label>
-                                        <div>
-                                            {isFile ? (
-                                                <a
-                                                    href={detail.file_url} // Use the authorized file URL from backend
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-primary"
-                                                >
-                                                    <i className="ti ti-download me-1"></i>
-                                                    Dosyayı Görüntüle / İndir
-                                                </a>
-                                            ) : detail.field_value?.startsWith('http') ? (
-                                                <a
-                                                    href={detail.field_value}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-primary"
-                                                >
-                                                    <i className="ti ti-external-link me-1"></i>
-                                                    Bağlantıyı Aç
-                                                </a>
-                                            ) : (
-                                                <span>{detail.field_value}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    <div className="card">
-                        <div className="card-header">
-                            <h5 className="mb-0">İstihbarat</h5>
-                        </div>
-                        <div className="card-body">
-                            {submission.investigation_notes && (
-                                <div className="mb-3">
-                                    <span className="text-muted">Mevcut Açıklama:</span>
-                                    <p className="mb-2">{submission.investigation_notes}</p>
-                                </div>
-                            )}
-                            <div className="d-flex align-items-center gap-3 mb-3">
-                                <span className="text-muted">Mevcut Durum:</span>
-                                {getInvestigationBadge(submission.investigation)}
+                        <div className="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 className="mb-0">Değerlendirmeler</h5>
+                                <small className="text-muted">
+                                    {submission.form?.name} - {submission.form?.department?.title}
+                                </small>
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label">Durum</label>
-                                <select
-                                    className="form-select"
-                                    value={newInvestigation}
-                                    onChange={(e) => setNewInvestigation(e.target.value)}
+                            <div className="d-flex align-items-center gap-2">
+                                <button
+                                    onClick={handleDelete}
+                                    className="btn btn-outline-danger btn-sm"
+                                    title="Sil"
                                 >
-                                    {INVESTIGATIONS.map((inv) => (
-                                        <option key={inv.value} value={inv.value}>
-                                            {inv.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <i className="ti ti-trash"></i>
+                                </button>
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label">Açıklama</label>
-                                <textarea
-                                    className="form-control"
-                                    value={investigationNotes}
-                                    onChange={(e) => setInvestigationNotes(e.target.value)}
-                                    placeholder="İstihbarat açıklaması..."
-                                    rows={3}
-                                />
-                            </div>
-                            <button
-                                onClick={handleInvestigationChange}
-                                className="btn btn-primary"
-                            >
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-lg-4">
-                    <div className="card">
-                        <div className="card-header">
-                            <h5 className="mb-0">Değerlendirmeler</h5>
                         </div>
                         <div className="card-body">
                             <form onSubmit={handleCommentSubmit} className="mb-4">
@@ -341,6 +286,70 @@ export default function Show({ submission }) {
                             </div>
                         </div>
                     </div>
+
+
+                </div>
+
+                <div className="col-lg-8">
+                    <div className="card mb-4">
+                        <div className="card-header">
+                            <h5 className="mb-0">Başvuru Bilgileri</h5>
+                        </div>
+                        <div className="card-body">
+                            {submission.details?.map(detail => {
+                                const field = submission.form?.fields?.find(f => f.name === detail.field_name);
+                                const isFile = field?.type === 'file' && detail.file_url; // Only files with accessible URLs
+
+                                return (
+                                    <div key={`${detail.field_name}-${submission.id}`} className="mb-3">
+                                        <label className="form-label text-muted">
+                                            {isFile && <i className="ti ti-file me-1"></i>}
+                                            {detail.field_label || detail.field_name}
+                                        </label>
+                                        <div>
+                                            {isFile ? (
+                                                <a
+                                                    href={detail.file_url} // Use the authorized file URL from backend
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-primary"
+                                                >
+                                                    <i className="ti ti-download me-1"></i>
+                                                    Dosyayı Görüntüle / İndir
+                                                </a>
+                                            ) : detail.field_value?.startsWith('http') ? (
+                                                <a
+                                                    href={detail.field_value}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-primary"
+                                                >
+                                                    <i className="ti ti-external-link me-1"></i>
+                                                    Bağlantıyı Aç
+                                                </a>
+                                            ) : (
+                                                <span>{detail.field_value}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Intelligence Reports Section */}
+                    <IntelligenceReportList reports={intelligenceReports} submissionId={submission.id} />
+                    <IntelligenceReportForm
+                        submissionId={submission.id}
+                        initialData={{
+                            status: intelligenceReports.length > 0 ? intelligenceReports.reduce((prev, current) => new Date(prev.date_of_investigation) > new Date(current.date_of_investigation) ? prev : current).status : 'pending',
+                            investigation_type: 'background',
+                            priority_level: 'medium'
+                        }}
+                        onReportAdded={(newReport) => {
+                            // Reload after adding new report for immediate visualization
+                        }}
+                    />
                 </div>
             </div>
         </AuthenticatedLayout>
