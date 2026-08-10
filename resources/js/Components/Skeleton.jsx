@@ -10,15 +10,15 @@ export function Skeleton({ className = '', variant = 'text', width, height, circ
     const variantClasses = {
         text: 'rounded',
         rectangular: 'rounded',
-        circular: 'rounded-full',
-        avatar: 'rounded-full',
+        circular: 'rounded-circle',
+        avatar: 'rounded-circle',
         card: 'rounded',
     };
 
     const classes = [
         baseClasses,
         variantClasses[variant] || variantClasses.text,
-        circle ? 'rounded-full' : '',
+        circle ? 'rounded-circle' : '',
         className,
     ].filter(Boolean).join(' ');
 

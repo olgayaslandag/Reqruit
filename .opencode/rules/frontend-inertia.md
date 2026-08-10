@@ -14,7 +14,7 @@
 
 ## Bileşen Mimarisi
 - Bakım için akıllı vs aptal bileşen kalıbını uygulayın
-- Geliştirilmiş tip güvenliği için TypeScript'i kullanın
+- Tutarlı ve net prop sözleşmeleri kullanın
 - Karmaşık UI'lar için bileşik bileşenler gibi tasarım kalıplarını uygulayın
 - Temel bileşenler oluşturun: yeniden kullanılabilir, yapılandırılabilir ve test edilmiş
 

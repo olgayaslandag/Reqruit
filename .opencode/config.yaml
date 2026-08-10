@@ -18,7 +18,7 @@ project:
   architecture: "service_repository_pattern_with_dto"
   database: "mysql"
   test_framework: "pest"
-  frontend_stack: ["blade", "inertia_react", "tailwind"]
+  frontend_stack: ["blade", "inertia_react"]
 
 # -----------------------------------------------------------------------------
 # AJAN YAPILANDIRMASI (AGENT MATRIX)
@@ -596,11 +596,8 @@ agents:
       - "x-show"
       - "x-transition"
       - "alpine component"
-      - "tailwind"
-      - "Tailwind CSS"
       - "class"
       - "utility class"
-      - "@apply"
       - "responsive"
       - "mobile"
       - "tablet"
@@ -635,14 +632,14 @@ agents:
   - name: "Frontend Inertia Architect"
     file: ".opencode/agents/frontend_inertia_architect.md"
     role: "specialist"
-    description: "Inertia.js, React, TypeScript ve State Management"
+    description: "Inertia.js, React ve State Management"
     triggers:
       - "resources/js/Pages/**"
       - "resources/js/Components/**"
       - "resources/js/Hooks/**"
       - "resources/js/Layouts/**"
       - "resources/js/Types/**"
-      - "resources/js/app.tsx"
+      - "resources/js/app.jsx"
       - "inertia"
       - "Inertia"
       - "Inertia.js"
@@ -651,14 +648,8 @@ agents:
       - "React"
       - "React.js"
       - "jsx"
-      - "tsx"
-      - "typescript"
-      - "TypeScript"
-      - "ts"
-      - "type"
-      - "interface"
-      - "generic"
       - "props"
+      - "page props"
       - "page props"
       - "shared data"
       - "Inertia.share"
@@ -757,11 +748,7 @@ agents:
       - "zustand"
       - "jotai"
       - "state management"
-      - "tailwind"
-      - "Tailwind CSS"
       - "className"
-      - "clsx"
-      - "twMerge"
       - "head"
       - "Head component"
       - "document title"
@@ -1324,7 +1311,7 @@ rules:
       - ".opencode/rules/cross-agent.md"
 
     # ---------------------------------------------------------
-    # Frontend Inertia Architect - React, TypeScript, Inertia
+    # Frontend Inertia Architect - React, Inertia
     # ---------------------------------------------------------
     frontend_inertia_architect:
       - ".opencode/rules/_global.md"

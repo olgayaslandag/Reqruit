@@ -2,7 +2,7 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
-import { showSuccess as showToastSuccess, showWarning as showToastWarning } from '@/Utils/toast';
+import { showSuccess as showToastSuccess, showWarning as showToastWarning, showError as showToastError } from '@/Utils/toast';
 import IntelligenceReportForm from '@/Components/IntelligenceReportForm';
 import IntelligenceReportList from '@/Components/IntelligenceReportList';
 
@@ -40,14 +40,32 @@ const PRIORITY_LEVELS = [
     { value: 'critical', label: 'Kritik' },
 ];
 
-export default function Show({ submission, intelligenceReports = [], investigators = [] }) {
+// Interaction types for contact timeline
+const INTERACTION_TYPES = [
+    { value: 'meeting', label: 'Görüşme', color: 'blue' },
+    { value: 'phone', label: 'Telefon', color: 'green' },
+    { value: 'email', label: 'E-posta', color: 'purple' },
+    { value: 'offer', label: 'Teklif', color: 'yellow' },
+    { value: 'negotiation', label: 'Pazarlık', color: 'orange' },
+    { value: 'other', label: 'Diğer', color: 'gray' },
+];
+
+export default function Show({ submission, intelligenceReports = [], investigators = [], interactions = [], aiEvaluations = [] }) {
     const { data: commentData, setData: setCommentData, post } = useForm({
         comment: '',
         rating: '',
         is_private: true,
     });
 
+    const { data: interactionData, setData: setInteractionData, post: postInteraction, processing: interactionProcessing, errors: interactionErrors } = useForm({
+        interaction_type: 'meeting',
+        interaction_date: '',
+        description: '',
+        response: '',
+    });
+
     const [newStatus, setNewStatus] = useState(submission.status);
+    const [isEvaluating, setIsEvaluating] = useState(false);
 
     const handleStatusChange = () => {
         router.put(`/admin/submissions/${submission.id}/status`, {
@@ -72,6 +90,51 @@ export default function Show({ submission, intelligenceReports = [], investigato
             },
         });
     };
+
+    const handleInteractionSubmit = (e) => {
+        e.preventDefault();
+
+        postInteraction(`/admin/submissions/${submission.id}/interactions`, {
+            preserveScroll: true,
+            only: ['submission', 'intelligenceReports', 'interactions', 'aiEvaluations'],
+            onSuccess: () => {
+                setInteractionData({ interaction_type: 'meeting', interaction_date: '', description: '', response: '' });
+                showToastSuccess('Takip kaydı başarıyla eklendi.');
+            },
+        });
+    };
+
+    const handleAiEvaluate = () => {
+        setIsEvaluating(true);
+        router.post(`/admin/submissions/${submission.id}/ai-evaluate`, {}, {
+            preserveScroll: true,
+            only: ['submission', 'intelligenceReports', 'interactions', 'aiEvaluations'],
+            onFinish: () => setIsEvaluating(false),
+            onError: () => {
+                showToastError('AI değerlendirmesi sırasında bir hata oluştu.');
+            },
+        });
+    };
+
+    const getInteractionBadge = (type) => {
+        const typeInfo = INTERACTION_TYPES.find(t => t.value === type);
+        const colors = {
+            blue: 'badge bg-info bg-opacity-10 text-info',
+            green: 'badge bg-success bg-opacity-10 text-success',
+            purple: 'badge bg-purple bg-opacity-10 text-purple',
+            yellow: 'badge bg-warning bg-opacity-10 text-warning',
+            orange: 'badge bg-warning bg-opacity-10 text-warning',
+            gray: 'badge bg-secondary bg-opacity-10 text-dark',
+        };
+        return (
+            <span className={`badge ${colors[typeInfo?.color] || 'bg-light'}`}>
+                {typeInfo?.label || type}
+            </span>
+        );
+    };
+
+    const latestCompletedEvaluation = (aiEvaluations || []).find(e => e.status === 'completed');
+    const latestFailedEvaluation = (aiEvaluations || []).find(e => e.status === 'failed');
 
     const getStatusBadge = (status) => {
         const statusInfo = STATUSES.find(s => s.value === status);
@@ -191,6 +254,64 @@ export default function Show({ submission, intelligenceReports = [], investigato
                             <small className="text-muted">
                                 Gönderim Tarihi: {new Date(submission.created_at).toLocaleString('tr-TR')}
                             </small>
+                        </div>
+                    </div>
+
+                    <div className="card mb-4 border-primary">
+                        <div className="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 className="mb-0">
+                                    <i className="ti ti-robot me-1 text-primary"></i>
+                                    AI Değerlendirme
+                                </h5>
+                                <small className="text-muted">OpenAI ile otomatik değerlendirme</small>
+                            </div>
+                        </div>
+                        <div className="card-body">
+                            {latestCompletedEvaluation ? (
+                                <div>
+                                    <div className="d-flex align-items-center mb-2">
+                                        <span className="text-warning fs-4 me-2">
+                                            {'★'.repeat(latestCompletedEvaluation.rating)}
+                                        </span>
+                                        <span className="fw-bold">{latestCompletedEvaluation.rating}/5</span>
+                                    </div>
+                                    {latestCompletedEvaluation.review && (
+                                        <p className="mb-2">{latestCompletedEvaluation.review}</p>
+                                    )}
+                                    <small className="text-muted d-block">
+                                        {latestCompletedEvaluation.model || latestCompletedEvaluation.provider}
+                                    </small>
+                                    <small className="text-muted d-block">
+                                        {new Date(latestCompletedEvaluation.created_at).toLocaleString('tr-TR')}
+                                    </small>
+                                </div>
+                            ) : latestFailedEvaluation ? (
+                                <div className="alert alert-danger mb-0">
+                                    <i className="ti ti-alert-triangle me-1"></i>
+                                    {latestFailedEvaluation.error || 'AI değerlendirmesi başarısız oldu.'}
+                                </div>
+                            ) : (
+                                <p className="text-muted mb-3">Henüz AI değerlendirmesi yapılmadı.</p>
+                            )}
+
+                            <button
+                                onClick={handleAiEvaluate}
+                                disabled={isEvaluating}
+                                className="btn btn-primary w-100 mt-3"
+                            >
+                                {isEvaluating ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Değerlendiriliyor...
+                                    </>
+                                ) : (
+                                    <>
+                                        <i className="ti ti-robot me-1"></i>
+                                        AI Değerlendir
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
 
@@ -334,6 +455,119 @@ export default function Show({ submission, intelligenceReports = [], investigato
                                     </div>
                                 );
                             })}
+                        </div>
+                    </div>
+
+                    <div className="card mb-4">
+                        <div className="card-header">
+                            <h5 className="mb-0">Takip Geçmişi</h5>
+                        </div>
+                        <div className="card-body">
+                            <form onSubmit={handleInteractionSubmit} className="row g-3 mb-4">
+                                <div className="col-md-6">
+                                    <label className="form-label">Takip Türü</label>
+                                    <select
+                                        className={`form-select ${interactionErrors.interaction_type ? 'is-invalid' : ''}`}
+                                        value={interactionData.interaction_type}
+                                        onChange={(e) => setInteractionData('interaction_type', e.target.value)}
+                                        disabled={interactionProcessing}
+                                    >
+                                        {INTERACTION_TYPES.map((type) => (
+                                            <option key={type.value} value={type.value}>
+                                                {type.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {interactionErrors.interaction_type && <div className="invalid-feedback">{interactionErrors.interaction_type}</div>}
+                                </div>
+
+                                <div className="col-md-6">
+                                    <label className="form-label">Takip Tarihi</label>
+                                    <input
+                                        type="date"
+                                        className={`form-control ${interactionErrors.interaction_date ? 'is-invalid' : ''}`}
+                                        value={interactionData.interaction_date}
+                                        onChange={(e) => setInteractionData('interaction_date', e.target.value)}
+                                        disabled={interactionProcessing}
+                                    />
+                                    {interactionErrors.interaction_date && <div className="invalid-feedback">{interactionErrors.interaction_date}</div>}
+                                </div>
+
+                                <div className="col-md-12">
+                                    <label className="form-label">Açıklama</label>
+                                    <textarea
+                                        className={`form-control ${interactionErrors.description ? 'is-invalid' : ''}`}
+                                        value={interactionData.description}
+                                        onChange={(e) => setInteractionData('description', e.target.value)}
+                                        rows={3}
+                                        placeholder="Görüşme detaylarını yazın..."
+                                        disabled={interactionProcessing}
+                                    />
+                                    {interactionErrors.description && <div className="invalid-feedback">{interactionErrors.description}</div>}
+                                </div>
+
+                                <div className="col-md-12">
+                                    <label className="form-label">Yanıt</label>
+                                    <textarea
+                                        className={`form-control ${interactionErrors.response ? 'is-invalid' : ''}`}
+                                        value={interactionData.response}
+                                        onChange={(e) => setInteractionData('response', e.target.value)}
+                                        rows={3}
+                                        placeholder="Adayın yanıtı..."
+                                        disabled={interactionProcessing}
+                                    />
+                                    {interactionErrors.response && <div className="invalid-feedback">{interactionErrors.response}</div>}
+                                </div>
+
+                                <div className="col-md-12">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary w-100"
+                                        disabled={interactionProcessing}
+                                    >
+                                        {interactionProcessing ? 'Gönderiliyor...' : 'Takip Ekle'}
+                                    </button>
+                                </div>
+                            </form>
+
+                            {interactions.length > 0 ? (
+                                <div>
+                                    {interactions.map((interaction) => (
+                                        <div key={interaction.id} className="d-flex mb-4">
+                                            <div className="flex-shrink-0 me-3">
+                                                <div className="bg-light rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                                                    <i className="ti ti-message-circle text-primary"></i>
+                                                </div>
+                                            </div>
+                                            <div className="flex-grow-1">
+                                                <div className="mb-1">
+                                                    {getInteractionBadge(interaction.interaction_type)}
+                                                    <span className="text-muted small ms-2">
+                                                        {new Date(interaction.interaction_date || interaction.created_at).toLocaleDateString('tr-TR')}
+                                                    </span>
+                                                </div>
+                                                {interaction.description && (
+                                                    <p className="mb-1">{interaction.description}</p>
+                                                )}
+                                                {interaction.response && (
+                                                    <div className="p-2 bg-light rounded mb-1">
+                                                        <small className="text-muted d-block">Yanıt:</small>
+                                                        <span>{interaction.response}</span>
+                                                    </div>
+                                                )}
+                                                <small className="text-muted">
+                                                    {interaction.creator?.name || 'Kullanıcı'} • {new Date(interaction.created_at).toLocaleString('tr-TR')}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-4">
+                                    <i className="ti ti-message-circle fs-1 text-muted mb-2"></i>
+                                    <p className="text-muted">Henüz takip kaydı yok.</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 

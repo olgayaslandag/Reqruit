@@ -65,7 +65,7 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                 <div className="mw-100 mx-auto">
                     <div className="d-grid d-grid-cols-1 gap-4">
                         {/* Sol Panel - Rapor Seçimi */}
-                        <div className="space-y-4">
+                        <div className="d-flex flex-column gap-4">
                             <h5 className="fw-semibold">Raporlar</h5>
                             {reportTypes.map((report) => (
                                 <button
@@ -73,12 +73,12 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                     onClick={() => setSelectedReport(report.id)}
                                     className={`w-100 p-4 rounded border-2 text-left  ${
                                         selectedReport === report.id
-                                            ? 'border-indigo-500 bg-indigo-50'
-                                            : 'border-secondary hover:border-secondary'
+                                            ? ' '
+                                            : 'border-secondary '
                                     }`}
                                 >
                                     <div className="d-flex align-items-start gap-2">
-                                        <svg className={`w-6 h-6 ${selectedReport === report.id ? 'text-primary' : 'text-muted'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className={`  ${selectedReport === report.id ? 'text-primary' : 'text-muted'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={report.icon} />
                                         </svg>
                                         <div>
@@ -117,10 +117,10 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
 
                                     {/* Son Dönemler */}
                                     <div className="bg-white rounded-3 shadow-sm">
-                                        <div className="p-4 border-b border-secondary">
+                                        <div className="p-4 border-bottom border-secondary">
                                             <h5 className="fw-semibold">Son Bordro Dönemleri</h5>
                                         </div>
-                                        <table className="w-100 divide-y divide-gray-200">
+                                        <table className="table table-hover w-100">
                                             <thead className="table-light">
                                                 <tr>
                                                     <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Dönem</th>
@@ -130,9 +130,9 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                                     <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Net</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
+                                            <tbody className="bg-white">
                                                 {summary.recent_periods?.map((period) => (
-                                                    <tr key={period.id} className="hover:table-light">
+                                                    <tr key={period.id} className="">
                                                         <td className="px-4 py-3 fs-sm fw-medium text-dark">{period.name}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{period.employee_count}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(period.total_gross)}</td>
@@ -150,10 +150,10 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                             {selectedReport === 'monthly' && monthlyData && (
                                 <div className="mb-3">
                                     <div className="bg-white rounded-3 shadow-sm">
-                                        <div className="p-4 border-b border-secondary">
+                                        <div className="p-4 border-bottom border-secondary">
                                             <h5 className="fw-semibold">Aylık Maliyet Analizi</h5>
                                         </div>
-                                        <table className="w-100 divide-y divide-gray-200">
+                                        <table className="table table-hover w-100">
                                             <thead className="table-light">
                                                 <tr>
                                                     <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Ay</th>
@@ -164,9 +164,9 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                                     <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Toplam Net</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
+                                            <tbody className="bg-white">
                                                 {monthlyData.map((month) => (
-                                                    <tr key={month.period} className="hover:table-light">
+                                                    <tr key={month.period} className="">
                                                         <td className="px-4 py-3 fs-sm fw-medium text-dark">{month.period}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{month.employee_count}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(month.total_gross)}</td>
@@ -192,8 +192,8 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                     {/* Grafik Alanı (ileride eklenebilir) */}
                                     <div className="bg-white rounded-3 shadow-sm p-4">
                                         <h5 className="fw-semibold">Maliyet Trendi</h5>
-                                        <div className="h-64 d-flex align-items-center justify-content-center text-muted">
-                                            <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="4 d-flex align-items-center justify-content-center text-muted">
+                                            <svg className=" " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                                             </svg>
                                         </div>
@@ -204,10 +204,10 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                             {/* Departman Maliyetleri */}
                             {selectedReport === 'departments' && departmentCosts && (
                                 <div className="bg-white rounded-3 shadow-sm">
-                                    <div className="p-4 border-b border-secondary">
+                                    <div className="p-4 border-bottom border-secondary">
                                         <h5 className="fw-semibold">Departman Bazlı Maliyetler</h5>
                                     </div>
-                                    <table className="w-100 divide-y divide-gray-200">
+                                    <table className="table table-hover w-100">
                                         <thead className="table-light">
                                             <tr>
                                                 <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Departman</th>
@@ -217,9 +217,9 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                                 <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">%</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
+                                        <tbody className="bg-white">
                                             {departmentCosts.map((dept) => (
-                                                <tr key={dept.id || dept.name} className="hover:table-light">
+                                                <tr key={dept.id || dept.name} className="">
                                                     <td className="px-4 py-3 fs-sm fw-medium text-dark">{dept.name}</td>
                                                     <td className="px-4 py-3 fs-sm text-dark">{dept.employee_count}</td>
                                                     <td className="px-4 py-3 fs-sm text-dark">{formatCurrency(dept.avg_salary)}</td>
@@ -236,10 +236,10 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                             {selectedReport === 'employees' && topEmployees && (
                                 <div className="mb-3">
                                     <div className="bg-white rounded-3 shadow-sm">
-                                        <div className="p-4 border-b border-secondary">
+                                        <div className="p-4 border-bottom border-secondary">
                                             <h5 className="fw-semibold">En Yüksek Maaşlı Çalışanlar</h5>
                                         </div>
-                                        <table className="w-100 divide-y divide-gray-200">
+                                        <table className="table table-hover w-100">
                                             <thead className="table-light">
                                                 <tr>
                                                     <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Sıra</th>
@@ -250,9 +250,9 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                                     <th className="px-4 py-3 text-left fs-xs fw-medium text-muted text-uppercase">Net Maaş</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
+                                            <tbody className="bg-white">
                                              {topEmployees.map((emp) => (
-                                                 <tr key={emp.id || emp.name} className="hover:table-light">
+                                                 <tr key={emp.id || emp.name} className="">
                                                         <td className="px-4 py-3 fs-sm text-muted">{index + 1}</td>
                                                         <td className="px-4 py-3 fs-sm fw-medium text-dark">{emp.name}</td>
                                                         <td className="px-4 py-3 fs-sm text-dark">{emp.department}</td>

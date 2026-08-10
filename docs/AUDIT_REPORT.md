@@ -167,14 +167,14 @@ DB::transaction(function () use ($employeeId, $leaveTypeId, $requestedDays) {
 |---|-------|-------|-------|------|
 | U1 | **Test butonu production'da** — `handleDocumentDelete(123)` hardcoded | `Employees/Show.jsx` | 120-125 | Veri kaybı riski |
 | U2 | **Employee Show sayfası placeholder** — Tüm sekmeler boş | `Employees/Show.jsx` | 164-182 | Kırık görünüm |
-| U3 | **Bootstrap + Tailwind çakışması** — Yüzlerce Tailwind class çalışmıyor | Tüm Pages | — | Tutarsız görünüm |
+| U3 | **CSS framework tutarsızlığı** — Bazı utility sınıfları düzgün çalışmıyor | Tüm Pages | — | Tutarsız görünüm |
 | U4 | **Departments/Edit submit butonu form dışında** | `Departments/Edit.jsx` | 138-152 | Kırık form |
 
 ### Yüksek
 
 | # | Sorun | Dosya | Satır |
 |---|-------|-------|-------|
-| U5 | TypeScript yok — Runtime hatalar, null reference'lar | Tüm `.jsx` dosyaları | — |
+| U5 | Tip tanımları eksik — Runtime hatalar, null reference'lar | Tüm `.jsx` dosyaları | — |
 | U6 | Error Boundary yok — Tek hata tüm app'i çökertiyor | `app.jsx` | — |
 | U7 | 9+ sayfada `usePage().props.flash` tekrarı | Tüm index sayfaları | — |
 | U8 | `prompt()` kullanımı — Reddetme nedenleri için native prompt | `LeaveRequests.jsx:105`, `Advances/Index.jsx:46` | — |
@@ -321,7 +321,7 @@ $this->call([
 | 13 | TC Kimlik No maskele | `AttendanceController.php`, `PayrollController.php` | 30dk |
 | 14 | Exception mesajlarını gizle, log'la | 5+ controller | 1 saat |
 | 15 | Employee Show sayfasını tamamla veya gizle | `Employees/Show.jsx` | 2 saat |
-| 16 | Bootstrap/Tailwind kararını uygula | Tüm Pages | 4 saat |
+| 16 | CSS framework kararını uygula | Tüm Pages | 4 saat |
 | 17 | Error Boundary ekle | `app.jsx` | 30dk |
 | 18 | moment.js → date-fns geçişi | `attendanceHelpers.jsx`, `formatters.jsx` | 2 saat |
 

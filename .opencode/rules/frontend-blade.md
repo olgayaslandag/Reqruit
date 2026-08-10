@@ -13,7 +13,7 @@
 - Dizi söz dizimi ile Blade'in koşullu sınıf bağlamasını kullanın
 
 ## Düzen ve Bileşen Tasarımı
-- Kurulan CSS çerçevelerini (Tailwind, Bootstrap) kullanarak duyarlı tasarım uygulayın
+- Kurulan CSS çerçevelerini (Bootstrap) kullanarak duyarlı tasarım uygulayın
 - Uygun erişilebilirlik öznitelikleri ile anlamsal HTML5 öğeleri kullanın
 - Açık prop sözleşmeleri ile modüler, birleştirilebilir bileşenler oluşturun
 - Tutarlı adlandırma ile CSS yardımcı sınıflarını sistemli olarak uygulayın

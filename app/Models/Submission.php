@@ -47,6 +47,16 @@ class Submission extends Model
         return $this->hasMany(IntelligenceReport::class);
     }
 
+    public function interactions(): HasMany
+    {
+        return $this->hasMany(ContactInteraction::class);
+    }
+
+    public function aiEvaluations(): HasMany
+    {
+        return $this->hasMany(SubmissionAiEvaluation::class)->orderBy('created_at', 'desc');
+    }
+
     public function getInvestigationLabelAttribute(): string
     {
         // For backward compatibility, still check the old investigation field first

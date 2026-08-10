@@ -56,7 +56,7 @@
 - Blade template'ler (resources/views/) veya Inertia/React component'ler
 - Form handler ve validation hata yönetimi (old() helper, error bags)
 - Client-side interaction tanımlamaları (Alpine.js, Vue.js)
-- Responsive tasarım uyumlu yapılar (Tailwind CSS, Bootstrap)
+- Responsive tasarım uyumlu yapılar (Bootstrap)
 - Accessibility standartları (ARIA attributes, semantic HTML)
 
 ## 7. Test Aşaması ve Kalite Güvence

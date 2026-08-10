@@ -80,7 +80,7 @@ export default function Approve({ pendingRequests }) {
                     </h5>
                     <Link
                         href={route('admin.adjustments.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
+                        className="btn btn-secondary btn-sm"
                     >
                         Geri
                     </Link>
@@ -89,16 +89,16 @@ export default function Approve({ pendingRequests }) {
         >
             <Head title="Talepleri Onayla" />
 
-            <div className="py-6">
+            <div className="py-5">
                 <div className="mw-100 mx-auto px-4">
                     {/* Toplu İşlem Paneli */}
-                    <div className="bg-white rounded-3 shadow-sm-md mb-5 p-4">
+                    <div className="bg-white rounded-3  mb-5 p-4">
                         <form onSubmit={handleBulkAction} className="d-grid d-grid-cols-1 gap-3">
                             <div>
                                 <label className="d-block fs-sm fw-medium text-dark mb-1">
                                     Toplu Eylem
                                 </label>
-                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={bulkAction.action}
+                                <select className="form-control w-100 rounded border-secondary " value={bulkAction.action}
                                     onChange={(e) => setBulkAction(prev => ({ ...prev, action: e.target.value }))}
                                 >
                                     <option value="approve">Onayla</option>
@@ -111,7 +111,7 @@ export default function Approve({ pendingRequests }) {
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Reddetme Sebebi (İsteğe Bağlı)
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                    <input className="form-control w-100 rounded border-secondary " type="text"
                                         value={bulkAction.reason}
                                         onChange={(e) => setBulkAction(prev => ({ ...prev, reason: e.target.value }))}
                                         placeholder="Reddetme sebebini girin..."
@@ -131,8 +131,8 @@ export default function Approve({ pendingRequests }) {
                     </div>
 
                     {/* Talep Listesi */}
-                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-secondary">
+                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
+                        <div className="px-5 py-4 border-bottom border-secondary">
                             <div className="d-flex align-items-center justify-content-between">
                                 <h5 className="fw-medium">
                                     Bekleyen Talepler ({pendingRequests?.length || 0} adet)
@@ -142,7 +142,7 @@ export default function Approve({ pendingRequests }) {
                                         type="checkbox"
                                         onChange={selectAll}
                                         checked={bulkAction.selectedIds.length === pendingRequests?.length && pendingRequests?.length > 0}
-                                        className="h-4 w-4 text-primary focus: border-secondary rounded"
+                                        className="  text-primary  rounded"
                                     />
                                     <span className="ml-2 fs-sm text-dark">
                                         Tümünü Seç ({bulkAction.selectedIds.length} adet seçili)
@@ -152,53 +152,53 @@ export default function Approve({ pendingRequests }) {
                         </div>
                         
                         <div className="overflow-auto">
-                            <table className="w-100 divide-y divide-gray-200">
+                            <table className="table table-hover w-100">
                                 <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider w-12">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase  ">
                                             <input
                                                 type="checkbox"
                                                 onChange={selectAll}
                                                 checked={bulkAction.selectedIds.length === pendingRequests?.length && pendingRequests?.length > 0}
-                                                className="h-4 w-4 text-primary focus: border-secondary rounded"
+                                                className="  text-primary  rounded"
                                             />
                                         </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Personel
                                         </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Tarih
                                         </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Değişim
                                         </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Orijinal Saatler
                                         </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Yeni Saatler
                                         </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Sebep
                                         </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-right fs-xs fw-medium text-muted text-uppercase ">
                                             Eylemler
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white">
                                     {pendingRequests && pendingRequests.length > 0 ? (
                                         pendingRequests.map((request) => (
-                                            <tr key={request.id} className="hover:table-light">
-                                                <td className="px-6 py-4 text-nowrap">
+                                            <tr key={request.id} className="">
+                                                <td className="px-5 py-4 text-nowrap">
                                                     <input
                                                         type="checkbox"
                                                         checked={bulkAction.selectedIds.includes(request.id)}
                                                         onChange={() => toggleSelection(request.id)}
-                                                        className="h-4 w-4 text-primary focus: border-secondary rounded"
+                                                        className="  text-primary  rounded"
                                                     />
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap">
+                                                <td className="px-5 py-4 text-nowrap">
                                                     <div className="fs-sm fw-medium text-dark">
                                                         {request.employee?.first_name} {request.employee?.last_name}
                                                     </div>
@@ -206,7 +206,7 @@ export default function Approve({ pendingRequests }) {
                                                         {request.employee?.identity_no}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap">
+                                                <td className="px-5 py-4 text-nowrap">
                                                     <div className="fs-sm fw-medium text-dark">
                                                         {new Date(request.date).toLocaleDateString('tr-TR')}
                                                     </div>
@@ -214,7 +214,7 @@ export default function Approve({ pendingRequests }) {
                                                         {new Date(request.date).toLocaleDateString('tr-TR', { weekday: 'short' })}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap">
+                                                <td className="px-5 py-4 text-nowrap">
                                                     <span className={`d-inline-d-flex align-items-center px-2 py-0.5 rounded fs-xs fw-medium ${
                                                         request.type === 'clock_in' 
                                                             ? 'bg-primary bg-opacity-10 text-info' 
@@ -229,7 +229,7 @@ export default function Approve({ pendingRequests }) {
                                                          request.type === 'both' ? 'Giris+Çıkış' : 'Süre Düzeltimesi'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
+                                                <td className="px-5 py-4 text-nowrap fs-sm text-dark">
                                                     <div className="fw-medium">
                                                         {request.original_clock_in ? new Date(request.original_clock_in).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
@@ -237,7 +237,7 @@ export default function Approve({ pendingRequests }) {
                                                         {request.original_clock_out ? new Date(request.original_clock_out).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-dark">
+                                                <td className="px-5 py-4 text-nowrap fs-sm text-dark">
                                                     <div className="fw-medium">
                                                         {request.new_clock_in ? new Date(request.new_clock_in).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
@@ -245,20 +245,20 @@ export default function Approve({ pendingRequests }) {
                                                         {request.new_clock_out ? new Date(request.new_clock_out).toLocaleTimeString('tr-TR') : '-'}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 fs-sm text-muted mw-100">
+                                                <td className="px-5 py-4 fs-sm text-muted mw-100">
                                                     {request.reason}
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
+                                                <td className="px-5 py-4 text-nowrap text-right fs-sm fw-medium">
                                                     <div className="d-flex justify-content-end">
                                                         <button
                                                             onClick={() => approveRequest(request.id)}
-                                                            className="text-success hover:text-green-900"
+                                                            className="text-success "
                                                         >
                                                             Onayla
                                                         </button>
                                                         <button
                                                             onClick={() => rejectRequest(request.id)}
-                                                            className="text-danger hover:text-red-900 ml-3"
+                                                            className="text-danger  ml-3"
                                                         >
                                                             Reddet
                                                         </button>
@@ -268,7 +268,7 @@ export default function Approve({ pendingRequests }) {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="8" className="px-6 py-12 text-center fs-sm text-muted">
+                                            <td colSpan="8" className="px-5 py-12 text-center fs-sm text-muted">
                                                 Onay bekleyen talep bulunamadı.
                                             </td>
                                         </tr>
@@ -279,16 +279,16 @@ export default function Approve({ pendingRequests }) {
                     </div>
 
                     {/* Onay Kuralları */}
-                    <div className="mt-6 bg-blue-50 border border-blue-200 rounded p-4">
+                    <div className="mt-6  border  rounded p-4">
                         <div className="d-flex">
                             <div className="d-flex-shrink-0">
-                                <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="  text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                 </svg>
                             </div>
                             <div className="ml-3">
                                 <h5 className="fw-medium">Devam Düzeltme Onay Kuralları</h5>
-                                <div className="mt-2 fs-sm text-info space-y-1">
+                                <div className="mt-2 fs-sm text-info d-flex flex-column gap-1">
                                     <p>• Talep edilen saatlerde uygun belge/bildirim varsa onay verilmelidir</p>
                                     <p>• Geciken girişler için sağlık raporu/gider makbuzu gibi belgeler göz önünde bulundurulmalıdır</p>
                                     <p>• Sıklıkla talepte bulunan çalışanların durumları ayrı ayrı incelenmelidir</p>

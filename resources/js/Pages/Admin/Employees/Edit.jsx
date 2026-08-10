@@ -88,10 +88,10 @@ export default function Edit({ employee, departments = [], managers = [], errors
                 <div className="d-flex align-items-center gap-3">
                     <Link
                         href={route('admin.employees.index')}
-                        className="p-2 text-muted hover:text-dark hover:bg-light rounded"
+                        className="p-2 text-muted   rounded"
                         title="Geri"
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className=" " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </Link>
@@ -114,7 +114,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         TC Kimlik No <span className="text-danger">*</span>
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                    <input className="form-control w-100 rounded border-secondary " type="text"
                                         value={data.identity_no}
                                         onChange={(e) => setData('identity_no', e.target.value)}
                                         required
@@ -129,7 +129,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                         <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Ad <span className="text-danger">*</span>
                                         </label>
-                                        <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                        <input className="form-control w-100 rounded border-secondary " type="text"
                                             value={data.first_name}
                                             onChange={(e) => setData('first_name', e.target.value)}
                                             required
@@ -141,7 +141,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                         <label className="d-block fs-sm fw-medium text-dark mb-1">
                                             Soyad <span className="text-danger">*</span>
                                         </label>
-                                        <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                        <input className="form-control w-100 rounded border-secondary " type="text"
                                             value={data.last_name}
                                             onChange={(e) => setData('last_name', e.target.value)}
                                             required
@@ -154,7 +154,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Doğum Tarihi
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="date"
+                                    <input className="form-control w-100 rounded border-secondary " type="date"
                                         value={data.birth_date}
                                         onChange={(e) => setData('birth_date', e.target.value)}
                                     />
@@ -164,7 +164,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Cinsiyet
                                     </label>
-                                    <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.gender}
+                                    <select className="form-control w-100 rounded border-secondary " value={data.gender}
                                         onChange={(e) => setData('gender', e.target.value)}
                                     >
                                         <option value="">Seçiniz</option>
@@ -186,7 +186,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Telefon
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="tel"
+                                    <input className="form-control w-100 rounded border-secondary " type="tel"
                                         value={data.phone}
                                         onChange={(e) => setData('phone', e.target.value)}
                                         placeholder="0555 555 55 55"
@@ -198,7 +198,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         E-posta
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="email"
+                                    <input className="form-control w-100 rounded border-secondary " type="email"
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
                                     />
@@ -209,7 +209,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Adres
                                     </label>
-                                    <textarea className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.address}
+                                    <textarea className="form-control w-100 rounded border-secondary " value={data.address}
                                         onChange={(e) => setData('address', e.target.value)}
                                         rows={3}
                                     />
@@ -225,7 +225,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Kişi Adı
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                    <input className="form-control w-100 rounded border-secondary " type="text"
                                         value={data.emergency_contact_name}
                                         onChange={(e) => setData('emergency_contact_name', e.target.value)}
                                     />
@@ -235,7 +235,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Telefon
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="tel"
+                                    <input className="form-control w-100 rounded border-secondary " type="tel"
                                         value={data.emergency_contact_phone}
                                         onChange={(e) => setData('emergency_contact_phone', e.target.value)}
                                         placeholder="0555 555 55 55"
@@ -246,7 +246,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Yakınlık
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                    <input className="form-control w-100 rounded border-secondary " type="text"
                                         value={data.emergency_contact_relation}
                                         onChange={(e) => setData('emergency_contact_relation', e.target.value)}
                                         placeholder="Anne, Baba, Kardeş vb."
@@ -263,7 +263,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Medeni Durum
                                     </label>
-                                    <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.marital_status}
+                                    <select className="form-control w-100 rounded border-secondary " value={data.marital_status}
                                         onChange={(e) => setData('marital_status', e.target.value)}
                                     >
                                         <option value="">Seçiniz</option>
@@ -279,7 +279,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Çocuk Sayısı
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="number"
+                                    <input className="form-control w-100 rounded border-secondary " type="number"
                                         value={data.children_count}
                                         onChange={(e) => setData('children_count', parseInt(e.target.value) || 0)}
                                         min={0}
@@ -296,7 +296,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         İşe Başlama Tarihi <span className="text-danger">*</span>
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="date"
+                                    <input className="form-control w-100 rounded border-secondary " type="date"
                                         value={data.hire_date}
                                         onChange={(e) => setData('hire_date', e.target.value)}
                                         required
@@ -308,7 +308,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Pozisyon <span className="text-danger">*</span>
                                     </label>
-                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                    <input className="form-control w-100 rounded border-secondary " type="text"
                                         value={data.position_title}
                                         onChange={(e) => setData('position_title', e.target.value)}
                                         required
@@ -321,7 +321,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Departman <span className="text-danger">*</span>
                                     </label>
-                                    <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.department_id}
+                                    <select className="form-control w-100 rounded border-secondary " value={data.department_id}
                                         onChange={(e) => setData('department_id', e.target.value)}
                                         required
                                     >
@@ -339,7 +339,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Çalışma Tipi
                                     </label>
-                                    <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.employment_type}
+                                    <select className="form-control w-100 rounded border-secondary " value={data.employment_type}
                                         onChange={(e) => setData('employment_type', e.target.value)}
                                     >
                                         {(employmentTypeOptions || []).map((option) => (
@@ -354,7 +354,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Sözleşme Tipi
                                     </label>
-                                    <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.contract_type}
+                                    <select className="form-control w-100 rounded border-secondary " value={data.contract_type}
                                         onChange={(e) => setData('contract_type', e.target.value)}
                                     >
                                         {(contractTypeOptions || []).map((option) => (
@@ -369,7 +369,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                         Yönetici
                                     </label>
-                                    <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={data.manager_id}
+                                    <select className="form-control w-100 rounded border-secondary " value={data.manager_id}
                                         onChange={(e) => setData('manager_id', e.target.value || '')}
                                     >
                                         <option value="">Yok</option>
@@ -390,12 +390,12 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                 <button
                                     type="button"
                                     onClick={addEducation}
-                                    className="text-primary hover:text-indigo-900 fs-sm"
+                                    className="text-primary  fs-sm"
                                 >
-                                    + Eğitim Ekle
+                                    Eğitim Ekle
                                 </button>
                             </div>
-                            <div className="space-y-4">
+                            <div className="d-flex flex-column gap-4">
                                 {education.map((edu, index) => (
                                     <div key={`edu-${index}`} className="p-4 table-light rounded">
                                         <div className="d-grid d-grid-cols-1 gap-3">
@@ -403,7 +403,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                                 <label className="d-block fs-sm fw-medium text-dark mb-1">
                                                     Okul Adı
                                                 </label>
-                                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                                <input className="form-control w-100 rounded border-secondary " type="text"
                                                     value={edu.school_name}
                                                     onChange={(e) => updateEducation(index, 'school_name', e.target.value)}
                                                     placeholder="Üniversite adı"
@@ -413,7 +413,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                                 <label className="d-block fs-sm fw-medium text-dark mb-1">
                                                     Bölüm
                                                 </label>
-                                                <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="text"
+                                                <input className="form-control w-100 rounded border-secondary " type="text"
                                                     value={edu.department}
                                                     onChange={(e) => updateEducation(index, 'department', e.target.value)}
                                                     placeholder="Bölüm adı"
@@ -423,7 +423,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                                 <label className="d-block fs-sm fw-medium text-dark mb-1">
                                                     Derece
                                                 </label>
-                                                <select className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" value={edu.degree}
+                                                <select className="form-control w-100 rounded border-secondary " value={edu.degree}
                                                     onChange={(e) => updateEducation(index, 'degree', e.target.value)}
                                                 >
                                                     <option value="">Seçiniz</option>
@@ -439,7 +439,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                                     <label className="d-block fs-sm fw-medium text-dark mb-1">
                                                         Mezuniyet Yılı
                                                     </label>
-                                                    <input className="form-control w-100 rounded border-secondary shadow-sm-sm focus: focus:border-indigo-500" type="number"
+                                                    <input className="form-control w-100 rounded border-secondary " type="number"
                                                         value={edu.graduation_year}
                                                         onChange={(e) => updateEducation(index, 'graduation_year', e.target.value)}
                                                         placeholder="2020"
@@ -450,9 +450,9 @@ export default function Edit({ employee, departments = [], managers = [], errors
                                                 <button
                                                     type="button"
                                                     onClick={() => removeEducation(index)}
-                                                    className="mt-6 p-1 text-danger hover:text-red-900"
+                                                    className="mt-6 p-1 text-danger "
                                                 >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg className=" " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
                                                 </button>
@@ -467,7 +467,7 @@ export default function Edit({ employee, departments = [], managers = [], errors
                         <div className="d-flex justify-content-end">
                             <Link
                                 href={route('admin.employees.index')}
-                                className="px-4 py-2 bg-gray-300 text-dark rounded hover:bg-gray-400"
+                                className="btn btn-light"
                             >
                                 İptal
                             </Link>

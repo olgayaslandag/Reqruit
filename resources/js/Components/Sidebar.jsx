@@ -22,6 +22,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 { title: 'Başvurular', href: '/admin/submissions' },
                 { title: 'Formlar', href: '/admin/forms' },
                 { title: 'Departmanlar', href: '/admin/departments' },
+                { title: 'Kalifiye Elemanlar', href: '/admin/candidates' },
                 { title: 'Çalışanlar', href: '/admin/employees' },
                 { title: 'Kullanıcılar', href: '/admin/users' },
             ],
@@ -84,7 +85,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
         // Menü durumunu güncelle
         setOpenMenus(prev => ({ ...prev, ...initialOpen }));
-    }, [currentRoute, menuGroups]);  
+    }, [currentRoute, menuGroups]);
 
     const toggleMenu = (title) => {
         setOpenMenus((prev) => ({
@@ -98,9 +99,11 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             <div className="navbar-wrapper">
                 <div className="m-header">
                     <Link href="/dashboard">
-                        <span className="font-size-1-3rem font-bold text-transform-uppercase">
-                            {usePage().props.appName || 'Reqruit'}
-                        </span>
+                        <img
+                            src="/assets/images/reqruit-logo.png"
+                            alt="Reqruit"
+                            height="35"
+                        />
                     </Link>
                 </div>
 

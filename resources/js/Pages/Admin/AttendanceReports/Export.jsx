@@ -56,10 +56,10 @@ export default function Export() {
         >
             <Head title="Rapor Dışa Aktar" />
 
-            <div className="py-6">
+            <div className="py-5">
                 <div className="mw-100 mx-auto px-4">
-                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-secondary">
+                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
+                        <div className="px-5 py-4 border-bottom border-secondary">
                             <h5 className="fw-medium">Dışa Aktarma Ayarları</h5>
                             <p className="mt-1 fs-sm text-muted">Rapor türünü seçip filtreleyerek dışa aktarma işlemini başlatın.</p>
                         </div>
@@ -142,14 +142,14 @@ export default function Export() {
                             {/* Ekstra Seçenekler */}
                             <div className="border-t border-secondary pt-4">
                                 <legend className="fs-sm fw-medium text-dark">Ekstra Seçenekler</legend>
-                                <div className="mt-2 space-y-2">
+                                <div className="mt-2 d-flex flex-column gap-2">
                                     <div className="d-flex align-items-start">
                                         <input
                                             id="include-summary"
                                             type="checkbox"
                                             checked={exportParams.include_summary}
                                             onChange={(e) => handleChange('include_summary', e.target.checked)}
-                                            className="h-4 w-4 text-primary focus: border-secondary rounded"
+                                            className="  text-primary  rounded"
                                         />
                                         <label htmlFor="include-summary" className="ml-2 d-block fs-sm text-dark">
                                             Genel özet dahil et
@@ -161,7 +161,7 @@ export default function Export() {
                                             id="include-details"
                                             checked={exportParams.include_detailed_records}
                                             onChange={(e) => handleChange('include_detailed_records', e.target.checked)}
-                                            className="h-4 w-4 text-primary focus: border-secondary rounded"
+                                            className="  text-primary  rounded"
                                         />
                                         <label htmlFor="include-details" className="ml-2 d-block fs-sm text-dark">
                                             Ayrıntılı kayıtlar dahil et
@@ -177,7 +177,7 @@ export default function Export() {
                                     disabled={!exportParams.start_date || !exportParams.end_date}
                                     className="btn btn-primary disabled:opacity-50"
                                 >
-                                    <svg className="-ml-1 mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="-ml-1 mr-3  " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                     </svg>
                                     Raporu Dışa Aktar
@@ -188,54 +188,54 @@ export default function Export() {
 
                     {/* Geçmiş Aktarımlar */}
                     {props.exportHistory && props.exportHistory.length > 0 && (
-                        <div className="mt-6 bg-white rounded-3 shadow-sm-md overflow-hidden">
-                            <div className="px-6 py-4 border-b border-secondary">
+                        <div className="mt-6 bg-white rounded-3 shadow-sm overflow-hidden">
+                            <div className="px-5 py-4 border-bottom border-secondary">
                                 <h5 className="fw-medium">Son Dışa Aktarılan Dosyalar</h5>
                                 <p className="mt-1 fs-sm text-muted">Önceden oluşturulan raporlar listesi</p>
                             </div>
 
                             <div className="overflow-auto">
-                                <table className="w-100 divide-y divide-gray-200">
+                                <table className="table table-hover w-100">
                                     <thead className="table-light">
                                         <tr>
-                                            <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                            <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                                 Rapor Adı
                                             </th>
-                                            <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                            <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                                 Tarih Aralığı
                                             </th>
-                                            <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                            <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                                 Biçim
                                             </th>
-                                            <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                            <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                                 Oluşturma Tarihi
                                             </th>
-                                            <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                            <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                                 Eylemler
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody className="bg-white">
                                          {props.exportHistory.map(historyItem => (
-                                             <tr key={historyItem.id} className="hover:table-light">
-                                                <td className="px-6 py-4 text-nowrap fs-sm fw-medium text-dark">
+                                             <tr key={historyItem.id} className="">
+                                                <td className="px-5 py-4 text-nowrap fs-sm fw-medium text-dark">
                                                     {historyItem.filename}
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-muted">
+                                                <td className="px-5 py-4 text-nowrap fs-sm text-muted">
                                                     {historyItem.start_date} - {historyItem.end_date}
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap">
+                                                <td className="px-5 py-4 text-nowrap">
                                                     <span className="px-2 d-inline-d-flex fs-xs leading-5 fw-semibold rounded-pill bg-primary bg-opacity-10 text-info">
                                                         {historyItem.format.toUpperCase()}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm text-muted">
+                                                <td className="px-5 py-4 text-nowrap fs-sm text-muted">
                                                     {formatDateTime(historyItem.created_at)}
                                                 </td>
-                                                <td className="px-6 py-4 text-nowrap fs-sm">
+                                                <td className="px-5 py-4 text-nowrap fs-sm">
                                                     <button
                                                         onClick={() => window.open(historyItem.download_url, '_blank')}
-                                                        className="text-primary hover:text-indigo-900"
+                                                        className="text-primary "
                                                     >
                                                         İndir
                                                     </button>
@@ -249,16 +249,16 @@ export default function Export() {
                     )}
 
                     {/* Yardım Metni */}
-                    <div className="mt-6 bg-blue-50 border border-blue-200 rounded p-4">
+                    <div className="mt-6  border  rounded p-4">
                         <div className="d-flex">
                             <div className="d-flex-shrink-0">
-                                <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="  text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                                 </svg>
                             </div>
                             <div className="ml-3">
                                 <h5 className="fw-medium">Dışa Aktarım Notları</h5>
-                                <div className="mt-2 fs-sm text-info space-y-1">
+                                <div className="mt-2 fs-sm text-info d-flex flex-column gap-1">
                                     <p>Raporları Excel veya PDF formatında dışa aktarabilirsiniz.</p>
                                     <p>Aralıkta çok fazla veri varsa dışa aktarım işlemi birkaç dakika sürebilir.</p>
                                     <p>Geçmiş verileri ve önceden oluşturulan raporları bu sayfada görebilirsiniz.</p>

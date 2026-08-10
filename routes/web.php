@@ -7,6 +7,7 @@ use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
@@ -97,7 +98,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{submission}/intelligence-reports', [SubmissionController::class, 'storeIntelligenceReport'])->name('storeIntelligenceReport');
         Route::delete('/{submission}/intelligence-reports/{report}', [SubmissionController::class, 'destroyIntelligenceReport'])->name('destroyIntelligenceReport');
         Route::post('/{submission}/comments', [SubmissionController::class, 'addComment'])->name('addComment');
+        Route::post('/{submission}/interactions', [SubmissionController::class, 'storeInteraction'])->name('storeInteraction');
+        Route::post('/{submission}/ai-evaluate', [SubmissionController::class, 'evaluate'])->name('evaluate');
         Route::delete('/{submission}', [SubmissionController::class, 'destroy'])->name('destroy');
+    });
+
+    // Admin - Candidates
+    Route::prefix('admin/candidates')->name('admin.candidates.')->group(function () {
+        Route::get('/', [CandidateController::class, 'index'])->name('index');
+        Route::get('/create', [CandidateController::class, 'create'])->name('create');
+        Route::post('/', [CandidateController::class, 'store'])->name('store');
+        Route::get('/{candidate}', [CandidateController::class, 'show'])->name('show');
+        Route::get('/{candidate}/edit', [CandidateController::class, 'edit'])->name('edit');
+        Route::put('/{candidate}', [CandidateController::class, 'update'])->name('update');
+        Route::delete('/{candidate}', [CandidateController::class, 'destroy'])->name('destroy');
+        Route::post('/{candidate}/interactions', [CandidateController::class, 'storeInteraction'])->name('storeInteraction');
     });
 
     // Admin - Users

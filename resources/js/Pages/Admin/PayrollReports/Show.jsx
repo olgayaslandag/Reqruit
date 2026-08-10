@@ -14,7 +14,7 @@ export default function Show({ periods }) {
                     </h5>
                     <Link
                         href={route('admin.payrolls.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
+                        className="btn btn-secondary btn-sm"
                     >
                         Bordrolara Dön
                     </Link>
@@ -26,32 +26,32 @@ export default function Show({ periods }) {
             <div className="py-12">
                 <div className="mw-100 mx-auto">
                     <div className="bg-white rounded-3 shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 table-light border-b border-secondary">
+                        <div className="px-5 py-4 table-light border-bottom border-secondary">
                             <h5 className="fw-medium">Mevcut Yayınlanmış Bordro Dönemleri</h5>
                         </div>
                         
                         <div className="overflow-auto">
-                            <table className="w-100 divide-y divide-gray-200">
+                            <table className="table table-hover w-100">
                                 <thead className="table-light">
                                     <tr>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Dönem Adı
                                         </th>
-                                        <th className="px-6 py-3 text-left fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-left fs-xs fw-medium text-muted text-uppercase ">
                                             Başlangıç - Bitiş Tarihi
                                         </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-right fs-xs fw-medium text-muted text-uppercase ">
                                             Çalışan Sayısı
                                         </th>
-                                        <th className="px-6 py-3 text-right fs-xs fw-medium text-muted text-uppercase tracking-wider">
+                                        <th className="px-5 py-3 text-right fs-xs fw-medium text-muted text-uppercase ">
                                             Hareketler
                                         </th>
                                     </tr>
                                 </thead>
-                                 <tbody className="bg-white divide-y divide-gray-200">
+                                 <tbody className="bg-white">
                                      {periods.map(period => (
-                                         <tr key={period.id} className="hover:table-light">
-                                            <td className="px-6 py-4 text-nowrap">
+                                         <tr key={period.id} className="">
+                                            <td className="px-5 py-4 text-nowrap">
                                                 <div className="fs-sm fw-medium text-dark">
                                                     {period.name}
                                                 </div>
@@ -59,7 +59,7 @@ export default function Show({ periods }) {
                                                     {period.status.toUpperCase()}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-nowrap">
+                                            <td className="px-5 py-4 text-nowrap">
                                                 <div className="fs-sm text-dark">
                                                     {new Date(period.start_date).toLocaleDateString('tr-TR')}
                                                 </div>
@@ -67,29 +67,29 @@ export default function Show({ periods }) {
                                                     {new Date(period.end_date).toLocaleDateString('tr-TR')}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-nowrap text-right fs-sm text-muted">
+                                            <td className="px-5 py-4 text-nowrap text-right fs-sm text-muted">
                                                 0 {/* Actually this would come from server with calculation */}
                                             </td>
-                                            <td className="px-6 py-4 text-nowrap text-right fs-sm fw-medium">
-                                                <div className="d-flex justify-content-end space-x-2">
+                                            <td className="px-5 py-4 text-nowrap text-right fs-sm fw-medium">
+                                                <div className="d-flex justify-content-end gap-2">
                                                     {/* Raporlama seçenekleri */}
                                                     <Link
                                                         href={route('admin.payroll-reports.summary', period.id)}
-                                                        className="text-primary hover:text-indigo-900"
+                                                        className="text-primary "
                                                     >
                                                         Özet Rapor
                                                     </Link>
                                                     <span className="text-gray-300">|</span>
                                                     <Link
                                                         href={route('admin.payroll-reports.taxSummary', period.id)}
-                                                        className="text-primary hover:text-indigo-900"
+                                                        className="text-primary "
                                                     >
                                                         Vergi Raporu
                                                     </Link>
                                                     <span className="text-gray-300">|</span>
                                                     <Link
                                                         href={route('admin.payroll-reports.departmentSummary', period.id)}
-                                                        className="text-primary hover:text-indigo-900"
+                                                        className="text-primary "
                                                     >
                                                         Departman Raporu
                                                     </Link>
@@ -120,7 +120,7 @@ export default function Show({ periods }) {
                             </p>
                             <Link
                                 href={route('admin.payroll-reports.compare')}
-                                className="text-primary hover:text-indigo-900 fs-sm"
+                                className="text-primary  fs-sm"
                             >
                                 Rapor Üret
                             </Link>
@@ -134,7 +134,7 @@ export default function Show({ periods }) {
                             </p>
                             <Link
                                 href={route('admin.payroll-reports.annual')}
-                                className="text-primary hover:text-indigo-900 fs-sm"
+                                className="text-primary  fs-sm"
                             >
                                 Rapor Üret
                             </Link>

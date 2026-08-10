@@ -4,7 +4,7 @@ Project stack:
 - Docker
 - MySQL
 - Pest (testing)
-- Blade, Inertia React, Tailwind
+- Blade, Inertia React
 
 Architecture:
 - Service + Repository pattern with DTO

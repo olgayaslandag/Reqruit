@@ -44,13 +44,17 @@ class DatabaseSeeder extends Seeder
             ImportAllDataSeeder::class,
             UserSeeder::class,
             EmployeeSeeder::class,
+            RecentHiresSeeder::class,
             LeaveTypesTableSeeder::class,
             LeaveEntitlementsSeeder::class,
             LeaveRequestsSeeder::class,
             SubmissionSeeder::class,
+            CandidateSeeder::class,
             PayrollSeeder::class,
+            RecentPayrollPeriodsSeeder::class,
             AdvanceRequestSeeder::class,
             \Database\Seeders\PDKS\PDKSSeeder::class,
+            AttendanceSummarySeeder::class,
         ]);
     }
 }

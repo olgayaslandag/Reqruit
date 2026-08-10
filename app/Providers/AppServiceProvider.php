@@ -10,12 +10,14 @@ use App\Interfaces\ILeaveTypeRepository;
 use App\Interfaces\IShiftRepository;
 use App\Interfaces\IUserRepository;
 use App\Models\AdvanceRequest;
+use App\Models\Candidate;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\PayrollPeriod;
 use App\Models\User;
 use App\Policies\AdvancePolicy;
+use App\Policies\CandidatePolicy;
 use App\Policies\LeaveEntitlementPolicy;
 use App\Policies\LeaveRequestPolicy;
 use App\Policies\LeaveTypePolicy;
@@ -96,6 +98,9 @@ class AppServiceProvider extends ServiceProvider
 
         // AdvanceRequest modeli için policy mapping
         Gate::policy(AdvanceRequest::class, AdvancePolicy::class);
+
+        // Candidate modeli için policy mapping
+        Gate::policy(Candidate::class, CandidatePolicy::class);
 
         // Leave models for policy mapping
         Gate::policy(LeaveType::class, LeaveTypePolicy::class);

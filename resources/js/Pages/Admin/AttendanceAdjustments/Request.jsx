@@ -85,7 +85,7 @@ export default function Request({ employees, attendanceRecords }) {
                     </h5>
                     <Link
                         href={route('admin.adjustments.index')}
-                        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 fs-sm"
+                        className="btn btn-secondary fs-sm"
                     >
                         Geri
                     </Link>
@@ -94,10 +94,10 @@ export default function Request({ employees, attendanceRecords }) {
         >
             <Head title="Yeni Talep" />
 
-            <div className="py-6">
+            <div className="py-5">
                 <div className="mw-100 mx-auto px-4">
-                    <div className="bg-white rounded-3 shadow-sm-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-secondary">
+                    <div className="bg-white rounded-3 shadow-sm overflow-hidden">
+                        <div className="px-5 py-4 border-bottom border-secondary">
                             <h5 className="fw-medium">Talep Oluştur</h5>
                             <p className="mt-1 fs-sm text-muted">Varolan devam kaydında yapılacak düzeltmeleri buradan talep edebilirsiniz</p>
                         </div>
@@ -155,7 +155,7 @@ export default function Request({ employees, attendanceRecords }) {
                                                     value={type.value}
                                                     checked={formData.type === type.value}
                                                     onChange={(e) => handleTypeChange(e.target.value)}
-                                                    className="h-4 w-4 text-primary focus: border-secondary mt-1"
+                                                    className="text-primary mt-1"
                                                 />
                                                 <label htmlFor={`type-${type.value}`} className="ml-2 d-block">
                                                     <span className="d-block fs-sm fw-medium text-dark">{type.label}</span>
@@ -174,7 +174,7 @@ export default function Request({ employees, attendanceRecords }) {
                                             Orijinal saat: {formData.original_clock_in || '-'} 
                                             {formData.original_clock_in && <span className="ml-2">→ Yeni saat: {formData.new_clock_in}</span>}
                                         </p>
-                                        <div className="space-y-3">
+                                        <div className="d-grid d-grid-cols-1 gap-3">
                                             <div>
                                                 <label className="d-block fs-xs fw-medium text-muted mb-1">
                                                     Orijinal Giriş Saati
@@ -204,7 +204,7 @@ export default function Request({ employees, attendanceRecords }) {
                                             Orijinal saat: {formData.original_clock_out || '-'} 
                                             {formData.original_clock_out && <span className="ml-2">→ Yeni saat: {formData.new_clock_out}</span>}
                                         </p>
-                                        <div className="space-y-3">
+                                        <div className="d-grid d-grid-cols-1 gap-3">
                                             <div>
                                                 <label className="d-block fs-xs fw-medium text-muted mb-1">
                                                     Orijinal Çıkış Saati
@@ -243,7 +243,7 @@ export default function Request({ employees, attendanceRecords }) {
                                 </div>
 
                                 {/* Onay Gerekliliği */}
-                                <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                                <div className=" border  rounded p-4">
                                     <h5 className="fw-medium text-info mb-2">Dikkat</h5>
                                     <div className="fs-sm text-info">
                                         <p>
@@ -258,7 +258,7 @@ export default function Request({ employees, attendanceRecords }) {
                             <div className="mt-8 d-flex justify-content-end">
                                 <Link
                                     href={route('admin.adjustments.index')}
-                                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                                    className="btn btn-secondary"
                                 >
                                     İptal
                                 </Link>
@@ -279,7 +279,7 @@ export default function Request({ employees, attendanceRecords }) {
                             <h5 className="fw-medium text-dark mb-2">Geçmiş Düzeltmeler</h5>
                             <Link
                                 href={route('admin.adjustments.index')}
-                                className="text-primary hover:text-indigo-800 fs-sm"
+                                className="text-primary fs-sm"
                             >
                                 Onaylanmış ve beklemedeki tüm talepler →
                             </Link>

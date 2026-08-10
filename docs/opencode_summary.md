@@ -15,7 +15,7 @@
 15. Tüm tablolar için 200+ satır demo veri oluşturuldu (PayrollPeriod:15, Advances:250, ShiftSchedules:14960 vb.)
 16. WorkCalendars tablosuna total_days, working_days, holiday_days sütunları eklendi
 17. OpenCode uyumluluk analizi yapıldı ve kritik sorunlar çözüldü: Controller'daki business logic Service katmanına taşındı, Seeder dosyalarında Model yerine DB facade kullanımı sağlandı, Interface'lere I prefix eklendi
-18. TypeScript dönüşümü iptal edilerek JavaScript kullanılması sağlandı, tüm frontend dosyaları JavaScript olarak geri yüklendi
+18. Frontend dosyaları JavaScript (JSX) olarak korundu, tip güvenliği dönüşümü yapılmadı
 19. Route hataları çözüldü: Eksik interface binding'leri tamamlandı, DepartmentRepository, FormRepository, SubmissionRepository ve ilgili service/controller dosyaları güncellendi
 20. Laravel cache temizlendi ve composer autoload yeniden oluşturuldu
 21. Submissions ve Forms sayfaları Bootstrap uyumlu hale getirildi; breadcrumbs, collapse filitreler eklendi

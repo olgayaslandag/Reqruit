@@ -253,10 +253,7 @@ function remove_overlay_menu() {
   document.querySelector('.topbar .pc-menu-overlay').remove();
 }
 
-window.addEventListener('load', function () {
-  // Bootstrap-related functionality has been removed for Tailwind compatibility
-  // Any tooltips, popovers, or toasts would need to be replaced with Tailwind-compatible alternatives
-});
+window.addEventListener('load', function () {});
 
 // active menu item list start
 var elem = document.querySelectorAll('.pc-sidebar .pc-navbar a');

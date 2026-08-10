@@ -703,7 +703,7 @@ export default function Show({ employee }) {
                 <div className="mw-100 mx-auto">
                     {/* Tabs */}
                     <div className="bg-white rounded-3 shadow-sm">
-                        <div className="border-b border-secondary">
+                        <div className="border-bottom border-secondary">
                             <nav className="d-flex flex-wrap -mb-px small">
                                 {[
                                     { id: 'info', label: 'Bilgi', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
@@ -718,14 +718,14 @@ export default function Show({ employee }) {
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`py-3 px-2 text-center border-b-2 fw-medium small ${
+                                        className={`py-3 px-2 text-center  fw-medium small ${
                                             activeTab === tab.id
-                                                ? 'border-indigo-500 text-primary'
-                                                : 'border-transparent text-muted hover:text-dark hover:border-secondary'
+                                                ? ' text-primary'
+                                                : ' text-muted  '
                                         }`}
                                     >
                                         <div className="d-flex flex-column align-items-center">
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className=" " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
                                             </svg>
                                             <span className="mt-1">{tab.label}</span>

@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddSubmissionCommentRequest;
+use App\Http\Requests\StoreContactInteractionRequest;
 use App\Http\Requests\UpdateSubmissionStatusRequest;
+use App\Models\ContactInteraction;
 use App\Models\Submission;
+use App\Services\AiEvaluationService;
+use App\Services\CandidateService;
 use App\Services\DepartmentService;
 use App\Services\FormService;
 use App\Services\SubmissionService;
@@ -20,7 +24,9 @@ class SubmissionController extends Controller
     public function __construct(
         protected SubmissionService $submissionService,
         protected FormService $formService,
-        protected DepartmentService $departmentService
+        protected DepartmentService $departmentService,
+        protected AiEvaluationService $aiEvaluationService,
+        protected CandidateService $candidateService
     ) {
         $this->authorizeResource(Submission::class, 'submission');
     }
@@ -60,10 +66,22 @@ class SubmissionController extends Controller
 
         // Load intelligence reports for this submission
         $intelligenceReports = $submission->intelligenceReports()->get();
-        
+
+        // Load contact interactions and AI evaluations for this submission
+        $interactions = $submission->interactions()
+            ->with('creator')
+            ->orderBy('interaction_date', 'desc')
+            ->get();
+
+        $aiEvaluations = $submission->aiEvaluations()
+            ->with('creator')
+            ->get();
+
         return Inertia::render('Admin/Submissions/Show', [
             'submission' => $submission,
             'intelligenceReports' => $intelligenceReports,
+            'interactions' => $interactions,
+            'aiEvaluations' => $aiEvaluations,
         ]);
     }
 
@@ -152,5 +170,31 @@ class SubmissionController extends Controller
         $report->delete();
 
         return back()->with('success', 'İstihbarat raporu başarıyla silindi.');
+    }
+
+    public function storeInteraction(StoreContactInteractionRequest $request, Submission $submission)
+    {
+        $this->authorize('update', $submission);
+
+        ContactInteraction::create([
+            'submission_id' => $submission->id,
+            ...$request->validated(),
+            'created_by' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Takip kaydı eklendi.');
+    }
+
+    public function evaluate(Request $request, Submission $submission)
+    {
+        $this->authorize('review', $submission);
+
+        $evaluation = $this->aiEvaluationService->evaluate($submission);
+
+        if ($evaluation->status === 'failed') {
+            return back()->with('error', 'AI değerlendirmesi yapılamadı: '.$evaluation->error);
+        }
+
+        return back()->with('success', 'AI değerlendirmesi tamamlandı.');
     }
 }

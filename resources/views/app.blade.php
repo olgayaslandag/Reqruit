@@ -4,11 +4,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Reqruit - Modern Admin Dashboard">
-<meta name="keywords" content="admin dashboard, laravel, react, inertia">
+<meta name="description" content="Reqruit - İK Yönetim Platformu">
+<meta name="keywords" content="ik yazılımı, insan kaynakları, hrms, personel devam kontrolü, bordro, izin yönetimi, maaş">
 <meta name="author" content="Reqruit">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/assets/images/reqruit-icon.png" type="image/png">
+<link rel="shortcut icon" href="/assets/images/reqruit-icon.png" type="image/png">
 <title inertia>{{ config('app.name', 'Reqruit') }}</title>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">

@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 .pc-sidebar .navbar-content {
   /* ✅ Dikey scroll'u aktif et */
   overflow-y: auto;
@@ -25,53 +21,106 @@
     padding-bottom: 1rem;
 }
 
-/* Custom styles for compatibility after removing Bootstrap */
+/* Custom styles */
 .btn {
-    @apply inline-flex items-center justify-center rounded px-4 py-2 text-sm font-medium transition-colors focus:outline-none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 
 .btn-primary {
-    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    background-color: #2563eb;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    color: #fff;
 }
 
 .btn-secondary {
-    @apply bg-gray-500 text-white hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    background-color: #6b7280;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+    color: #fff;
 }
 
 .btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+    background-color: #16a34a;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background-color: #15803d;
+    color: #fff;
 }
 
 .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+    background-color: #dc2626;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background-color: #b91c1c;
+    color: #fff;
 }
 
 .form-control {
-    @apply w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm;
+    width: 100%;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    outline: none;
 }
 
 .card {
-    @apply rounded-lg border border-gray-200 bg-white shadow-sm;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .alert {
-    @apply rounded-md p-4 mb-4;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
 }
 
 .alert-danger {
-    @apply bg-red-50 border border-red-200 text-red-700;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
 }
 
 .alert-success {
-    @apply bg-green-50 border border-green-200 text-green-700;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
 }
 
 .alert-warning {
-    @apply bg-yellow-50 border border-yellow-200 text-yellow-700;
+    background-color: #fefce8;
+    border: 1px solid #fef08a;
+    color: #a16207;
 }
 
 .navbar {
-    @apply flex w-full items-center p-4;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding: 1rem;
 }
 
 /* Classes for inline styles replacement */

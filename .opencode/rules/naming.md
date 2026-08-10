@@ -41,7 +41,7 @@ Dosyalar teknik türlerine göre değil, ait oldukları **İş Alanına (Domain)
 ### 3. Dosya ve Dizin Kuralları
 - **Modeller/Varlıklar:** Daima **tekil** isimler kullanılır (`User`, `Product`).
 - **Koleksiyonlar/Kontrolörler:** Daima **çoğul** isimler tercih edilir (`UsersController`, `Products/`).
-- **Bileşen Eşleşmesi:** Frontend dosyaları (Vue/React), dışa aktarılan bileşen ismiyle birebir eşleşmelidir (`OrderSummary.tsx`).
+- **Bileşen Eşleşmesi:** Frontend dosyaları (Vue/React), dışa aktarılan bileşen ismiyle birebir eşleşmelidir (`OrderSummary.jsx`).
 - **Yapılandırma:** Config dosyalarında bileşik kelimeler kısa çizgi (`kebab-case`) ile ayrılır (`auth-config.php`).
 
 ---
