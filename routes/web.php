@@ -30,13 +30,18 @@ use Inertia\Inertia;
 
 // Public Routes
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+    return view('front.landing');
+})->name('landing');
+
+// Contact form submission (placeholder)
+Route::post('/contact', function () {
+    return redirect()->back()->with('success', 'Mesajınız başarıyla gönderildi!');
+})->name('contact.submit');
+
+// Demo request form submission
+Route::post('/demo', function () {
+    return redirect()->back()->with('success', 'Demo talebiniz alındı! En kısa sürede sizinle iletişime geçeceğiz.');
+})->name('demo.submit');
 
 // Public Form - show and submit (with rate limiting for submit)
 Route::get('/forms/{slug}', [PublicFormController::class, 'show'])->name('public.forms.show');
