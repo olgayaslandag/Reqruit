@@ -62,7 +62,11 @@ class EmployeeService
                 throw new \Exception('Bu TC Kimlik numarasına sahip bir çalışan zaten mevcut.');
             }
 
-            return $this->employeeRepository->create($data);
+            $employee = $this->employeeRepository->create($data);
+            \Cache::forget('employees.dropdown.active');
+            \Cache::forget('employees.tree');
+
+            return $employee;
         });
     }
 
@@ -80,7 +84,11 @@ class EmployeeService
                 }
             }
 
-            return $this->employeeRepository->update($id, $data);
+            $employee = $this->employeeRepository->update($id, $data);
+            \Cache::forget('employees.dropdown.active');
+            \Cache::forget('employees.tree');
+
+            return $employee;
         });
     }
 
@@ -90,7 +98,11 @@ class EmployeeService
     public function delete(int $id): bool
     {
         return \DB::transaction(function () use ($id) {
-            return $this->employeeRepository->delete($id);
+            $result = $this->employeeRepository->delete($id);
+            \Cache::forget('employees.dropdown.active');
+            \Cache::forget('employees.tree');
+
+            return $result;
         });
     }
 

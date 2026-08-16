@@ -48,7 +48,10 @@ class AttendanceRecord extends Model
 
     public function scopeForDate($query, $date)
     {
-        return $query->whereDate('date', $date);
+        $date = \Illuminate\Support\Carbon::parse($date);
+
+        return $query->where('date', '>=', $date->toDateString())
+            ->where('date', '<=', $date->toDateString());
     }
 
     public function scopeForEmployee($query, $employeeId)

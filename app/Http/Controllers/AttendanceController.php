@@ -290,6 +290,12 @@ class AttendanceController extends Controller
 
     public function scan(Request $request)
     {
+        // Manual authorization check
+        $user = auth()->user();
+        if (! in_array($user?->rank_id?->value, [1, 2])) {
+            abort(403, 'Unauthorized');
+        }
+
         $employees = Employee::whereNull('termination_date')
             ->orderBy('first_name')
             ->orderBy('last_name')

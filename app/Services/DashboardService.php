@@ -185,8 +185,8 @@ class DashboardService
 
             $active = \DB::table('leave_requests')
                 ->where('status', 'approved')
-                ->whereDate('start_date', '<=', $today)
-                ->whereDate('end_date', '>=', $today)
+                ->where('start_date', '<=', $today)
+                ->where('end_date', '>=', $today)
                 ->count();
 
             $approvedThisMonth = \DB::table('leave_requests')

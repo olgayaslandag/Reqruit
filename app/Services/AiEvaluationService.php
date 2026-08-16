@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Models\Submission;
 use App\Models\SubmissionAiEvaluation;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AiEvaluationService
 {
@@ -29,8 +30,8 @@ class AiEvaluationService
 
         $details = $submission->details()
             ->get()
-            ->filter(fn ($detail) => !$detail->isFile())
-            ->map(fn ($detail) => $detail->field_label . ': ' . $detail->field_value)
+            ->filter(fn ($detail) => ! $detail->isFile())
+            ->map(fn ($detail) => $detail->field_label.': '.$detail->field_value)
             ->implode("\n");
 
         if (mb_strlen($details) > 3000) {
@@ -39,7 +40,7 @@ class AiEvaluationService
 
         $systemPrompt = 'Sen bir insan kaynakları uzmanısın. Adayın başvuru verilerini değerlendirip 1 ile 5 arasında bir yıldız puanı ve kısa bir Türkçe değerlendirme yazmalısın. Yaş, cinsiyet, medeni hal, adres gibi deterministik olmayan kişisel veriler adayın uygunluğunu belirlemede kullanılmamalı ve ayrımcılık yapılmamalıdır. Sadece JSON formatında {"stars": 1-5, "review": "kısa Türkçe değerlendirme"} döndür.';
 
-        $userPrompt = "Aşağıdaki başvuru verilerini değerlendir:\n\n" . $details;
+        $userPrompt = "Aşağıdaki başvuru verilerini değerlendir:\n\n".$details;
 
         try {
             $response = Http::withToken($apiKey)
@@ -63,7 +64,7 @@ class AiEvaluationService
                     'provider' => 'openai',
                     'model' => config('services.openai.model'),
                     'status' => 'failed',
-                    'error' => 'OpenAI isteği başarısız oldu: ' . $response->status(),
+                    'error' => 'OpenAI isteği başarısız oldu: '.$response->status(),
                     'created_by' => auth()->id(),
                 ]);
             }
@@ -91,6 +92,11 @@ class AiEvaluationService
                 'created_by' => auth()->id(),
             ]);
         } catch (\Throwable $e) {
+            Log::error('AI değerlendirmesi sırasında hata oluştu', [
+                'submission_id' => $submission->id,
+                'error' => $e->getMessage(),
+            ]);
+
             return SubmissionAiEvaluation::create([
                 'submission_id' => $submission->id,
                 'rating' => null,
@@ -98,7 +104,7 @@ class AiEvaluationService
                 'provider' => 'openai',
                 'model' => config('services.openai.model'),
                 'status' => 'failed',
-                'error' => 'OpenAI isteği sırasında hata: ' . $e->getMessage(),
+                'error' => 'AI değerlendirmesi sırasında beklenmeyen bir hata oluştu.',
                 'created_by' => auth()->id(),
             ]);
         }

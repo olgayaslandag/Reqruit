@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Interfaces\IDepartmentRepository;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class DepartmentService
@@ -44,7 +45,10 @@ class DepartmentService
             $data['slug'] = $originalSlug.'-'.$counter++;
         }
 
-        return $this->departmentRepository->create($data);
+        $department = $this->departmentRepository->create($data);
+        Cache::forget('departments.list');
+
+        return $department;
     }
 
     public function update(int $id, array $data)
@@ -53,11 +57,17 @@ class DepartmentService
             $data['slug'] = $data['slug'] ?? Str::slug($data['title']);
         }
 
-        return $this->departmentRepository->update($id, $data);
+        $department = $this->departmentRepository->update($id, $data);
+        Cache::forget('departments.list');
+
+        return $department;
     }
 
     public function delete(int $id)
     {
-        return $this->departmentRepository->delete($id);
+        $result = $this->departmentRepository->delete($id);
+        Cache::forget('departments.list');
+
+        return $result;
     }
 }

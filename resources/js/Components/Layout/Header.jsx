@@ -53,7 +53,7 @@ export default function Header() {
                             <a className="nav-link" href="#about">Hakkımızda</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#pricing">Fiyatlandırma</a>
+                            <a className="nav-link" href="#faq">SSS</a>
                         </li>
                         <li className="nav-item">
                             <a className="nav-link" href="#contact">İletişim</a>

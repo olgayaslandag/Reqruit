@@ -48,10 +48,13 @@ class WidgetFormController extends Controller
 
         $validated = $request->validate($rules);
 
+        $fileFieldNames = $form->fields->where('type', 'file')->pluck('name')->all();
+        $files = array_intersect_key($request->file() ?: [], array_flip($fileFieldNames));
+
         $submission = $this->widgetService->handleSubmission(
             $form,
             $validated,
-            $request->file()
+            $files
         );
 
         return response()->json([

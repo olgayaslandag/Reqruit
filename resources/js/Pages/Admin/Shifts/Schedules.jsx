@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { showError, showSuccess } from '@/Utils/sweetAlert';
+import { showError, showSuccess, confirmAction } from '@/Utils/sweetAlert';
 import { useFlashWithToast } from '@/Hooks/useFlash';
 
 export default function Schedules({ schedules, shifts, employees, departments }) {
@@ -36,12 +36,12 @@ export default function Schedules({ schedules, shifts, employees, departments })
     });
 
     const handleRemoveAssignment = (id) => {
-        if (!confirm('Bu atamayı kaldırmak istediğinize emin misiniz?')) return;
-        
-        setAssignments(assignments.filter(a => a.id !== id));
-        router.delete(route('admin.shift-schedules.remove', id), {
-            onSuccess: () => showSuccess('Vardiya ataması kaldırıldı.'),
-            onError: () => showError('Atama kaldırma işlemi sırasında bir hata oluştu.')
+        confirmAction('Bu atamayı kaldırmak istediğinize emin misiniz?', () => {
+            setAssignments(assignments.filter(a => a.id !== id));
+            router.delete(route('admin.shift-schedules.remove', id), {
+                onSuccess: () => showSuccess('Vardiya ataması kaldırıldı.'),
+                onError: () => showError('Atama kaldırma işlemi sırasında bir hata oluştu.')
+            });
         });
     };
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { showToast } from '@/Utils/toast';
 
@@ -49,7 +49,7 @@ export function useFlash(options = {}) {
 export function useFlashWithToast() {
     const { props } = usePage();
     const flash = props.flash || {};
-    const prevFlashRef = { current: null };
+    const prevFlashRef = useRef(null);
 
     useEffect(() => {
         // Only show if flash data has changed (prevents stale messages)

@@ -29,59 +29,17 @@ class PublicFormController extends Controller
     {
         $form = $this->formService->getBySlug($slug);
 
-        // Get field definitions for validation
-        $fields = $form->fields;
-        $rules = [];
-
-        foreach ($fields as $field) {
-            $fieldRules = [];
-
-            if ($field->required) {
-                $fieldRules[] = 'required';
-            } else {
-                $fieldRules[] = 'nullable';
-            }
-
-            switch ($field->type) {
-                case 'email':
-                    $fieldRules[] = 'email';
-                    break;
-                case 'number':
-                    $fieldRules[] = 'numeric';
-                    break;
-                case 'file':
-                    $fieldRules[] = 'file';
-                    $fieldRules[] = 'max:10240'; // 10MB
-
-                    // Check allowed file types from options
-                    if (! empty($field->options) && is_array($field->options)) {
-                        $allowedMimes = [];
-                        foreach ($field->options as $opt) {
-                            $allowedMimes[] = match (strtolower($opt)) {
-                                'pdf' => 'application/pdf',
-                                'doc' => 'application/msword',
-                                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                'jpg', 'jpeg' => 'image/jpeg',
-                                'png' => 'image/png',
-                                default => $opt,
-                            };
-                        }
-                        if (! empty($allowedMimes)) {
-                            $fieldRules[] = 'mimes:'.implode(',', $field->options);
-                        }
-                    }
-                    break;
-            }
-
-            $rules[$field->name] = $fieldRules;
-        }
+        $rules = $this->formService->buildValidationRules($form);
 
         $validated = $request->validate($rules);
+
+        $fileFieldNames = $form->fields->where('type', 'file')->pluck('name')->all();
+        $files = array_intersect_key($request->file() ?: [], array_flip($fileFieldNames));
 
         $submission = $this->submissionService->handleSubmission(
             $slug,
             $validated,
-            $request->file()
+            $files
         );
 
         return back()->with('success', [

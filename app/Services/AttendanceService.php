@@ -76,7 +76,8 @@ class AttendanceService
 
         // Get the shift schedule for this day
         $shiftSchedule = ShiftSchedule::where('employee_id', $employeeId)
-            ->whereDate('date', $date)
+            ->where('date', '>=', $date->toDateString())
+            ->where('date', '<=', $date->toDateString())
             ->first();
 
         $shift = null;
@@ -242,7 +243,8 @@ class AttendanceService
         return \Cache::remember($cacheKey, HOLIDAY_CACHE_TTL, function () use ($workCalendarId, $date) {
             return Holiday::where('work_calendar_id', $workCalendarId)
                 ->where(function ($query) use ($date) {
-                    $query->whereDate('date', $date)
+                    $query->where('date', '>=', $date->toDateString())
+                        ->where('date', '<=', $date->toDateString())
                         ->orWhere(function ($q) use ($date) {
                             $q->where('is_recurring', true)
                                 ->whereMonth('date', $date->month)
@@ -275,7 +277,8 @@ class AttendanceService
         if ($record->type === AttendanceTypeEnum::CHECK_IN) {
             // Validate that it doesn't overlap with another check-in for the same day
             $existingCheckIns = AttendanceRecord::where('employee_id', $employee->id)
-                ->whereDate('date', $record->date)
+                ->where('date', '>=', $record->date->toDateString())
+                ->where('date', '<=', $record->date->toDateString())
                 ->where('type', AttendanceTypeEnum::CHECK_IN)
                 ->where('id', '!=', $record->id)
                 ->count();
@@ -367,7 +370,8 @@ class AttendanceService
         }
 
         if (isset($filters['date'])) {
-            $query->whereDate('date', $filters['date']);
+            $query->where('date', '>=', $filters['date'])
+                ->where('date', '<=', $filters['date']);
         }
 
         if (isset($filters['start_date']) && isset($filters['end_date'])) {
@@ -390,7 +394,8 @@ class AttendanceService
         $query = AttendanceRecord::where('employee_id', $employeeId)->with(['employee.department']);
 
         if (isset($filters['date'])) {
-            $query->whereDate('date', $filters['date']);
+            $query->where('date', '>=', $filters['date'])
+                ->where('date', '<=', $filters['date']);
         }
 
         if (isset($filters['start_date']) && isset($filters['end_date'])) {
@@ -404,7 +409,8 @@ class AttendanceService
     {
         // Get the shift schedule for this day
         $shiftSchedule = ShiftSchedule::where('employee_id', $employeeId)
-            ->whereDate('date', $date)
+            ->where('date', '>=', $date->toDateString())
+            ->where('date', '<=', $date->toDateString())
             ->first();
 
         if ($shiftSchedule) {

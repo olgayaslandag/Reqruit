@@ -6,7 +6,6 @@ namespace App\Services;
 
 use App\Enums\PayrollStatusEnum;
 use App\Interfaces\IPayrollRepository;
-use App\Models\PayrollItem;
 use App\Models\PayrollPeriod;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -100,10 +99,10 @@ class PayrollService
         // Tüm çalışanların maaş yapılandırmasını toplu olarak al
         $employeeSalaries = DB::table('employee_salaries')
             ->whereIn('employee_id', $employeeIds)
-            ->where('valid_from', '<=', $period->start_date)
+            ->where('start_date', '<=', $period->start_date)
             ->where(function ($query) {
-                $query->whereNull('valid_until')
-                    ->orWhere('valid_until', '>=', $period->start_date);
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', $period->start_date);
             })
             ->join('salary_components', 'employee_salaries.salary_component_id', '=', 'salary_components.id')
             ->select([
@@ -121,9 +120,10 @@ class PayrollService
             // Mevcut kalemleri sil
             $period->payrollItems()->delete();
 
-            // Her bir maaş yapılandırması için payroll item oluştur
+            // Toplu insert için satırları hazırla
+            $rows = [];
             foreach ($employeeSalaries as $salary) {
-                $items[] = PayrollItem::create([
+                $rows[] = [
                     'payroll_period_id' => $periodId,
                     'employee_id' => $salary->employee_id,
                     'salary_component_id' => $salary->salary_component_id,
@@ -131,7 +131,16 @@ class PayrollService
                     'calculated_amount' => $salary->amount,
                     'quantity' => 1,
                     'unit_price' => $salary->amount,
-                ]);
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            if (! empty($rows)) {
+                DB::table('payroll_items')->insert($rows);
+                $items = DB::table('payroll_items')
+                    ->where('payroll_period_id', $periodId)
+                    ->get();
             }
 
             DB::commit();

@@ -34,7 +34,7 @@ export default function Footer() {
                             <ul className="list-unstyled footer-link mt-3 mb-0 fs-14">
                                 <li><a href="#about">Hakkımızda</a></li>
                                 <li><a href="#features">Özellikler</a></li>
-                                <li><a href="#pricing">Fiyatlandırma</a></li>
+                                <li><a href="#faq">SSS</a></li>
                                 <li><a href="#contact">İletişim</a></li>
                             </ul>
                         </div>

@@ -4,8 +4,19 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import StatCard from '@/Components/StatCard';
 import DashboardSection from '@/Components/DashboardSection';
 import ReactApexChart from 'react-apexcharts';
+import useInView from '@/Hooks/useInView';
 
 const moneyFormatter = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 });
+
+function LazyChart({ options, series, type, height, eager = false }) {
+    const [ref, inView] = useInView();
+
+    if (eager || inView) {
+        return <ReactApexChart options={options} series={series} type={type} height={height} />;
+    }
+
+    return <div ref={ref} style={{ minHeight: height }} />;
+}
 
 const statusLabels = {
     new: 'Yeni',
@@ -276,10 +287,10 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
                         </div>
                         <div className="row row-cols-1 row-cols-lg-2 g-3">
                             <div className="col">
-                                <ReactApexChart options={employeeDonutOptions} series={employeeDonutSeries} type="donut" height={280} />
+                                <LazyChart options={employeeDonutOptions} series={employeeDonutSeries} type="donut" height={280} eager />
                             </div>
                             <div className="col">
-                                <ReactApexChart options={monthlyHiresOptions} series={monthlyHiresSeries} type="bar" height={280} />
+                                <LazyChart options={monthlyHiresOptions} series={monthlyHiresSeries} type="bar" height={280} eager />
                             </div>
                         </div>
                     </DashboardSection>
@@ -294,10 +305,10 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
                         </div>
                         <div className="row row-cols-1 row-cols-lg-2 g-3">
                             <div className="col">
-                                <ReactApexChart options={statusDonutOptions} series={statusDonutSeries} type="donut" height={300} />
+                                <LazyChart options={statusDonutOptions} series={statusDonutSeries} type="donut" height={300} />
                             </div>
                             <div className="col">
-                                <ReactApexChart options={weeklyBarOptions} series={weeklyBarSeries} type="bar" height={300} />
+                                <LazyChart options={weeklyBarOptions} series={weeklyBarSeries} type="bar" height={300} />
                             </div>
                         </div>
                     </DashboardSection>
@@ -310,7 +321,7 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
                                 </div>
                             ))}
                         </div>
-                        <ReactApexChart options={attendanceStackedOptions} series={attendanceStackedSeries} type="bar" height={300} />
+                        <LazyChart options={attendanceStackedOptions} series={attendanceStackedSeries} type="bar" height={300} />
                     </DashboardSection>
 
                     <DashboardSection title="İzinler" subtitle="İzin talepleri ve dağılımı" icon="🗓️">
@@ -323,7 +334,7 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
                         </div>
                         <div className="row justify-content-center">
                             <div className="col-lg-8">
-                                <ReactApexChart options={leaveDonutOptions} series={leaveDonutSeries} type="donut" height={300} />
+                                <LazyChart options={leaveDonutOptions} series={leaveDonutSeries} type="donut" height={300} />
                             </div>
                         </div>
                     </DashboardSection>
@@ -336,7 +347,7 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
                                 </div>
                             ))}
                         </div>
-                        <ReactApexChart options={payrollLineOptions} series={payrollLineSeries} type="line" height={300} />
+                        <LazyChart options={payrollLineOptions} series={payrollLineSeries} type="line" height={300} />
                     </DashboardSection>
 
                     <DashboardSection title="Hızlı Erişim" subtitle="Sık kullanılan modüllere hızlı erişim" icon="⚡">

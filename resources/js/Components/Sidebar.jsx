@@ -24,7 +24,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 { title: 'Departmanlar', href: '/admin/departments' },
                 { title: 'Kalifiye Elemanlar', href: '/admin/candidates' },
                 { title: 'Çalışanlar', href: '/admin/employees' },
-                { title: 'Kullanıcılar', href: '/admin/users' },
             ],
         },
         {
@@ -63,6 +62,13 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             items: [
                 { title: 'Bordro Raporları', href: '/admin/payroll-reports' },
                 { title: 'Devam Raporları', href: '/admin/attendance-reports' },
+            ],
+        },
+        {
+            title: 'Kullanıcılar',
+            icon: 'user',
+            items: [
+                { title: 'Kullanıcılar', href: '/admin/users' },
             ],
         },
     ], []);
@@ -112,7 +118,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         {menuGroups.map((group) => {
                             const isOpen = openMenus[group.title] || false;
                             const isSingleItem = group.items.length === 1;
-                            const shouldBeDropdown = !(group.title === 'Ana Sayfa' && isSingleItem);
+                            const shouldBeDropdown = !isSingleItem;
 
                             if (!shouldBeDropdown) {
                                 // Render as single link (Dashboard)

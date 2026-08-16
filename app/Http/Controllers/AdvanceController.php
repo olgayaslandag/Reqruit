@@ -84,6 +84,8 @@ class AdvanceController extends Controller
      */
     public function getSalaryInfo(Request $request)
     {
+        $this->authorize('create', AdvanceRequest::class);
+
         $employee = \App\Models\Employee::with('employeeSalaries')->findOrFail($request->employee_id);
 
         $latestSalary = $employee->employeeSalaries()->latest()->first();

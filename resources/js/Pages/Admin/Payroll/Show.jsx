@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
@@ -65,7 +65,7 @@ export default function Show({ period, employees, salaryComponents }) {
         return { gross, ssk, tax, net };
     };
 
-    const totals = employees.reduce((acc, emp) => {
+    const totals = useMemo(() => employees.reduce((acc, emp) => {
         const calc = calculateEmployeePayroll(emp);
         return {
             gross: acc.gross + calc.gross,
@@ -73,12 +73,12 @@ export default function Show({ period, employees, salaryComponents }) {
             tax: acc.tax + calc.tax,
             net: acc.net + calc.net,
         };
-    }, { gross: 0, ssk: 0, tax: 0, net: 0 });
+    }, { gross: 0, ssk: 0, tax: 0, net: 0 }), [employees]);
 
-    const filteredEmployees = employees.filter(emp => 
+    const filteredEmployees = useMemo(() => employees.filter(emp =>
         emp.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         emp.identity_no?.includes(searchTerm)
-    );
+    ), [employees, searchTerm]);
 
     const handleApprove = () => {
         confirmDelete('Bu bordroyu onaylamak istediğinize emin misiniz?', () => {
@@ -382,11 +382,64 @@ export default function Show({ period, employees, salaryComponents }) {
                     {activeTab === 'details' && (
                         <div>
                             <h6 className="fw-bold mb-3">Bordro Detayları</h6>
-                            <div className="bg-light p-3 rounded">
-                                <pre className="mb-0 text-small">
-                                    {JSON.stringify(period, null, 2)}
-                                </pre>
+                            <div className="table-responsive">
+                                <table className="table table-sm table-bordered align-middle">
+                                    <thead className="table-light">
+                                        <tr>
+                                            <th>Dönem</th>
+                                            <th>Durum</th>
+                                            <th>Başlangıç</th>
+                                            <th>Bitiş</th>
+                                            <th>Ödeme Sıklığı</th>
+                                            <th>Oluşturan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td className="fw-semibold">{period.name}</td>
+                                            <td>
+                                                <span className={`badge ${getStatusBadgeClass(period.status)}`}>
+                                                    {getStatusLabel(period.status)}
+                                                </span>
+                                            </td>
+                                            <td>{period.start_date ? formatDate(period.start_date) : '-'}</td>
+                                            <td>{period.end_date ? formatDate(period.end_date) : '-'}</td>
+                                            <td>{period.payment_frequency || '-'}</td>
+                                            <td>{period.creator?.name || '-'}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
+
+                            {period.payrollItems?.length > 0 && (
+                                <div className="table-responsive mt-3">
+                                    <table className="table table-sm table-hover align-middle">
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Çalışan</th>
+                                                <th>Bileşen</th>
+                                                <th className="text-end">Tutar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {period.payrollItems.slice(0, 100).map((item) => (
+                                                <tr key={item.id}>
+                                                    <td>
+                                                        {item.employee?.first_name} {item.employee?.last_name}
+                                                    </td>
+                                                    <td>{item.salaryComponent?.name || '-'}</td>
+                                                    <td className="text-end">{formatCurrency(item.amount)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    {period.payrollItems.length > 100 && (
+                                        <p className="text-muted small mt-2">
+                                            İlk 100 kalem gösteriliyor (toplam {period.payrollItems.length}).
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

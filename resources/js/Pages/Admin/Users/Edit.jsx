@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Link, Head } from '@inertiajs/react';
 
 export default function Edit({ user, errors: propErrors }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -35,7 +35,7 @@ export default function Edit({ user, errors: propErrors }) {
                     <h5 className="mb-0">Kullanıcı Bilgileri</h5>
                 </div>
                 <div className="card-body">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} id="userForm">
                         <div className="mb-3">
                             <label className="form-label">Ad Soyad</label>
                             <input
@@ -72,7 +72,9 @@ export default function Edit({ user, errors: propErrors }) {
                                 onChange={(e) => setData('password', e.target.value)}
                                 className="form-control"
                                 placeholder="Değiştirmek istemiyorsanız boş bırakın"
-                                minLength="8"
+                                minLength="10"
+                                pattern="(?=.*[a-zçğıöşü])(?=.*[A-ZÇĞİÖŞÜ])(?=.*\d)(?=.*[@$!%*?&])[A-Za-zçğıöşüÇĞİÖŞÜ\d@$!%*?&]{10,}"
+                                title="En az 10 karakter, büyük-küçük harf, rakam ve özel karakter (@$!%*?&) içermelidir."
                             />
                             {errors.password && (
                                 <div className="text-danger small mt-1">{errors.password}</div>
@@ -106,16 +108,17 @@ export default function Edit({ user, errors: propErrors }) {
                                 <option value={3}>Beklemede</option>
                             </select>
                         </div>
+
+                        <div className="d-flex justify-content-end gap-2">
+                            <Link href={route('admin.users.index')} className="btn btn-secondary">
+                                İptal
+                            </Link>
+                            <button type="submit" disabled={processing} className="btn btn-primary">
+                                Güncelle
+                            </button>
+                        </div>
                     </form>
                 </div>
-            </div>
-            <div className="d-flex justify-content-end gap-2">
-                <a href="/admin/users" className="btn btn-secondary">
-                    İptal
-                </a>
-                <button type="submit" disabled={processing} className="btn btn-primary">
-                    Güncelle
-                </button>
             </div>
         </AuthenticatedLayout>
     );

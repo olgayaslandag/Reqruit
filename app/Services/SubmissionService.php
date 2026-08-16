@@ -86,9 +86,17 @@ class SubmissionService
         return \DB::transaction(function () use ($formSlug, $data, $files) {
             $form = $this->formRepository->getBySlug($formSlug);
 
+            $formFields = $form->fields->keyBy('name');
+
             // Handle file uploads - secure storage with local disk
             $uploadedFiles = [];
             foreach ($files as $key => $file) {
+                $formField = $formFields[$key] ?? null;
+
+                if (! $formField || $formField->type !== 'file') {
+                    continue;
+                }
+
                 if ($file && $file->isValid()) {
                     // Store in local disk (private) - not publicly accessible
                     $path = $file->store('submissions/'.$form->id, 'local');
@@ -104,9 +112,6 @@ class SubmissionService
             // Prepare details
             $details = [];
             $labels = $data['labels'] ?? [];
-
-            // Get form fields to map field labels when not provided via $labels
-            $formFields = $form->fields->keyBy('name');
 
             foreach ($data as $key => $value) {
                 if (in_array($key, ['_token', 'labels'])) {
@@ -143,7 +148,7 @@ class SubmissionService
     {
         return $this->submissionRepository->updateInvestigation($id, $investigation, $notes);
     }
-    
+
     /**
      * Create a new intelligence report for a submission
      */

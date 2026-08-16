@@ -14,6 +14,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->error('DatabaseSeeder production ortamında çalıştırılamaz.');
+
+            return;
+        }
+
         // Create or update admin user
         $existingUser = DB::table('users')->where('email', 'olgayaslandag@gmail.com')->first();
 

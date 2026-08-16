@@ -1,5 +1,6 @@
 import { router } from '@inertiajs/react';
 import { confirmDelete } from '@/Utils/sweetAlert';
+import { showError } from '@/Utils/toast';
 
 const IntelligenceReportList = ({ reports, submissionId }) => {
     // Define status badges and labels
@@ -20,8 +21,8 @@ const IntelligenceReportList = ({ reports, submissionId }) => {
                 onSuccess: () => {
                     // Mesaj zaten layout içinde flash olarak gösterilecek
                 },
-                onError: (error) => {
-                    console.error('Silme hatası:', error);
+                onError: () => {
+                    showError('İstihbarat raporu silinirken bir hata oluştu.');
                 }
             });
         });
@@ -65,6 +66,7 @@ const IntelligenceReportList = ({ reports, submissionId }) => {
                                                 onClick={(e) => handleDelete(report.id, e)}
                                                 className="btn btn-outline-danger btn-sm"
                                                 title="Sil"
+                                                aria-label="Sil"
                                             >
                                                 <i className="ti ti-trash"></i>
                                             </button>

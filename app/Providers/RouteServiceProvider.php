@@ -63,6 +63,11 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(10)->by(optional($request->user())->id ?: $request->ip());
         });
 
+        // AI değerlendirme - OpenAI maliyet koruması için kullanıcı bazlı sıkı limit
+        RateLimiter::for('ai_evaluation', function (Request $request) {
+            return Limit::perMinute(5)->by($request->user()->id);
+        });
+
         // Continue with default login throttling
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->email.$request->ip());

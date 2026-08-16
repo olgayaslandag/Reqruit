@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
@@ -102,15 +103,39 @@ export default function LeaveRequests({ leaveRequests, employees, leaveTypes, fi
     };
 
     const handleReject = (request) => {
-        const rejectionReason = prompt('Reddetme gerekçesini belirtin:');
-        if (rejectionReason) {
-            router.put(route('admin.leave.requests.update', request.id), {
-                status: 'rejected',
-                rejection_reason: rejectionReason
-            }, {
-                onSuccess: () => showSuccess('İzin talebi reddedildi.')
-            });
-        }
+        Swal.fire({
+            title: 'Reddetme Gerekçesi',
+            input: 'textarea',
+            inputPlaceholder: 'Reddetme gerekçesini belirtin...',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Reddetme gerekçesi zorunludur.';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Reddet',
+            cancelButtonText: 'İptal',
+            showLoaderOnConfirm: true,
+            preConfirm: (rejectionReason) => {
+                return new Promise((resolve) => {
+                    router.put(route('admin.leave.requests.update', request.id), {
+                        status: 'rejected',
+                        rejection_reason: rejectionReason
+                    }, {
+                        onSuccess: () => {
+                            showSuccess('İzin talebi reddedildi.');
+                            resolve();
+                        },
+                        onError: () => {
+                            showError('İzin talebi reddedilirken bir hata oluştu.');
+                            resolve();
+                        },
+                    });
+                });
+            },
+        });
     };
 
     const resetForm = () => {

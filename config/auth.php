@@ -20,6 +20,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Open Registration
+    |--------------------------------------------------------------------------
+    |
+    | Açık kayıt varsayılan olarak kapalıdır. Kullanıcılar yalnızca yönetici
+    | tarafından oluşturulabilir. Açık kayıt istenirse .env içinde
+    | AUTH_ALLOW_REGISTRATION=true olarak etkinleştirilebilir.
+    |
+    */
+
+    'allow_registration' => env('AUTH_ALLOW_REGISTRATION', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Authentication Guards
     |--------------------------------------------------------------------------
     |

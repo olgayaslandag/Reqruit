@@ -339,61 +339,6 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
                     );
                 })}
             </div>
-            <style>{`
-                .fixed-toast-container {
-                    position: fixed;
-                    top: 80px; /* Change from 80px to 20px to appear lower */
-                    right: 20px;
-                    z-index: 9999;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                }
-                
-                .toast-item-container {
-                    padding: 12px 20px;
-                    border-radius: 6px;
-                    min-width: 250px;
-                    max-width: 400px;
-                    color: white;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    opacity: 0.95;
-                    animation: slideIn 0.3s ease-out;
-                    cursor: pointer;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                }
-                
-                .toast-icon {
-                    font-weight: bold;
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 12px;
-                    flex-shrink: 0;
-                }
-                
-                .toast-item-bg-success { background-color: #155724; }
-                .toast-icon-bg-success { background-color: #157347; }
-                
-                .toast-item-bg-error { background-color: #7a1c1c; }
-                .toast-icon-bg-error { background-color: #dc3545; }
-                
-                .toast-item-bg-warning { background-color: #856404; }
-                .toast-icon-bg-warning { background-color: #ffc107; color: black; }
-                
-                .toast-item-bg-info { background-color: #0c5460; }
-                .toast-icon-bg-info { background-color: #17a2b8; }
-                
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-            `}</style>
         </>
     );
 }

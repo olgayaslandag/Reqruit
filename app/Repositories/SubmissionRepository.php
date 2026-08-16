@@ -66,7 +66,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
         // Check if investigation filter is specified and needs to be applied
         $investigationFilter = null;
         $modifiedFilters = $filters;
-        if (isset($filters['investigation']) && !empty($filters['investigation'])) {
+        if (isset($filters['investigation']) && ! empty($filters['investigation'])) {
             $investigationFilter = $filters['investigation'];
             unset($modifiedFilters['investigation']); // Remove to avoid direct SQL filtering
         }
@@ -80,18 +80,18 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
                         status,
                         ROW_NUMBER() OVER (PARTITION BY submission_id ORDER BY created_at DESC) as rn
                     FROM `intelligence_reports`
-                ) as latest_intel_reports'), function($join) {
+                ) as latest_intel_reports'), function ($join) {
                     $join->on('submissions.id', '=', 'latest_intel_reports.submission_id')
-                         ->where('latest_intel_reports.rn', 1);
+                        ->where('latest_intel_reports.rn', 1);
                 });
 
             // Apply the filters to the modified query
             $this->applyModifiedFilters($query, $modifiedFilters, $investigationFilter);
-                
+
             $paginator = $query->with(['form:id,name,department_id', 'form.department:id,title'])
                 ->orderBy('submissions.created_at', 'desc')
                 ->paginate($perPage);
-                
+
             return $this->enrichPaginatedSubmissions($paginator);
         } else {
             // No investigation filter, proceed with normal approach
@@ -111,7 +111,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
     }
 
     /**
-     * Apply filters specifically when investigation filter is handled separately 
+     * Apply filters specifically when investigation filter is handled separately
      */
     protected function applyModifiedFilters(mixed $query, array $filters, string $investigationFilter): void
     {
@@ -124,18 +124,18 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
         }
 
         // Special handling for investigation filter
-        $query->where(function($subQuery) use ($investigationFilter) {
+        $query->where(function ($subQuery) use ($investigationFilter) {
             // Match either the old investigation field OR latest report status
             $subQuery->where('submissions.investigation', $investigationFilter)
-                     ->orWhere('latest_intel_reports.status', $investigationFilter);
+                ->orWhere('latest_intel_reports.status', $investigationFilter);
         });
 
         if (isset($filters['date_from'])) {
-            $query->whereDate('submissions.created_at', '>=', $filters['date_from']);
+            $query->where('submissions.created_at', '>=', $filters['date_from']);
         }
 
         if (isset($filters['date_to'])) {
-            $query->whereDate('submissions.created_at', '<=', $filters['date_to']);
+            $query->where('submissions.created_at', '<=', $filters['date_to'].' 23:59:59');
         }
 
         if (isset($filters['department_id'])) {
@@ -257,7 +257,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
             ->orderBy('created_at', 'desc')
             ->get()
             ->groupBy('submission_id');
-        
+
         // Get all submissions with relationships (excluding intelligence reports for now)
         $submissions = Submission::with(['form:id,name,department_id', 'form.department:id,title'])
             ->whereIn('id', $submissionIds)
@@ -269,6 +269,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
             $reports = $intelligenceReports->get($submission->id, collect());
             // Take only latest 5 reports
             $submission->setRelation('intelligenceReports', $reports->take(5));
+
             return $submission;
         });
 
@@ -293,7 +294,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
 
             // Update with intelligent properties
             $enrichedSubmission = $this->buildComputedSubmission($enrichedSub ?: $submission, $submissionDetails, $stats);
-            
+
             // Add the computed/derived attributes for investigation
             $enrichedSubmission->current_investigation = $enrichedSub->current_investigation ?? $enrichedSub->investigation ?? 'none';
             $enrichedSubmission->current_investigation_notes = $enrichedSub->current_investigation_notes ?? null;
@@ -480,12 +481,12 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
     public function getById(int $id): Submission
     {
         $submission = Submission::with(['form.department', 'form.fields', 'comments.user'])->findOrFail($id);
-        
+
         // Load intelligence reports separately to avoid eager loading issues
         $intelligenceReports = \App\Models\IntelligenceReport::where('submission_id', $id)
             ->get();
         $submission->setRelation('intelligenceReports', $intelligenceReports);
-        
+
         return $submission;
     }
 
@@ -497,12 +498,12 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
         $submission = Submission::with(['form.department', 'details'])
             ->where('reference_no', $referenceNo)
             ->firstOrFail();
-            
+
         // Load intelligence reports separately to avoid eager loading issues
         $intelligenceReports = \App\Models\IntelligenceReport::where('submission_id', $submission->id)
             ->get();
         $submission->setRelation('intelligenceReports', $intelligenceReports);
-        
+
         return $submission;
     }
 
@@ -553,7 +554,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
 
         return $submission;
     }
-    
+
     /**
      * Create a new intelligence report.
      */
@@ -573,7 +574,7 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
     {
         $submission = Submission::with(['form.department', 'form.fields', 'details', 'comments.user'])
             ->findOrFail($id);
-            
+
         // Load intelligence reports separately to avoid eager loading issues
         $intelligenceReports = \App\Models\IntelligenceReport::where('submission_id', $id)
             ->get();
@@ -620,17 +621,17 @@ class SubmissionRepository extends BaseRepository implements ISubmissionReposito
 
         // For now, we'll keep the basic investigation filter and handle advanced filtering at the application level
         // This ensures backward compatibility while still allowing new features
-        if (isset($filters['investigation']) && !empty($filters['investigation'])) {
+        if (isset($filters['investigation']) && ! empty($filters['investigation'])) {
             $investigationStatus = $filters['investigation'];
             $query->where('investigation', $investigationStatus);
         }
 
         if (isset($filters['date_from'])) {
-            $query->whereDate('created_at', '>=', $filters['date_from']);
+            $query->where('created_at', '>=', $filters['date_from']);
         }
 
         if (isset($filters['date_to'])) {
-            $query->whereDate('created_at', '<=', $filters['date_to']);
+            $query->where('created_at', '<=', $filters['date_to'].' 23:59:59');
         }
 
         if (isset($filters['department_id'])) {

@@ -15,6 +15,7 @@ class UserController extends Controller
     public function __construct(\App\Services\UserService $userService)
     {
         $this->userService = $userService;
+        $this->authorizeResource(User::class, 'user');
     }
 
     public function index(Request $request)
@@ -51,7 +52,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:10|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/',
+            'password' => ['required', 'string', 'min:10', 'confirmed', 'regex:/^(?=.*[a-zçğıöşü])(?=.*[A-ZÇĞİÖŞÜ])(?=.*\d)(?=.*[@$!%*?&])[A-Za-zçğıöşüÇĞİÖŞÜ\d@$!%*?&]{10,}$/u'],
             'rank_id' => 'required|integer|min:1|max:5',
             'status_id' => 'required|integer|min:1|max:3',
         ]);
@@ -96,7 +97,7 @@ class UserController extends Controller
         $updatedUser = $this->userService->update($user->id, $userData);
 
         if ($request->filled('password')) {
-            $request->validate(['password' => 'string|min:10|confirmed|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/']);
+            $request->validate(['password' => ['string', 'min:10', 'confirmed', 'regex:/^(?=.*[a-zçğıöşü])(?=.*[A-ZÇĞİÖŞÜ])(?=.*\d)(?=.*[@$!%*?&])[A-Za-zçğıöşüÇĞİÖŞÜ\d@$!%*?&]{10,}$/u']]);
 
             $passwordData = ['password' => $request->password];
             $updatedUser = $this->userService->update($user->id, $passwordData);
@@ -108,6 +109,10 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Kendi hesabınızı silemezsiniz.');
+        }
+
         $deleted = $this->userService->delete($user->id);
 
         return redirect()->route('admin.users.index')

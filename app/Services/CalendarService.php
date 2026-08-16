@@ -51,16 +51,21 @@ class CalendarService
 
     public function isHoliday(int $calendarId, Carbon $date): bool
     {
-        return Holiday::where('work_calendar_id', $calendarId)
-            ->where(function ($query) use ($date) {
-                $query->whereDate('date', $date)
-                    ->orWhere(function ($q) use ($date) {
-                        $q->where('is_recurring', true)
-                            ->whereMonth('date', $date->month)
-                            ->whereDay('date', $date->day);
-                    });
-            })
-            ->exists();
+        $cacheKey = "calendar_holiday:{$calendarId}:{$date->format('Y-m-d')}";
+
+        return \Cache::remember($cacheKey, 86400, function () use ($calendarId, $date) {
+            return Holiday::where('work_calendar_id', $calendarId)
+                ->where(function ($query) use ($date) {
+                    $query->where('date', '>=', $date->toDateString())
+                        ->where('date', '<=', $date->toDateString())
+                        ->orWhere(function ($q) use ($date) {
+                            $q->where('is_recurring', true)
+                                ->whereMonth('date', $date->month)
+                                ->whereDay('date', $date->day);
+                        });
+                })
+                ->exists();
+        });
     }
 
     public function getHolidaysInRange(int $calendarId, Carbon $startDate, Carbon $endDate): Collection

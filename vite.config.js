@@ -20,5 +20,14 @@ export default defineConfig({
     },
     build: {
         sourcemap: false,
+        chunkSizeWarningLimit: 700,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'react-vendor': ['react', 'react-dom', '@inertiajs/react', 'axios'],
+                    'apexcharts': ['apexcharts', 'react-apexcharts'],
+                },
+            },
+        },
     },
 });

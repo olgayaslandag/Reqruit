@@ -239,6 +239,8 @@ class EmployeeController extends Controller
      */
     public function terminate(Request $request, Employee $employee)
     {
+        $this->authorize('terminate', $employee);
+
         $request->validate([
             'termination_date' => ['required', 'date', 'before_or_equal:today'],
             'termination_reason' => ['required', 'string', 'max:1000'],
@@ -259,6 +261,8 @@ class EmployeeController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
+        $this->authorize('viewAny', Employee::class);
+
         $request->validate([
             'keyword' => ['required', 'string', 'min:2'],
         ]);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Interfaces\IFormRepository;
+use App\Models\Form;
 
 class FormService
 {
@@ -48,6 +49,51 @@ class FormService
                 ];
             }),
         ];
+    }
+
+    public function buildValidationRules(Form $form): array
+    {
+        $rules = [];
+
+        foreach ($form->fields as $field) {
+            $fieldRules = [];
+
+            if ($field->required) {
+                $fieldRules[] = 'required';
+            } else {
+                $fieldRules[] = 'nullable';
+            }
+
+            switch ($field->type) {
+                case 'email':
+                    $fieldRules[] = 'email';
+                    break;
+                case 'number':
+                    $fieldRules[] = 'numeric';
+                    break;
+                case 'tel':
+                    $fieldRules[] = 'string';
+                    $fieldRules[] = 'max:20';
+                    break;
+                case 'file':
+                    $fieldRules[] = 'file';
+                    $fieldRules[] = 'max:10240';
+
+                    $allowedExtensions = ! empty($field->options) && is_array($field->options)
+                        ? $field->options
+                        : ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'];
+
+                    $fieldRules[] = 'mimes:'.implode(',', $allowedExtensions);
+                    break;
+                default:
+                    $fieldRules[] = 'string';
+                    $fieldRules[] = 'max:5000';
+            }
+
+            $rules[$field->name] = $fieldRules;
+        }
+
+        return $rules;
     }
 
     public function create(array $data)

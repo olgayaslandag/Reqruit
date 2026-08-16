@@ -85,6 +85,8 @@ class ShiftController extends Controller
 
     public function assignToEmployee(Request $request)
     {
+        $this->authorize('create', Shift::class);
+
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'shift_id' => 'required|exists:shifts,id',
@@ -123,6 +125,8 @@ class ShiftController extends Controller
 
     public function assignBulk(Request $request)
     {
+        $this->authorize('create', Shift::class);
+
         $request->validate([
             'employee_ids' => 'required|array',
             'employee_ids.*' => 'exists:employees,id',
@@ -164,6 +168,8 @@ class ShiftController extends Controller
 
     public function getEmployeeSchedule(Request $request)
     {
+        $this->authorize('viewAny', Shift::class);
+
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
@@ -182,6 +188,8 @@ class ShiftController extends Controller
 
     public function schedules(Request $request)
     {
+        $this->authorize('viewAny', Shift::class);
+
         $query = \App\Models\ShiftSchedule::with(['employee', 'shift']);
 
         if ($request->has('shift_id')) {
@@ -193,7 +201,8 @@ class ShiftController extends Controller
         }
 
         if ($request->has('date')) {
-            $query->whereDate('date', $request->date);
+            $query->where('date', '>=', $request->date)
+                ->where('date', '<=', $request->date);
         }
 
         $schedules = $query->orderBy('date', 'desc')->paginate(20);

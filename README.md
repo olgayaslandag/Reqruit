@@ -539,3 +539,38 @@ php artisan serve
 ```
 
 Varsayılan demo verileri (kullanıcılar, departmanlar, formlar, başvurular, maaşlar, devam kayıtları) seeder'lar ile hazır gelir; sistemi hemen keşfetmeye başlayabilirsiniz.
+
+### 12.1 Production (Canlı Ortam) Dağıtımı
+
+Canlı ortama taşımadan önce aşağıdaki adımlar uygulanmalıdır:
+
+```bash
+# .env içinde production ayarları
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://site-adresi.com
+SESSION_SECURE_COOKIE=true
+SESSION_DRIVER=redis      # veya database
+CACHE_STORE=redis         # önerilir (database ise okumalar DB'ye biner)
+QUEUE_CONNECTION=redis    # veya database
+
+# Bağımlılıklar ve derleme
+composer install --no-dev --optimize-autoloader
+npm ci && npm run build
+
+# Cache optimizasyonları (her deploy'da tekrar çalıştırın)
+php artisan optimize
+php artisan event:cache
+php artisan migrate --force
+
+# Kuyruk işçisi (bildirim e-postaları vb.) — supervisor ile daima ayakta tutun
+php artisan queue:work --sleep=3 --tries=3
+
+# Planlı görevler (varsa)
+# cron: * * * * * php /site/yolu/artisan schedule:run >> /dev/null 2>&1
+```
+
+**Önemli uyarılar:**
+- `php artisan migrate --seed` canlı ortamda **çalıştırmayın**. Seeder'lar bilinen demo şifreleri (`123123123`) ile kullanıcılar oluşturur ve production'da devre dışı bırakılmıştır.
+- Queue worker çalışmazsa mail bildirimleri gönderilmez; worker'ı supervisor/systemd ile kalıcı hale getirin.
+- Config, route ve view cache'leri her deploy sonrası yenilenmelidir.

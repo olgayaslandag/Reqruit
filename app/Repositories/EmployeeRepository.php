@@ -154,55 +154,57 @@ class EmployeeRepository extends BaseRepository implements IEmployeeRepository
      */
     public function getTree(): array
     {
-        // Use recursive CTE query for better performance on large datasets
-        // This builds the hierarchy in the database rather than in PHP memory
-        $employees = \DB::table('employees as e')
-            ->select([
-                'e.id',
-                'e.identity_no',
-                'e.first_name',
-                'e.last_name',
-                'e.email',
-                'e.phone',
-                'e.position_title',
-                'e.department_id',
-                'e.manager_id',
-                'e.hire_date',
-                'd.title as department_name',
-            ])
-            ->leftJoin('departments as d', 'e.department_id', '=', 'd.id')
-            ->whereNull('e.deleted_at')
-            ->orderBy('e.first_name')
-            ->get();
+        return \Cache::remember('employees.tree', 300, function () {
+            // Use recursive CTE query for better performance on large datasets
+            // This builds the hierarchy in the database rather than in PHP memory
+            $employees = \DB::table('employees as e')
+                ->select([
+                    'e.id',
+                    'e.identity_no',
+                    'e.first_name',
+                    'e.last_name',
+                    'e.email',
+                    'e.phone',
+                    'e.position_title',
+                    'e.department_id',
+                    'e.manager_id',
+                    'e.hire_date',
+                    'd.title as department_name',
+                ])
+                ->leftJoin('departments as d', 'e.department_id', '=', 'd.id')
+                ->whereNull('e.deleted_at')
+                ->orderBy('e.first_name')
+                ->get();
 
-        // Convert to array for easier manipulation
-        $employeesById = [];
-        $employeeObjects = [];
+            // Convert to array for easier manipulation
+            $employeesById = [];
+            $employeeObjects = [];
 
-        foreach ($employees as $emp) {
-            $emp->subordinates_list = [];
-            $emp->children = [];
-            $employeesById[$emp->id] = $emp;
-            $employeeObjects[$emp->id] = $emp;
-        }
-
-        // Build tree structure in memory (lightweight operation with DB-fetched data)
-        $tree = [];
-        foreach ($employeeObjects as $employee) {
-            if ($employee->manager_id && isset($employeeObjects[$employee->manager_id])) {
-                $parent = $employeeObjects[$employee->manager_id];
-                $parent->subordinates_list[] = $employee;
-            } else {
-                $tree[] = $employee; // Top-level employee (no manager)
+            foreach ($employees as $emp) {
+                $emp->subordinates_list = [];
+                $emp->children = [];
+                $employeesById[$emp->id] = $emp;
+                $employeeObjects[$emp->id] = $emp;
             }
-        }
 
-        // Recursively convert subordinates_list to children
-        foreach ($tree as $employee) {
-            $this->convertSubordinatesToChildren($employee);
-        }
+            // Build tree structure in memory (lightweight operation with DB-fetched data)
+            $tree = [];
+            foreach ($employeeObjects as $employee) {
+                if ($employee->manager_id && isset($employeeObjects[$employee->manager_id])) {
+                    $parent = $employeeObjects[$employee->manager_id];
+                    $parent->subordinates_list[] = $employee;
+                } else {
+                    $tree[] = $employee; // Top-level employee (no manager)
+                }
+            }
 
-        return $tree;
+            // Recursively convert subordinates_list to children
+            foreach ($tree as $employee) {
+                $this->convertSubordinatesToChildren($employee);
+            }
+
+            return $tree;
+        });
     }
 
     /**

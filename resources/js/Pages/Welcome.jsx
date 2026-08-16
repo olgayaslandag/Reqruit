@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import Header from '@/Components/Layout/Header';
 import Footer from '@/Components/Layout/Footer';
 
@@ -365,166 +366,122 @@ export default function Welcome() {
             </section>
             {/* End Counter */}
 
-            {/* Start Pricing */}
-            <section className="section pricing" id="pricing">
-                <div className="bg-shape"></div>
+            {/* Start FAQ */}
+            <section className="section faq" id="faq">
                 <div className="container">
-                    <div className="row gy-5 justify-content-center">
-                        <div className="col-lg-12">
-                            <div className="text-center">
-                                <h3 className="heading">İhtiyacınıza Uygun Planı Seçin</h3>
-                                <p className="text-muted">14 günlük ücretsiz deneme imkanı</p>
+                    <div className="row justify-content-center">
+                        <div className="col-lg-8">
+                            <div className="text-center mb-5">
+                                <h3 className="heading">Sıkça Sorulan Sorular</h3>
+                                <p className="text-muted fs-17">
+                                    Reqruit hakkında merak edilenlerin yanıtları.
+                                </p>
                             </div>
                         </div>
-                        <div className="col-lg-4 col-md-6">
-                            <span className="pricing-bg"></span>
-                            <div className="card pricing-box border-light h-100 py-5 mx-1">
-                                <div className="pb-4 text-center border-bottom">
-                                    <h6 className="text-info">Başlangıç</h6>
-                                    <h1 className="mb-0 pt-2 fw-bold">₺999 <sub className="fs-14 fw-normal text-muted">/ay</sub></h1>
+                    </div>
+                    <div className="row justify-content-center">
+                        <div className="col-lg-9">
+                            <div className="accordion" id="faqAccordion">
+                                <div className="card border-0 mb-3 shadow-sm">
+                                    <div className="card-header bg-white border-0 p-0" id="faqHeading1">
+                                        <button className="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="false" aria-controls="faqCollapse1">
+                                            Reqruit nedir ve kimler için uygundur?
+                                            <i className="mdi mdi-chevron-down float-end"></i>
+                                        </button>
+                                    </div>
+                                    <div id="faqCollapse1" className="collapse" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                                        <div className="card-body pt-0 px-4 pb-4">
+                                            <p className="text-muted mb-0">
+                                                Reqruit; işe alım, çalışan yönetimi, PDKS, bordro ve daha fazlasını tek platformda sunan bir insan kaynakları yazılımıdır. Küçük ekiplerden büyük organizasyonlara kadar tüm şirketlere uygundur.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="p-4 pb-0">
-                                    <ul className="list-unstyled">
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>Temel modüller</span>
-                                                    <p className="text-muted fs-12 mb-0">İşe alım ve çalışan yönetimi</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>25 çalışana kadar</span>
-                                                    <p className="text-muted fs-12 mb-0">Küçük ekipler için ideal</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>E-posta desteği</span>
-                                                    <p className="text-muted fs-12 mb-0">7/24 e-posta ile destek</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                <div className="card border-0 mb-3 shadow-sm">
+                                    <div className="card-header bg-white border-0 p-0" id="faqHeading2">
+                                        <button className="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                                            Kurulum ve geçiş süreci nasıl işliyor?
+                                            <i className="mdi mdi-chevron-down float-end"></i>
+                                        </button>
+                                    </div>
+                                    <div id="faqCollapse2" className="collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                                        <div className="card-body pt-0 px-4 pb-4">
+                                            <p className="text-muted mb-0">
+                                                Uzman ekibimiz kurulum ve veri taşıma sürecinde size uçtan uca eşlik eder. Çoğu şirket birkaç gün içinde tüm süreçlerini Reqruit'e taşıyabilir.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="mx-auto">
-                                    <a href="javascript:void(0)" className="btn btn-outline-dark">Planı Seç</a>
+                                <div className="card border-0 mb-3 shadow-sm">
+                                    <div className="card-header bg-white border-0 p-0" id="faqHeading3">
+                                        <button className="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                                            Verilerim güvende mi?
+                                            <i className="mdi mdi-chevron-down float-end"></i>
+                                        </button>
+                                    </div>
+                                    <div id="faqCollapse3" className="collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                                        <div className="card-body pt-0 px-4 pb-4">
+                                            <p className="text-muted mb-0">
+                                                Verileriniz uçtan uca şifrelenir ve KVKK uyumlu güvenli sunucularda saklanır. Rol bazlı yetkilendirme ile yalnızca yetkili kullanıcılar bilgilere erişebilir.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-4 col-md-6">
-                            <div className="card pricing-box border-light h-100 py-5 mx-1 active">
-                                <div className="pb-4 text-center border-bottom">
-                                    <h6 className="text-danger">Profesyonel</h6>
-                                    <h1 className="mb-0 pt-2 fw-bold">₺1.999 <sub className="fs-14 fw-normal text-muted">/ay</sub></h1>
+                                <div className="card border-0 mb-3 shadow-sm">
+                                    <div className="card-header bg-white border-0 p-0" id="faqHeading4">
+                                        <button className="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                                            Mevcut sistemlerimle entegre olabilir mi?
+                                            <i className="mdi mdi-chevron-down float-end"></i>
+                                        </button>
+                                    </div>
+                                    <div id="faqCollapse4" className="collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+                                        <div className="card-body pt-0 px-4 pb-4">
+                                            <p className="text-muted mb-0">
+                                                Evet. Reqruit, API ve webhook desteği sayesinde muhasebe, ERP ve diğer iş yazılımlarınızla kolayca entegre olur. Kurumsal ihtiyaçlarınız için özel entegrasyonlar da sunuyoruz.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="p-4 pb-0">
-                                    <ul className="list-unstyled">
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>Tüm modüller</span>
-                                                    <p className="text-muted fs-12 mb-0">6 modülün tamamı</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>100 çalışana kadar</span>
-                                                    <p className="text-muted fs-12 mb-0">Orta ölçekli şirketler</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>AI özellikler</span>
-                                                    <p className="text-muted fs-12 mb-0">Akıllı değerlendirme</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                <div className="card border-0 mb-3 shadow-sm">
+                                    <div className="card-header bg-white border-0 p-0" id="faqHeading5">
+                                        <button className="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                                            Eğitim ve destek sağlıyor musunuz?
+                                            <i className="mdi mdi-chevron-down float-end"></i>
+                                        </button>
+                                    </div>
+                                    <div id="faqCollapse5" className="collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
+                                        <div className="card-body pt-0 px-4 pb-4">
+                                            <p className="text-muted mb-0">
+                                                Evet. Tüm kullanıcılarımıza başlangıç eğitimi, kapsamlı dokümantasyon ve 7/24 destek sunuyoruz. Kurumsal müşterilerimiz için ayrıca özel hesap yöneticisi atanır.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="mx-auto">
-                                    <a href="javascript:void(0)" className="btn btn-outline-dark active">Planı Seç</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-lg-4 col-md-6">
-                            <div className="card pricing-box border-light h-100 py-5 mx-1">
-                                <div className="pb-4 text-center border-bottom">
-                                    <h6 className="text-primary">Kurumsal</h6>
-                                    <h1 className="mb-0 pt-2 fw-bold">Özel <sub className="fs-14 fw-normal text-muted">/fiyat</sub></h1>
-                                </div>
-                                <div className="p-4 pb-0">
-                                    <ul className="list-unstyled">
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>Sınırsız çalışan</span>
-                                                    <p className="text-muted fs-12 mb-0">Büyük organizasyonlar</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>Özel entegrasyonlar</span>
-                                                    <p className="text-muted fs-12 mb-0">API ve webhook</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div className="d-flex align-items-center">
-                                                <div className="flex-shring-0">
-                                                    <i className="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div className="flex-grow-1 ms-2">
-                                                    <span>Dedike destek ekibi</span>
-                                                    <p className="text-muted fs-12 mb-0">Özel hesap yöneticisi</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="mx-auto">
-                                    <a href="javascript:void(0)" className="btn btn-outline-dark">Planı Seç</a>
+                                <div className="card border-0 mb-3 shadow-sm">
+                                    <div className="card-header bg-white border-0 p-0" id="faqHeading6">
+                                        <button className="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+                                            Özel ihtiyaçlarım için ne yapabilirim?
+                                            <i className="mdi mdi-chevron-down float-end"></i>
+                                        </button>
+                                    </div>
+                                    <div id="faqCollapse6" className="collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordion">
+                                        <div className="card-body pt-0 px-4 pb-4">
+                                            <p className="text-muted mb-0">
+                                                İhtiyacınıza özel modüller, raporlar ve entegrasyonlar için{" "}
+                                                <a href="#contact" className="text-decoration-underline">
+                                                    iletişime geçebilirsiniz
+                                                </a>
+                                                . Ekibimiz sizin için en uygun çözümü birlikte planlar.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-            {/* End Pricing */}
+            {/* End FAQ */}
 
             {/* Start Testimonial */}
             <section className="section testimonial">
@@ -634,7 +591,7 @@ export default function Welcome() {
                     </div>
                     <div className="row justify-content-around">
                         <div className="col-lg-6">
-                            <form onSubmit={(e) => { e.preventDefault(); alert('Mesajınız alındı.'); }}>
+                            <form onSubmit={(e) => { e.preventDefault(); Swal.fire({ title: 'Başarılı', text: 'Mesajınız alındı.', icon: 'success', timer: 3000, showConfirmButton: false, toast: true, position: 'top-end' }); }}>
                                 <div className="row">
                                     <div className="col-lg-6">
                                         <div className="position-relative mb-3">

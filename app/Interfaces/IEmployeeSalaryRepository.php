@@ -25,6 +25,8 @@ interface IEmployeeSalaryRepository
 
     public function getActiveByEmployee(int $employeeId, ?string $date = null): Collection;
 
+    public function getActiveByEmployees(array $employeeIds, ?string $date = null): Collection;
+
     public function getByComponent(int $componentId): Collection;
 
     public function endCurrent(int $employeeId, int $componentId, string $endDate): EmployeeSalary;

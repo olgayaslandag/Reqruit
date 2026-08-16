@@ -50,7 +50,7 @@
                             <a class="nav-link" href="#about">Hakkımızda</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#pricing">Fiyatlandırma</a>
+                            <a class="nav-link" href="#faq">SSS</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#contact">İletişim</a>
@@ -399,169 +399,104 @@
         </section>
         <!-- end counter -->
 
-        <!-- START pricing -->
-        <section class="section pricing" id="pricing">
-            <div class="bg-shape"></div>
+        <!-- START FAQ -->
+        <section class="section faq" id="faq">
             <div class="container">
-                <div class="row gy-5 justify-content-center">
-                    <div class="col-lg-12">
-                        <div class="text-center">
-                            <h3 class="heading">İhtiyacınıza Uygun Planı Seçin</h3>
-                            <p class="text-muted">14 günlük ücretsiz deneme imkanı</p>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="text-center mb-5">
+                            <h3 class="heading">Sıkça Sorulan Sorular</h3>
+                            <p class="text-muted fs-17">Reqruit hakkında merak edilenlerin yanıtları.</p>
                         </div>
                     </div><!-- End col -->
-                    <div class="col-lg-4 col-md-6">
-                        <span class="pricing-bg"></span>
-                        <div class="card pricing-box border-light h-100 py-5 mx-1">
-                            <div class="pb-4 text-center border-bottom">
-                                <h6 class="text-info">Başlangıç</h6>
-                                <h1 class="mb-0 pt-2 fw-bold">₺999 <sub class="fs-14 fw-normal text-muted">/ay</sub></h1>
-                            </div>
-                            <div class="p-4 pb-0">
-                                    <ul class="list-unstyled">
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>Temel modüller</span>
-                                                    <p class="text-muted fs-12 mb-0">İşe alım ve çalışan yönetimi</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>25 çalışana kadar</span>
-                                                    <p class="text-muted fs-12 mb-0">Küçük ekipler için ideal</p>
-                                                </div>
-                                            </div> 
-                                        </li>
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>E-posta desteği</span> 
-                                                    <p class="text-muted fs-12 mb-0">7/24 e-posta ile destek</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                            </div>
-                            <div class="mx-auto">
-                                <a href="{{ route('register') }}" class="btn btn-outline-dark">Planı Seç</a>
+                </div><!-- End row -->
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+                        <div class="accordion" id="faqAccordion">
+                            <div class="card border-0 mb-3 shadow-sm">
+                                <div class="card-header bg-white border-0 p-0" id="faqHeading1">
+                                    <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="false" aria-controls="faqCollapse1">
+                                        Reqruit nedir ve kimler için uygundur?
+                                        <i class="mdi mdi-chevron-down float-end"></i>
+                                    </button>
                                 </div>
-                        </div><!-- End card -->
-                    </div>
-                    <!-- end col -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card pricing-box border-light h-100 py-5 mx-1 active">
-                            <div class="pb-4 text-center border-bottom">
-                                <h6 class="text-danger">Profesyonel</h6>
-                                <h1 class="mb-0 pt-2 fw-bold">₺1.999 <sub class="fs-14 fw-normal text-muted">/ay</sub></h1>
+                                <div id="faqCollapse1" class="collapse" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                                    <div class="card-body pt-0 px-4 pb-4">
+                                        <p class="text-muted mb-0">Reqruit; işe alım, çalışan yönetimi, PDKS, bordro ve daha fazlasını tek platformda sunan bir insan kaynakları yazılımıdır. Küçük ekiplerden büyük organizasyonlara kadar tüm şirketlere uygundur.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="p-4 pb-0">
-                                    <ul class="list-unstyled">
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>Tüm modüller</span> 
-                                                    <p class="text-muted fs-12 mb-0">6 modülün tamamı</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>100 çalışana kadar</span> 
-                                                    <p class="text-muted fs-12 mb-0">Orta ölçekli şirketler</p>
-                                                </div>
-                                            </div> 
-                                        </li>
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>AI özellikler</span>
-                                                    <p class="text-muted fs-12 mb-0">Akıllı değerlendirme</p>
-                                                </div>
-                                            </div>   
-                                        </li>
-                                    </ul>
+                            <div class="card border-0 mb-3 shadow-sm">
+                                <div class="card-header bg-white border-0 p-0" id="faqHeading2">
+                                    <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                                        Kurulum ve geçiş süreci nasıl işliyor?
+                                        <i class="mdi mdi-chevron-down float-end"></i>
+                                    </button>
+                                </div>
+                                <div id="faqCollapse2" class="collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                                    <div class="card-body pt-0 px-4 pb-4">
+                                        <p class="text-muted mb-0">Uzman ekibimiz kurulum ve veri taşıma sürecinde size uçtan uca eşlik eder. Çoğu şirket birkaç gün içinde tüm süreçlerini Reqruit'e taşıyabilir.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mx-auto">
-                                <a href="{{ route('register') }}" class="btn btn-outline-dark active">Planı Seç</a>
-                              </div>
-                        </div><!-- End card -->
-                    </div>
-                    <!-- col end -->
-                    <div class="col-lg-4 col-md-6">
-                        <div class="card pricing-box border-light h-100 py-5 mx-1">
-                            <div class="pb-4 text-center border-bottom">
-                                <h6 class="text-primary">Kurumsal</h6>
-                                <h1 class="mb-0 pt-2 fw-bold">Özel <sub class="fs-14 fw-normal text-muted">/fiyat</sub></h1>
+                            <div class="card border-0 mb-3 shadow-sm">
+                                <div class="card-header bg-white border-0 p-0" id="faqHeading3">
+                                    <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                                        Verilerim güvende mi?
+                                        <i class="mdi mdi-chevron-down float-end"></i>
+                                    </button>
+                                </div>
+                                <div id="faqCollapse3" class="collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                                    <div class="card-body pt-0 px-4 pb-4">
+                                        <p class="text-muted mb-0">Verileriniz uçtan uca şifrelenir ve KVKK uyumlu güvenli sunucularda saklanır. Rol bazlı yetkilendirme ile yalnızca yetkili kullanıcılar bilgilere erişebilir.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="p-4 pb-0">
-                                    <ul class="list-unstyled">
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>Sınırsız çalışan</span>
-                                                    <p class="text-muted fs-12 mb-0">Büyük organizasyonlar</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>Özel entegrasyonlar</span> 
-                                                    <p class="text-muted fs-12 mb-0">API ve webhook</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="d-flex align-items-center">
-                                                <div class="flex-shring-0">
-                                                    <i class="mdi mdi-circle-medium"></i>
-                                                </div>
-                                                <div class="flex-grow-1 ms-2">
-                                                    <span>Dedike destek ekibi</span>
-                                                    <p class="text-muted fs-12 mb-0">Özel hesap yöneticisi</p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                            <div class="card border-0 mb-3 shadow-sm">
+                                <div class="card-header bg-white border-0 p-0" id="faqHeading4">
+                                    <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                                        Mevcut sistemlerimle entegre olabilir mi?
+                                        <i class="mdi mdi-chevron-down float-end"></i>
+                                    </button>
+                                </div>
+                                <div id="faqCollapse4" class="collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+                                    <div class="card-body pt-0 px-4 pb-4">
+                                        <p class="text-muted mb-0">Evet. Reqruit, API ve webhook desteği sayesinde muhasebe, ERP ve diğer iş yazılımlarınızla kolayca entegre olur. Kurumsal ihtiyaçlarınız için özel entegrasyonlar da sunuyoruz.</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mx-auto">
-                                <a href="#contact" class="btn btn-outline-dark">İletişime Geç</a>
-                              </div>
-                        </div><!-- End card -->
-                    </div>
-                    <!-- col end -->
+                            <div class="card border-0 mb-3 shadow-sm">
+                                <div class="card-header bg-white border-0 p-0" id="faqHeading5">
+                                    <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                                        Eğitim ve destek sağlıyor musunuz?
+                                        <i class="mdi mdi-chevron-down float-end"></i>
+                                    </button>
+                                </div>
+                                <div id="faqCollapse5" class="collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
+                                    <div class="card-body pt-0 px-4 pb-4">
+                                        <p class="text-muted mb-0">Evet. Tüm kullanıcılarımıza başlangıç eğitimi, kapsamlı dokümantasyon ve 7/24 destek sunuyoruz. Kurumsal müşterilerimiz için ayrıca özel hesap yöneticisi atanır.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card border-0 mb-3 shadow-sm">
+                                <div class="card-header bg-white border-0 p-0" id="faqHeading6">
+                                    <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+                                        Özel ihtiyaçlarım için ne yapabilirim?
+                                        <i class="mdi mdi-chevron-down float-end"></i>
+                                    </button>
+                                </div>
+                                <div id="faqCollapse6" class="collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordion">
+                                    <div class="card-body pt-0 px-4 pb-4">
+                                        <p class="text-muted mb-0">İhtiyacınıza özel modüller, raporlar ve entegrasyonlar için <a href="#contact" class="text-decoration-underline">iletişime geçebilirsiniz</a>. Ekibimiz sizin için en uygun çözümü birlikte planlar.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- End col -->
                 </div><!-- End row -->
             </div><!-- End container -->
         </section>
-        <!-- END pricing -->
+        <!-- END FAQ -->
 
         <!-- testimonial -->
         <section class="section testimonial">
@@ -740,7 +675,7 @@
                         <ul class="list-unstyled footer-link mt-3 mb-0 fs-14">
                             <li><a href="#about">Hakkımızda</a></li>
                             <li><a href="#features">Özellikler</a></li>
-                            <li><a href="#pricing">Fiyatlandırma</a></li>
+                            <li><a href="#faq">SSS</a></li>
                             <li><a href="#contact">İletişim</a></li>
                         </ul>
                     </div><!-- End col -->

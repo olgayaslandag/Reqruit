@@ -1,17 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { router, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer
-} from 'recharts';
+import ReactApexChart from 'react-apexcharts';
 
 export default function Overtime({ overtimeReport = {}, filters = {}, employees = [] }) {
     const { props } = usePage();
@@ -34,6 +25,38 @@ export default function Overtime({ overtimeReport = {}, filters = {}, employees 
     ];
 
     const overtimeData = overtimeReport.chart_data || [];
+
+    const overtimeChartOptions = useMemo(() => ({
+        chart: { type: 'bar', height: 300, toolbar: { show: false } },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                columnWidth: '55%',
+            },
+        },
+        dataLabels: { enabled: false },
+        legend: { position: 'bottom' },
+        xaxis: {
+            categories: overtimeData.map((item) => item.period),
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+        },
+        yaxis: {
+            labels: {
+                formatter: (value) => `${value} sa`,
+            },
+        },
+        colors: ['#f59e0b', '#3b82f6'],
+        grid: { borderColor: '#e5e7eb', strokeDashArray: 4 },
+    }), [overtimeData]);
+
+    const overtimeChartSeries = useMemo(
+        () => [
+            { name: 'Toplam', data: overtimeData.map((item) => item.total_overtime ?? 0) },
+            { name: 'Ortalama', data: overtimeData.map((item) => item.avg_overtime ?? 0) },
+        ],
+        [overtimeData],
+    );
 
     return (
         <AuthenticatedLayout
@@ -143,17 +166,7 @@ export default function Overtime({ overtimeReport = {}, filters = {}, employees 
                     </div>
                     <div className="card-body">
                         <div className="graph-height">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={overtimeData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="period" />
-                                    <YAxis />
-                                    <Tooltip formatter={(value) => [`${value} saat`, 'Fazla Mesai']} />
-                                    <Legend />
-                                    <Bar dataKey="total_overtime" name="Toplam" fill="#f59e0b" />
-                                    <Bar dataKey="avg_overtime" name="Ortalama" fill="#3b82f6" />
-                                </BarChart>
-                            </ResponsiveContainer>
+                            <ReactApexChart options={overtimeChartOptions} series={overtimeChartSeries} type="bar" height={300} />
                         </div>
                     </div>
                 </div>

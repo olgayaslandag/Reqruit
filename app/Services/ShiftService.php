@@ -45,7 +45,8 @@ class ShiftService
 
         // First, remove any existing assignments for this employee on the specified date
         ShiftSchedule::where('employee_id', $employeeId)
-            ->whereDate('date', $date)
+            ->where('date', '>=', $date->toDateString())
+            ->where('date', '<=', $date->toDateString())
             ->delete();
 
         return ShiftSchedule::create([
@@ -76,30 +77,52 @@ class ShiftService
             $endDate = Carbon::parse($endDate);
         }
 
-        $result = collect();
-
-        // If recurrence is daily or weekly, generate dates accordingly
+        // Çalışılacak tarih listesini oluştur
+        $dates = [];
         if ($recurrence === 'daily') {
-            // Assign the shift to each day from start to end date
             for ($date = clone $startDate; $date->lessThanOrEqualTo($endDate); $date->addDay()) {
-                foreach ($employeeIds as $employeeId) {
-                    $result->push($this->assignShiftToEmployee($employeeId, $shiftId, $date));
-                }
+                $dates[] = $date->toDateString();
             }
         } else {
-            // Otherwise, apply to each employee for the single date
-            foreach ($employeeIds as $employeeId) {
-                $result->push($this->assignShiftToEmployee($employeeId, $shiftId, $startDate));
-            }
+            $dates[] = $startDate->toDateString();
         }
 
-        return $result;
+        return \DB::transaction(function () use ($employeeIds, $shiftId, $dates) {
+            // Mevcut çakışan kayıtları (çalışan + tarih) tek DELETE ile temizle
+            ShiftSchedule::whereIn('employee_id', $employeeIds)
+                ->whereIn('date', $dates)
+                ->delete();
+
+            // Tüm satırları tek bulk INSERT ile yaz
+            $rows = [];
+            foreach ($employeeIds as $employeeId) {
+                foreach ($dates as $date) {
+                    $rows[] = [
+                        'shift_id' => $shiftId,
+                        'employee_id' => $employeeId,
+                        'date' => $date,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+                }
+            }
+
+            if (! empty($rows)) {
+                \DB::table('shift_schedules')->insert($rows);
+            }
+
+            return ShiftSchedule::whereIn('employee_id', $employeeIds)
+                ->where('shift_id', $shiftId)
+                ->whereIn('date', $dates)
+                ->get();
+        });
     }
 
     public function getEmployeeShiftForDate(int $employeeId, Carbon $date): ?Shift
     {
         $shiftSchedule = ShiftSchedule::where('employee_id', $employeeId)
-            ->whereDate('date', $date)
+            ->where('date', '>=', $date->toDateString())
+            ->where('date', '<=', $date->toDateString())
             ->first();
 
         if ($shiftSchedule) {
@@ -140,7 +163,8 @@ class ShiftService
     public function removeShiftAssignment(int $employeeId, Carbon $date): bool
     {
         ShiftSchedule::where('employee_id', $employeeId)
-            ->whereDate('date', $date)
+            ->where('date', '>=', $date->toDateString())
+            ->where('date', '<=', $date->toDateString())
             ->delete();
 
         return true;

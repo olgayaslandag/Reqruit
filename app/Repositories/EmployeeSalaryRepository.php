@@ -79,6 +79,17 @@ class EmployeeSalaryRepository extends BaseRepository implements IEmployeeSalary
             ->get();
     }
 
+    public function getActiveByEmployees(array $employeeIds, ?string $date = null): Collection
+    {
+        $date = $date ?? now()->toDateString();
+
+        return $this->model->whereIn('employee_id', $employeeIds)
+            ->activeOn($date)
+            ->with('salaryComponent')
+            ->get()
+            ->groupBy('employee_id');
+    }
+
     public function getByComponent(int $componentId): Collection
     {
         return $this->model->where('salary_component_id', $componentId)

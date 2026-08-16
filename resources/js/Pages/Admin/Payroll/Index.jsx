@@ -256,6 +256,7 @@ export default function Index({ payrollPeriods, filters }) {
                                                         href={route('admin.payrolls.show', period.id)}
                                                         className="btn btn-sm btn-outline-info"
                                                         title="Görüntüle"
+                                                        aria-label="Görüntüle"
                                                     >
                                                         <i className="ti ti-eye"></i>
                                                     </Link>
@@ -266,6 +267,7 @@ export default function Index({ payrollPeriods, filters }) {
                                                                 href={route('admin.payrolls.edit', period.id)}
                                                                 className="btn btn-sm btn-outline-primary"
                                                                 title="Düzenle"
+                                                                aria-label="Düzenle"
                                                             >
                                                                 <i className="ti ti-edit"></i>
                                                             </Link>
@@ -273,6 +275,7 @@ export default function Index({ payrollPeriods, filters }) {
                                                                 onClick={() => handleDelete(period.id)}
                                                                 className="btn btn-sm btn-outline-danger"
                                                                 title="Sil"
+                                                                aria-label="Sil"
                                                             >
                                                                 <i className="ti ti-trash"></i>
                                                             </button>
@@ -284,6 +287,7 @@ export default function Index({ payrollPeriods, filters }) {
                                                             href={route('admin.payrolls.approve', period.id)}
                                                             className="btn btn-sm btn-outline-success"
                                                             title="Onayla"
+                                                            aria-label="Onayla"
                                                         >
                                                             <i className="ti ti-check"></i>
                                                         </Link>
@@ -336,10 +340,9 @@ export default function Index({ payrollPeriods, filters }) {
                                                 href={link.url}
                                                 className="page-link"
                                                 data={{ only: ['payrollPeriods', 'filters'] }}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')
-                                                }}
-                                            />
+                                            >
+                                                {link.label.replace(/&laquo;/g, '«').replace(/&raquo;/g, '»')}
+                                            </Link>
                                         </li>
                                     ))}
                                 </ul>

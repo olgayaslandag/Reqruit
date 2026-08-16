@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AddSubmissionCommentRequest;
 use App\Http\Requests\StoreContactInteractionRequest;
 use App\Http\Requests\UpdateSubmissionStatusRequest;
+use App\Jobs\RunAiEvaluation;
 use App\Models\ContactInteraction;
 use App\Models\Submission;
 use App\Services\AiEvaluationService;
@@ -94,7 +95,7 @@ class SubmissionController extends Controller
             'notes' => ['required', 'string', 'max:2000'], // increased max length for more detailed messages
         ]);
 
-        // Create a new intelligence report  
+        // Create a new intelligence report
         $intelligenceReport = $this->submissionService->createIntelligenceReport(
             $submission->id,
             $validated['status'],
@@ -157,7 +158,7 @@ class SubmissionController extends Controller
         return redirect()->route('admin.submissions.index')
             ->with('success', 'Başvuru başarıyla silindi.');
     }
-    
+
     public function destroyIntelligenceReport(Request $request, $submissionId, $reportId)
     {
         $submission = Submission::findOrFail($submissionId);
@@ -189,12 +190,8 @@ class SubmissionController extends Controller
     {
         $this->authorize('review', $submission);
 
-        $evaluation = $this->aiEvaluationService->evaluate($submission);
+        RunAiEvaluation::dispatch($submission);
 
-        if ($evaluation->status === 'failed') {
-            return back()->with('error', 'AI değerlendirmesi yapılamadı: '.$evaluation->error);
-        }
-
-        return back()->with('success', 'AI değerlendirmesi tamamlandı.');
+        return back()->with('success', 'AI değerlendirmesi kuyruğa alındı. Sonuç birazdan görünecek.');
     }
 }

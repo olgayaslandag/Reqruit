@@ -76,7 +76,7 @@ class SubmissionPolicy
      */
     public function update(User $user, Submission $submission): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -84,7 +84,7 @@ class SubmissionPolicy
      */
     public function delete(User $user, Submission $submission): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -92,7 +92,11 @@ class SubmissionPolicy
      */
     public function review(User $user, Submission $submission): bool
     {
-        return true;
+        return in_array($user->rank_id, [
+            UserRoleEnum::ADMIN,
+            UserRoleEnum::IK_MANAGER,
+            UserRoleEnum::RECRUITER,
+        ]);
     }
 
     /**
@@ -100,7 +104,7 @@ class SubmissionPolicy
      */
     public function addComment(User $user, Submission $submission): bool
     {
-        return true;
+        return $this->view($user, $submission);
     }
 
     /**

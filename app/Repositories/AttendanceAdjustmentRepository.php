@@ -96,7 +96,8 @@ class AttendanceAdjustmentRepository extends BaseRepository implements IAttendan
         }
 
         if (isset($filters['adjustment_date'])) {
-            $query->whereDate('adjustment_date', $filters['adjustment_date']);
+            $query->where('adjustment_date', '>=', $filters['adjustment_date'])
+                ->where('adjustment_date', '<=', $filters['adjustment_date']);
         }
 
         if (isset($filters['requested_by'])) {

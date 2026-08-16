@@ -1,4 +1,5 @@
 import { router, Link } from '@inertiajs/react';
+import Swal from 'sweetalert2';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { formatDate, formatCurrency } from '@/Utils/formatters';
@@ -16,13 +17,36 @@ export default function Show({ advance }) {
     };
 
     const handleReject = () => {
-        const reason = prompt('Reddetme sebebini giriniz:');
-        if (reason) {
-            router.post(route('admin.advances.reject', advance.id), { reason }, {
-                onSuccess: () => showSuccess('Avans talebi reddedildi.'),
-                onError: () => showError('Avans talebi reddedilirken bir hata oluştu.'),
-            });
-        }
+        Swal.fire({
+            title: 'Reddetme Nedeni',
+            input: 'textarea',
+            inputPlaceholder: 'Reddetme gerekçesini yazın...',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Reddetme nedeni zorunludur.';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Reddet',
+            cancelButtonText: 'İptal',
+            showLoaderOnConfirm: true,
+            preConfirm: (reason) => {
+                return new Promise((resolve) => {
+                    router.post(route('admin.advances.reject', advance.id), { reason }, {
+                        onSuccess: () => {
+                            showSuccess('Avans talebi reddedildi.');
+                            resolve();
+                        },
+                        onError: () => {
+                            showError('Avans talebi reddedilirken bir hata oluştu.');
+                            resolve();
+                        },
+                    });
+                });
+            },
+        });
     };
 
     const handleMarkAsPaid = () => {

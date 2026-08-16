@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Interfaces\IEmployeeSalaryRepository;
 use App\Models\Employee;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Config;
 
 /**
  * Maaş Hesaplama Servisi
@@ -77,11 +79,13 @@ class SalaryCalculationService
     /**
      * Çalışanın brüt maaşını hesaplar.
      */
-    public function calculateGrossSalary(Employee $employee, ?string $date = null): float
+    public function calculateGrossSalary(Employee $employee, ?string $date = null, ?Collection $preloaded = null): float
     {
         $date = $date ?? now()->toDateString();
 
-        $salaries = $this->employeeSalaryRepository->getActiveByEmployee($employee->id, $date);
+        $salaries = $preloaded !== null
+            ? ($preloaded->get($employee->id) ?? collect())
+            : $this->employeeSalaryRepository->getActiveByEmployee($employee->id, $date);
 
         // Sadece kazanç kalemlerini al
         $earnings = $salaries->filter(function ($salary) {
@@ -202,8 +206,35 @@ class SalaryCalculationService
     {
         $grossSalary = $this->getMinimumWageMonthly();
 
-        // Calculate based on mimicking how other methods work
-        // Use minimum wage amount directly to determine typical deductions
+        // SGK işçi payı
+        $sgkEmployee = $this->calculateSgkEmployeeShare($grossSalary);
+
+        // Gelir vergisi matrahı
+        $incomeTaxMatrah = $this->calculateIncomeTaxMatrah($grossSalary, $sgkEmployee['total']);
+
+        // Aylık gelir vergisi
+        $incomeTax = $this->calculateMonthlyIncomeTax($incomeTaxMatrah);
+
+        // Damga vergisi
+        $stampTax = $this->calculateStampTax($grossSalary);
+
+        return [
+            'gross_salary' => $grossSalary,
+            'sgk_employee' => $sgkEmployee,
+            'income_tax_matrah' => $incomeTaxMatrah,
+            'income_tax' => $incomeTax,
+            'stamp_tax' => $stampTax,
+            'total_deductions' => round($sgkEmployee['total'] + $incomeTax + $stampTax, 2),
+            'net_salary' => round($grossSalary - $sgkEmployee['total'] - $incomeTax - $stampTax, 2),
+        ];
+    }
+
+    /**
+     * Çalışanın tüm kesinti ve vergi kalemlerini hesaplar.
+     */
+    public function calculateAllDeductions(Employee $employee, ?string $date = null, ?Collection $preloaded = null): array
+    {
+        $grossSalary = $this->calculateGrossSalary($employee, $date, $preloaded);
 
         // SGK işçi payı
         $sgkEmployee = $this->calculateSgkEmployeeShare($grossSalary);
@@ -225,6 +256,20 @@ class SalaryCalculationService
             'stamp_tax' => $stampTax,
             'total_deductions' => round($sgkEmployee['total'] + $incomeTax + $stampTax, 2),
             'net_salary' => round($grossSalary - $sgkEmployee['total'] - $incomeTax - $stampTax, 2),
+        ];
+    }
+
+    /**
+     * İşveren toplam maliyetini hesaplar.
+     */
+    public function calculateEmployerCost(float $grossSalary): array
+    {
+        $sgkEmployer = $this->calculateSgkEmployerShare($grossSalary);
+
+        return [
+            'gross_salary' => $grossSalary,
+            'sgk_employer' => $sgkEmployer,
+            'total_cost' => round($grossSalary + $sgkEmployer['total'], 2),
         ];
     }
 }

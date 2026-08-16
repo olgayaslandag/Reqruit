@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Interfaces\IEmployeeSalaryRepository;
 use App\Models\Employee;
 use App\Models\PayrollPeriod;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PayrollReportService
 {
     public function __construct(
-        protected SalaryCalculationService $salaryCalculationService
+        protected SalaryCalculationService $salaryCalculationService,
+        protected IEmployeeSalaryRepository $employeeSalaryRepository
     ) {}
 
     /**
@@ -185,45 +188,53 @@ class PayrollReportService
      */
     public function getTaxSummary(PayrollPeriod $period): array
     {
-        $employees = $period->employeesInPeriod()->get();
+        return Cache::remember("payroll.tax_summary.{$period->id}", 300, function () use ($period) {
+            $employees = $period->employeesInPeriod()->get();
 
-        $calculationsBatch = [];
-        foreach ($employees as $employee) {
-            $calculations = $this->salaryCalculationService->calculateAllDeductions($employee, $period->start_date);
-            $calculationsBatch[$employee->id] = $calculations;
-        }
+            // Tüm çalışanların aktif maaşlarını tek sorguda yükle (N+1 önleme)
+            $salaryMap = $this->employeeSalaryRepository->getActiveByEmployees(
+                $employees->pluck('id')->all(),
+                $period->start_date->toDateString()
+            );
 
-        $totalSgkEmployee = 0;
-        $totalSgkEmployer = 0;
-        $totalIncomeTax = 0;
-        $totalStampTax = 0;
-        $totalGross = 0;
+            $calculationsBatch = [];
+            foreach ($employees as $employee) {
+                $calculations = $this->salaryCalculationService->calculateAllDeductions($employee, $period->start_date, $salaryMap);
+                $calculationsBatch[$employee->id] = $calculations;
+            }
 
-        foreach ($calculationsBatch as $calculation) {
-            $totalGross += $calculation['gross_salary'];
-            $totalSgkEmployee += $calculation['sgk_employee']['total'];
-            $totalIncomeTax += $calculation['income_tax'];
-            $totalStampTax += $calculation['stamp_tax'];
+            $totalSgkEmployee = 0;
+            $totalSgkEmployer = 0;
+            $totalIncomeTax = 0;
+            $totalStampTax = 0;
+            $totalGross = 0;
 
-            // İşveren payı (ayrı hesaplanır)
-            $employerCost = $this->salaryCalculationService->calculateEmployerCost($calculation['gross_salary']);
-            $totalSgkEmployer += $employerCost['sgk_employer']['total'];
-        }
+            foreach ($calculationsBatch as $calculation) {
+                $totalGross += $calculation['gross_salary'];
+                $totalSgkEmployee += $calculation['sgk_employee']['total'];
+                $totalIncomeTax += $calculation['income_tax'];
+                $totalStampTax += $calculation['stamp_tax'];
 
-        return [
-            'period' => $period,
-            'total_gross' => $totalGross,
-            'sgk' => [
-                'employee_share' => $totalSgkEmployee,
-                'employer_share' => $totalSgkEmployer,
-                'total' => $totalSgkEmployee + $totalSgkEmployer,
-            ],
-            'income_tax' => $totalIncomeTax,
-            'stamp_tax' => $totalStampTax,
-            'total_deductions' => $totalSgkEmployee + $totalIncomeTax + $totalStampTax,
-            'total_net' => $totalGross - ($totalSgkEmployee + $totalIncomeTax + $totalStampTax),
-            'total_employer_cost' => $totalGross + $totalSgkEmployer,
-        ];
+                // İşveren payı (ayrı hesaplanır)
+                $employerCost = $this->salaryCalculationService->calculateEmployerCost($calculation['gross_salary']);
+                $totalSgkEmployer += $employerCost['sgk_employer']['total'];
+            }
+
+            return [
+                'period' => $period,
+                'total_gross' => $totalGross,
+                'sgk' => [
+                    'employee_share' => $totalSgkEmployee,
+                    'employer_share' => $totalSgkEmployer,
+                    'total' => $totalSgkEmployee + $totalSgkEmployer,
+                ],
+                'income_tax' => $totalIncomeTax,
+                'stamp_tax' => $totalStampTax,
+                'total_deductions' => $totalSgkEmployee + $totalIncomeTax + $totalStampTax,
+                'total_net' => $totalGross - ($totalSgkEmployee + $totalIncomeTax + $totalStampTax),
+                'total_employer_cost' => $totalGross + $totalSgkEmployer,
+            ];
+        });
     }
 
     public function getMonthlyComparison(Request $request)

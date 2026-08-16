@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import EmptyState from '@/Components/EmptyState';
+import { SkeletonRow } from '@/Components/Skeleton';
 import { Head, Link, router } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 import Pagination from '@/Components/Pagination';
@@ -24,9 +25,21 @@ const INVESTIGATION_FILTER_OPTIONS = [
 export default function Index({ submissions, forms, departments, filters }) {
     const submissionList = submissions?.data || submissions || [];
     const [filterStatus, setFilterStatus] = useState(filters?.status || '');
-    const [filterInvestigation, setFilterInvestigation] = useState(filters.investigation || '');
-    const [filterForm, setFilterForm] = useState(filters.form_id || '');
-    const [filterDepartment, setFilterDepartment] = useState(filters.department_id || '');
+    const [filterInvestigation, setFilterInvestigation] = useState(filters?.investigation || '');
+    const [filterForm, setFilterForm] = useState(filters?.form_id || '');
+    const [filterDepartment, setFilterDepartment] = useState(filters?.department_id || '');
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const startHandler = () => setIsLoading(true);
+        const finishHandler = () => setIsLoading(false);
+        router.on('start', startHandler);
+        router.on('finish', finishHandler);
+        return () => {
+            router.off('start', startHandler);
+            router.off('finish', finishHandler);
+        };
+    }, []);
 
     const applyFilters = () => {
         const params = {};
@@ -207,7 +220,11 @@ export default function Index({ submissions, forms, departments, filters }) {
                         </tr>
                     </thead>
                         <tbody>
-                            {submissionList.length > 0 ? (
+                            {isLoading ? (
+                                Array.from({ length: 5 }).map((_, index) => (
+                                    <SkeletonRow key={index} columns={8} />
+                                ))
+                            ) : submissionList.length > 0 ? (
                                 submissionList.map((submission) => {
                                     const investigationStatus = getDisplayInvestigationStatus(submission);
                                     
@@ -247,6 +264,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                                                         href={`/admin/submissions/${submission.id}`}
                                                         className="btn btn-link text-primary p-0"
                                                         title="Görüntüle"
+                                                        aria-label="Görüntüle"
                                                     >
                                                         <i className="ti ti-eye"></i>
                                                     </Link>
@@ -254,6 +272,7 @@ export default function Index({ submissions, forms, departments, filters }) {
                                                         onClick={() => handleDelete(submission.id)}
                                                         className="btn btn-link text-danger p-0"
                                                         title="Sil"
+                                                        aria-label="Sil"
                                                     >
                                                         <i className="ti ti-trash"></i>
                                                     </button>

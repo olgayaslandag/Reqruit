@@ -108,7 +108,9 @@ export default function Show({ submission, intelligenceReports = [], investigato
         setIsEvaluating(true);
         router.post(`/admin/submissions/${submission.id}/ai-evaluate`, {}, {
             preserveScroll: true,
-            only: ['submission', 'intelligenceReports', 'interactions', 'aiEvaluations'],
+            onSuccess: () => {
+                showToastSuccess('Değerlendirme kuyruğa alındı, sonuç birkaç dakika içinde görünecek.');
+            },
             onFinish: () => setIsEvaluating(false),
             onError: () => {
                 showToastError('AI değerlendirmesi sırasında bir hata oluştu.');
@@ -328,6 +330,7 @@ export default function Show({ submission, intelligenceReports = [], investigato
                                     onClick={handleDelete}
                                     className="btn btn-outline-danger btn-sm"
                                     title="Sil"
+                                    aria-label="Sil"
                                 >
                                     <i className="ti ti-trash"></i>
                                 </button>

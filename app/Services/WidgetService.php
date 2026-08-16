@@ -16,7 +16,8 @@ class WidgetService
 {
     public function __construct(
         protected IFormRepository $formRepository,
-        protected ISubmissionRepository $submissionRepository
+        protected ISubmissionRepository $submissionRepository,
+        protected FormService $formService
     ) {}
 
     public function getRootDepartments(): Collection
@@ -51,52 +52,22 @@ class WidgetService
 
     public function buildValidationRules(Form $form): array
     {
-        $rules = [];
-
-        foreach ($form->fields as $field) {
-            $fieldRules = [];
-
-            if ($field->required) {
-                $fieldRules[] = 'required';
-            } else {
-                $fieldRules[] = 'nullable';
-            }
-
-            switch ($field->type) {
-                case 'email':
-                    $fieldRules[] = 'email';
-                    break;
-                case 'number':
-                    $fieldRules[] = 'numeric';
-                    break;
-                case 'tel':
-                    $fieldRules[] = 'string';
-                    $fieldRules[] = 'max:20';
-                    break;
-                case 'file':
-                    $fieldRules[] = 'file';
-                    $fieldRules[] = 'max:10240';
-
-                    if (! empty($field->options) && is_array($field->options)) {
-                        $fieldRules[] = 'mimes:'.implode(',', $field->options);
-                    }
-                    break;
-                default:
-                    $fieldRules[] = 'string';
-                    $fieldRules[] = 'max:5000';
-            }
-
-            $rules[$field->name] = $fieldRules;
-        }
-
-        return $rules;
+        return $this->formService->buildValidationRules($form);
     }
 
     public function handleSubmission(Form $form, array $data, array $files = []): mixed
     {
         return DB::transaction(function () use ($form, $data, $files) {
+            $formFields = $form->fields->keyBy('name');
+
             $uploadedFiles = [];
             foreach ($files as $key => $file) {
+                $formField = $formFields[$key] ?? null;
+
+                if (! $formField || $formField->type !== 'file') {
+                    continue;
+                }
+
                 if ($file && $file->isValid()) {
                     $path = $file->store('submissions/'.$form->id, 'local');
                     $uploadedFiles[$key] = $path;
@@ -107,9 +78,6 @@ class WidgetService
 
             $details = [];
             $labels = $data['labels'] ?? [];
-
-            // Get form fields to map field labels when not provided via $labels
-            $formFields = $form->fields->keyBy('name');
 
             foreach ($data as $key => $value) {
                 if (in_array($key, ['_token', 'labels'])) {

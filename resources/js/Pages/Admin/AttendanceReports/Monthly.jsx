@@ -1,17 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer
-} from 'recharts';
+import ReactApexChart from 'react-apexcharts';
 
 export default function Monthly({ monthlyReport = {}, filters = {}, employees = [] }) {
     const [localFilters, setLocalFilters] = useState({
@@ -32,6 +23,34 @@ export default function Monthly({ monthlyReport = {}, filters = {}, employees = 
     ];
 
     const attendanceData = monthlyReport.chart_data || [];
+
+    const monthlyChartOptions = useMemo(() => ({
+        chart: { type: 'bar', height: 300, toolbar: { show: false } },
+        plotOptions: {
+            bar: {
+                borderRadius: 4,
+                columnWidth: '55%',
+            },
+        },
+        dataLabels: { enabled: false },
+        legend: { position: 'bottom' },
+        xaxis: {
+            categories: attendanceData.map((item) => item.day),
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+        },
+        yaxis: { min: 0 },
+        colors: ['#3b82f6', '#f59e0b'],
+        grid: { borderColor: '#e5e7eb', strokeDashArray: 4 },
+    }), [attendanceData]);
+
+    const monthlyChartSeries = useMemo(
+        () => [
+            { name: 'Çalışma', data: attendanceData.map((item) => item.worked_hours ?? 0) },
+            { name: 'Fazla Mesai', data: attendanceData.map((item) => item.overtime ?? 0) },
+        ],
+        [attendanceData],
+    );
 
     return (
         <AuthenticatedLayout
@@ -130,17 +149,7 @@ export default function Monthly({ monthlyReport = {}, filters = {}, employees = 
                     </div>
                     <div className="card-body">
                         <div className="graph-height">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={attendanceData}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="day" />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="worked_hours" name="Çalışma" fill="#3b82f6" />
-                                    <Bar dataKey="overtime" name="Fazla Mesai" fill="#f59e0b" />
-                                </BarChart>
-                            </ResponsiveContainer>
+                            <ReactApexChart options={monthlyChartOptions} series={monthlyChartSeries} type="bar" height={300} />
                         </div>
                     </div>
                 </div>

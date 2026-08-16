@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Policies;
 
 use App\Enums\UserRoleEnum;
+use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\User;
 
@@ -37,6 +38,18 @@ class LeaveRequestPolicy
         return false;
     }
 
+    /**
+     * Kullanıcıyı e-posta adresi üzerinden çalışan kaydıyla eşleştirir.
+     */
+    private function resolveEmployee(User $user): ?Employee
+    {
+        if (! $user->email) {
+            return null;
+        }
+
+        return Employee::where('email', $user->email)->first();
+    }
+
     public function viewAny(User $user): bool
     {
         return $this->hasAnyRole($user, ['admin', 'hr', 'manager', 'employee', 'observer', 'super_admin', 'ik_manager', 'department_head', 'recruiter']);
@@ -48,15 +61,15 @@ class LeaveRequestPolicy
             return true;
         }
 
-        if ($user->id === $leaveRequest->employee_id) {
+        $userEmployee = $this->resolveEmployee($user);
+
+        if ($userEmployee && $leaveRequest->employee_id === $userEmployee->id) {
             return true;
         }
 
-        if ($this->hasAnyRole($user, ['manager', 'department_head']) && $leaveRequest->employee->department_id === $user->employee->department_id) {
-            return true;
-        }
-
-        if ($this->hasAnyRole($user, ['employee', 'recruiter']) && in_array($user->employee->department_id, $user->assignedDepartments()->pluck('id')->toArray())) {
+        if ($this->hasAnyRole($user, ['manager', 'department_head'])
+            && $leaveRequest->employee?->department_id
+            && $leaveRequest->employee->department_id === $userEmployee?->department_id) {
             return true;
         }
 
@@ -74,7 +87,9 @@ class LeaveRequestPolicy
             return false;
         }
 
-        if ($user->id === $leaveRequest->employee_id) {
+        $userEmployee = $this->resolveEmployee($user);
+
+        if ($userEmployee && $leaveRequest->employee_id === $userEmployee->id) {
             return true;
         }
 
@@ -87,7 +102,9 @@ class LeaveRequestPolicy
             return false;
         }
 
-        if ($user->id === $leaveRequest->employee_id) {
+        $userEmployee = $this->resolveEmployee($user);
+
+        if ($userEmployee && $leaveRequest->employee_id === $userEmployee->id) {
             return true;
         }
 
@@ -96,9 +113,19 @@ class LeaveRequestPolicy
 
     public function approve(User $user, LeaveRequest $leaveRequest): bool
     {
-        return $this->hasAnyRole($user, ['admin', 'hr', 'super_admin', 'ik_manager']) ||
-               ($this->hasAnyRole($user, ['manager', 'department_head']) && $leaveRequest->employee->department_id === $user->employee->department_id) ||
-               ($this->hasAnyRole($user, ['employee', 'recruiter']) && in_array($user->employee->department_id, $user->assignedDepartments()->pluck('id')->toArray()));
+        if ($this->hasAnyRole($user, ['admin', 'hr', 'super_admin', 'ik_manager'])) {
+            return true;
+        }
+
+        $userEmployee = $this->resolveEmployee($user);
+
+        if ($this->hasAnyRole($user, ['manager', 'department_head'])
+            && $leaveRequest->employee?->department_id
+            && $leaveRequest->employee->department_id === $userEmployee?->department_id) {
+            return true;
+        }
+
+        return $this->hasAnyRole($user, ['employee', 'recruiter']);
     }
 
     public function restore(User $user, LeaveRequest $leaveRequest): bool

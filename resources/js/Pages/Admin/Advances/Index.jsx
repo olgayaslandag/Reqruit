@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 import { router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import EmptyState from '@/Components/EmptyState';
@@ -44,13 +45,36 @@ export default function Index({ advances, filters, pendingCount, approvedCount, 
     };
 
     const handleReject = (id) => {
-        const reason = prompt('Reddetme nedeni:');
-        if (reason) {
-            router.post(route('admin.advances.reject', id), { reason }, {
-                onSuccess: () => showSuccess('Avans reddedildi.'),
-                onError: () => showError('İşlem sırasında hata oluştu.'),
-            });
-        }
+        Swal.fire({
+            title: 'Reddetme Nedeni',
+            input: 'textarea',
+            inputPlaceholder: 'Reddetme gerekçesini yazın...',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Reddetme nedeni zorunludur.';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Reddet',
+            cancelButtonText: 'İptal',
+            showLoaderOnConfirm: true,
+            preConfirm: (reason) => {
+                return new Promise((resolve) => {
+                    router.post(route('admin.advances.reject', id), { reason }, {
+                        onSuccess: () => {
+                            showSuccess('Avans reddedildi.');
+                            resolve();
+                        },
+                        onError: () => {
+                            showError('İşlem sırasında hata oluştu.');
+                            resolve();
+                        },
+                    });
+                });
+            },
+        });
     };
 
     const handleMarkAsPaid = (id) => {

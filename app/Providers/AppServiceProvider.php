@@ -10,12 +10,14 @@ use App\Interfaces\ILeaveTypeRepository;
 use App\Interfaces\IShiftRepository;
 use App\Interfaces\IUserRepository;
 use App\Models\AdvanceRequest;
+use App\Models\AttendanceAdjustment;
 use App\Models\Candidate;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\PayrollPeriod;
 use App\Models\User;
+use App\Policies\AdjustmentPolicy;
 use App\Policies\AdvancePolicy;
 use App\Policies\CandidatePolicy;
 use App\Policies\LeaveEntitlementPolicy;
@@ -106,6 +108,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(LeaveType::class, LeaveTypePolicy::class);
         Gate::policy(LeaveEntitlement::class, LeaveEntitlementPolicy::class);
         Gate::policy(LeaveRequest::class, LeaveRequestPolicy::class);
+
+        // AttendanceAdjustment modeli için policy mapping (sınıf adı modele göre kurala uymuyor)
+        Gate::policy(AttendanceAdjustment::class, AdjustmentPolicy::class);
 
         // User modeli için policy mapping
         Gate::policy(User::class, UserPolicy::class);

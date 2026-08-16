@@ -25,6 +25,7 @@ export default function Form({ form }) {
     const renderField = (field) => {
         const commonProps = {
             name: field.name,
+            id: field.name,
             required: field.required,
             className: 'dd-input',
         };
@@ -181,7 +182,10 @@ export default function Form({ form }) {
                 <form onSubmit={handleSubmit} encType="multipart/form-data" className="dd-form">
                     {form.fields.map(field => (
                         <div key={field.name} className="dd-field">
-                            <label className="dd-label">
+                            <label
+                                className="dd-label"
+                                htmlFor={field.type === 'checkbox' || field.type === 'radio' ? undefined : field.name}
+                            >
                                 {field.label}
                                 {field.required && <span className="dd-required">*</span>}
                             </label>

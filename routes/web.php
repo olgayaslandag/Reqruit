@@ -24,9 +24,7 @@ use App\Http\Controllers\SalaryComponentController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Public Routes
 Route::get('/', function () {
@@ -61,19 +59,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/signed-url/{path}', [FileController::class, 'generateSignedUrl'])->where('path', '.*')->name('signed-url');
     });
 
-    // Test route - TEMPORARY for debugging
-    Route::get('/test-files/{path}', function ($path) {
-        $fullPath = storage_path('app/private/'.$path);
-
-        return response()->json([
-            'path' => $path,
-            'fullPath' => $fullPath,
-            'exists' => file_exists($fullPath),
-            'realPath' => realpath($fullPath),
-            'baseDir' => storage_path('app/private'),
-        ]);
-    })->where('path', '.*');
-
     // Admin - Departments
     Route::prefix('admin/departments')->name('admin.departments.')->group(function () {
         Route::get('/', [DepartmentController::class, 'index'])->name('index');
@@ -104,7 +89,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{submission}/intelligence-reports/{report}', [SubmissionController::class, 'destroyIntelligenceReport'])->name('destroyIntelligenceReport');
         Route::post('/{submission}/comments', [SubmissionController::class, 'addComment'])->name('addComment');
         Route::post('/{submission}/interactions', [SubmissionController::class, 'storeInteraction'])->name('storeInteraction');
-        Route::post('/{submission}/ai-evaluate', [SubmissionController::class, 'evaluate'])->name('evaluate');
+        Route::post('/{submission}/ai-evaluate', [SubmissionController::class, 'evaluate'])
+            ->middleware('throttle:ai_evaluation')
+            ->name('evaluate');
         Route::delete('/{submission}', [SubmissionController::class, 'destroy'])->name('destroy');
     });
 
@@ -275,10 +262,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/{attendance}', [AttendanceController::class, 'update'])->name('update');
         Route::delete('/{attendance}', [AttendanceController::class, 'destroy'])->name('destroy');
         Route::post('/clock-in', [AttendanceController::class, 'clockIn'])
+            ->middleware('throttle:clock_attendance')
             ->name('clockIn');
         Route::post('/clock-out', [AttendanceController::class, 'clockOut'])
+            ->middleware('throttle:clock_attendance')
             ->name('clockOut');
         Route::post('/manual-clock', [AttendanceController::class, 'manualClock'])
+            ->middleware('throttle:manual_clock')
             ->name('manual-clock');
         Route::get('/employee/{employeeId}', [AttendanceController::class, 'forEmployee'])->name('employee');
     });
@@ -339,6 +329,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [AdjustmentController::class, 'index'])->name('index');
         Route::get('/create', [AdjustmentController::class, 'create'])->name('create');
         Route::post('/', [AdjustmentController::class, 'store'])->name('store');
+        Route::get('/my-requests', [AdjustmentController::class, 'myRequests'])->name('myRequests');
+        Route::post('/request', [AdjustmentController::class, 'requestAdjustment'])->name('request');
         Route::get('/{adjustment}', [AdjustmentController::class, 'show'])->name('show');
         Route::get('/{adjustment}/edit', [AdjustmentController::class, 'edit'])->name('edit');
         Route::put('/{adjustment}', [AdjustmentController::class, 'update'])->name('update');
@@ -346,8 +338,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{adjustment}', [AdjustmentController::class, 'destroy'])->name('destroy');
         Route::post('/{adjustment}/approve', [AdjustmentController::class, 'approve'])->name('approve');
         Route::post('/{adjustment}/reject', [AdjustmentController::class, 'reject'])->name('reject');
-        Route::get('/my-requests', [AdjustmentController::class, 'myRequests'])->name('myRequests');
-        Route::post('/request', [AdjustmentController::class, 'requestAdjustment'])->name('request');
     });
 
     // Profile

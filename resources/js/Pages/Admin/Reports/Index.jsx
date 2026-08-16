@@ -251,7 +251,7 @@ export default function Index({ summary, monthlyData, topEmployees, departmentCo
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white">
-                                             {topEmployees.map((emp) => (
+                                             {topEmployees.map((emp, index) => (
                                                  <tr key={emp.id || emp.name} className="">
                                                         <td className="px-4 py-3 fs-sm text-muted">{index + 1}</td>
                                                         <td className="px-4 py-3 fs-sm fw-medium text-dark">{emp.name}</td>

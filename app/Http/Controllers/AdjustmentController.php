@@ -28,6 +28,7 @@ class AdjustmentController extends Controller
     {
         $this->attendanceService = $attendanceService;
         $this->attendanceAdjustmentService = $attendanceAdjustmentService;
+        $this->authorizeResource(AttendanceAdjustment::class, 'adjustment');
     }
 
     public function index(Request $request)
@@ -54,7 +55,8 @@ class AdjustmentController extends Controller
         }
 
         if ($request->has('adjustment_date')) {
-            $query->whereDate('adjustment_date', $request->adjustment_date);
+            $query->where('adjustment_date', '>=', $request->adjustment_date)
+                ->where('adjustment_date', '<=', $request->adjustment_date);
         }
 
         $adjustments = $query->latest()->paginate(15);
@@ -125,6 +127,8 @@ class AdjustmentController extends Controller
 
     public function approve(ApproveAdjustmentRequest $request, AttendanceAdjustment $adjustment)
     {
+        $this->authorize('approve', $adjustment);
+
         if ($adjustment->status !== AdjustmentStatusEnum::PENDING) {
             return response()->json([
                 'success' => false,
@@ -157,6 +161,8 @@ class AdjustmentController extends Controller
 
     public function reject(RejectAdjustmentRequest $request, AttendanceAdjustment $adjustment)
     {
+        $this->authorize('reject', $adjustment);
+
         if ($adjustment->status !== AdjustmentStatusEnum::PENDING) {
             return response()->json([
                 'success' => false,
@@ -177,6 +183,8 @@ class AdjustmentController extends Controller
 
     public function updateStatus(UpdateAdjustmentStatusRequest $request, AttendanceAdjustment $adjustment)
     {
+        $this->authorize('update', $adjustment);
+
         $validated = $request->validated();
 
         $status = $validated['status'];
@@ -201,7 +209,8 @@ class AdjustmentController extends Controller
         }
 
         if ($request->has('adjustment_date')) {
-            $query->whereDate('adjustment_date', $request->adjustment_date);
+            $query->where('adjustment_date', '>=', $request->adjustment_date)
+                ->where('adjustment_date', '<=', $request->adjustment_date);
         }
 
         $adjustments = $query->latest()->paginate(15);

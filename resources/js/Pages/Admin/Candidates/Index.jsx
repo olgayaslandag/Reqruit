@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import EmptyState from '@/Components/EmptyState';
 import Pagination from '@/Components/Pagination';
+import { SkeletonRow } from '@/Components/Skeleton';
 import { Head, Link, router } from '@inertiajs/react';
 import { confirmDelete, showSuccess } from '@/Utils/sweetAlert';
 
@@ -16,6 +17,18 @@ export default function Index({ candidates, filters }) {
     const candidateList = candidates?.data || candidates || [];
     const [search, setSearch] = useState(filters?.search || '');
     const [filterStatus, setFilterStatus] = useState(filters?.status || '');
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const startHandler = () => setIsLoading(true);
+        const finishHandler = () => setIsLoading(false);
+        router.on('start', startHandler);
+        router.on('finish', finishHandler);
+        return () => {
+            router.off('start', startHandler);
+            router.off('finish', finishHandler);
+        };
+    }, []);
 
     const applyFilters = () => {
         const params = {};
@@ -140,7 +153,11 @@ export default function Index({ candidates, filters }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {candidateList.length > 0 ? (
+                                {isLoading ? (
+                                    Array.from({ length: 5 }).map((_, index) => (
+                                        <SkeletonRow key={index} columns={8} />
+                                    ))
+                                ) : candidateList.length > 0 ? (
                                     candidateList.map((candidate) => (
                                         <tr key={candidate.id}>
                                             <td className="px-4 py-3">
@@ -176,6 +193,7 @@ export default function Index({ candidates, filters }) {
                                                         href={`/admin/candidates/${candidate.id}`}
                                                         className="btn btn-link text-primary p-0"
                                                         title="Görüntüle"
+                                                        aria-label="Görüntüle"
                                                     >
                                                         <i className="ti ti-eye"></i>
                                                     </Link>
@@ -183,6 +201,7 @@ export default function Index({ candidates, filters }) {
                                                         onClick={() => handleDelete(candidate.id)}
                                                         className="btn btn-link text-danger p-0"
                                                         title="Sil"
+                                                        aria-label="Sil"
                                                     >
                                                         <i className="ti ti-trash"></i>
                                                     </button>

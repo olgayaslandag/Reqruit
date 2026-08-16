@@ -14,6 +14,12 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->error('UserSeeder production ortamında çalıştırılamaz. Demo hesaplar bilinen şifrelerle oluşturulur.');
+
+            return;
+        }
+
         $roles = UserRoleEnum::cases();
         $statuses = UserStatusEnum::cases();
         $hashedPassword = Hash::make('123123123'); // Pre-compute once

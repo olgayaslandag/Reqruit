@@ -24,7 +24,6 @@ class ApprovePayrollRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => ['required', 'in:manager,hr,accounting'],
             'comment' => ['nullable', 'string'],
         ];
     }

@@ -152,84 +152,52 @@
 
 .fixed-toast-container {
     position: fixed;
-    top: 20px;
+    top: 80px;
     right: 20px;
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .toast-item-container {
-    padding: 12px 16px;
+    padding: 12px 20px;
     border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    cursor: pointer;
-    min-width: 280px;
+    min-width: 250px;
     max-width: 400px;
+    color: white;
     display: flex;
     align-items: center;
     gap: 10px;
-    animation: slideIn 0.3s ease;
-}
-
-.toast-item-bg-success {
-    background: #d1e7dd;
-    border-left: 4px solid #0f5132;
-    color: #0f5132;
-}
-
-.toast-item-bg-error {
-    background: #f8d7da;
-    border-left: 4px solid #842029;
-    color: #842029;
-}
-
-.toast-item-bg-warning {
-    background: #fff3cd;
-    border-left: 4px solid #664d03;
-    color: #664d03;
-}
-
-.toast-item-bg-info {
-    background: #cff4fc;
-    border-left: 4px solid #055160;
-    color: #055160;
+    opacity: 0.95;
+    animation: slideIn 0.3s ease-out;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .toast-icon {
-    display: inline-flex;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
     font-size: 12px;
-    font-weight: 700;
     flex-shrink: 0;
 }
 
-.toast-icon-bg-success {
-    background: #0f5132;
-    color: #d1e7dd;
-}
+.toast-item-bg-success { background-color: #155724; }
+.toast-icon-bg-success { background-color: #157347; }
 
-.toast-icon-bg-error {
-    background: #842029;
-    color: #f8d7da;
-}
+.toast-item-bg-error { background-color: #7a1c1c; }
+.toast-icon-bg-error { background-color: #dc3545; }
 
-.toast-icon-bg-warning {
-    background: #664d03;
-    color: #fff3cd;
-}
+.toast-item-bg-warning { background-color: #856404; }
+.toast-icon-bg-warning { background-color: #ffc107; color: black; }
 
-.toast-icon-bg-info {
-    background: #055160;
-    color: #cff4fc;
-}
+.toast-item-bg-info { background-color: #0c5460; }
+.toast-icon-bg-info { background-color: #17a2b8; }
 
 .tree-node-indent {
     padding-left: var(--tree-indent, 0);
@@ -328,4 +296,76 @@
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
+}
+
+.auth-main {
+    position: relative;
+}
+
+.auth-main .auth-wrapper {
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.auth-main .auth-wrapper.v3 {
+    display: flex;
+    align-items: center;
+}
+
+.auth-main .auth-wrapper.v3 .auth-form {
+    flex-direction: column;
+    background: url('/assets/images/authentication/img-auth-bg.svg');
+    min-height: 100vh;
+    padding: 24px;
+    background-repeat: no-repeat;
+    background-size: auto 75%;
+    background-position: left center;
+    position: relative;
+    justify-content: space-between;
+}
+
+.auth-main .auth-wrapper.v3 .auth-form > * {
+    position: relative;
+    z-index: 5;
+}
+
+.auth-main .auth-wrapper.v3 .auth-form:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+}
+
+.auth-main .auth-wrapper .auth-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.auth-main .auth-wrapper .auth-form .card {
+    width: 100%;
+    max-width: 480px;
+    box-shadow: none;
+}
+
+.auth-main .auth-wrapper .auth-footer,
+.auth-main .auth-wrapper .auth-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.auth-main .auth-wrapper.v3 .auth-form.auth-form-brand {
+    background: url('/assets/images/reqruit-icon.png');
+    background-repeat: no-repeat;
+    background-size: auto 75%;
+    background-position: left center;
 }

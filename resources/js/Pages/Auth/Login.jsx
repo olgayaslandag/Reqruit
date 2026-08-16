@@ -1,5 +1,6 @@
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
+import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Login({ status, canResetPassword }) {
@@ -17,12 +18,12 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <>
+        <GuestLayout className="auth-form-brand">
             <Head title="Giriş Yap" />
 
             <div className="auth-header">
-                <a href="/">
-                    <img src="/assets/images/reqruit-logo.png" alt="Reqruit" style={{ height: '40px' }} />
+                <a href="#">
+                    <img src="/assets/images/reqruit-logo.png" alt="img" width="118" height="41" />
                 </a>
             </div>
 
@@ -30,9 +31,6 @@ export default function Login({ status, canResetPassword }) {
                 <div className="card-body">
                     <div className="d-flex justify-content-between align-items-end mb-4">
                         <h3 className="mb-0"><b>Giriş Yap</b></h3>
-                        <Link href={route('register')} className="link-primary text-decoration-none">
-                            Hesabın yok mu?
-                        </Link>
                     </div>
 
                     {status && (
@@ -70,7 +68,7 @@ export default function Login({ status, canResetPassword }) {
                         </div>
 
                         <div className="d-flex mt-1 justify-content-between align-items-center">
-                            <div className="form-check">
+                            <div className="form-check mb-0">
                                 <input
                                     className="form-check-input input-primary"
                                     type="checkbox"
@@ -83,8 +81,8 @@ export default function Login({ status, canResetPassword }) {
                                 </label>
                             </div>
                             {canResetPassword && (
-                                <Link href={route('password.request')} className="text-primary text-decoration-none">
-                                    Şifremi unuttum
+                                <Link href={route('password.request')} className="link-primary text-decoration-none">
+                                    Şifremi unuttum?
                                 </Link>
                             )}
                         </div>
@@ -95,48 +93,21 @@ export default function Login({ status, canResetPassword }) {
                             </PrimaryButton>
                         </div>
                     </form>
-
-                    <div className="saprator mt-3">
-                        <span>Şununla giriş yap</span>
-                    </div>
-                    <div className="row">
-                        <div className="col-4">
-                            <div className="d-grid">
-                                <button type="button" className="btn mt-2 btn-light-primary bg-light text-muted">
-                                    <img src="/assets/images/authentication/google.svg" alt="img" /> <span className="d-none d-sm-inline-block"> Google</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div className="col-4">
-                            <div className="d-grid">
-                                <button type="button" className="btn mt-2 btn-light-primary bg-light text-muted">
-                                    <img src="/assets/images/authentication/twitter.svg" alt="img" /> <span className="d-none d-sm-inline-block"> Twitter</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div className="col-4">
-                            <div className="d-grid">
-                                <button type="button" className="btn mt-2 btn-light-primary bg-light text-muted">
-                                    <img src="/assets/images/authentication/facebook.svg" alt="img" /> <span className="d-none d-sm-inline-block"> Facebook</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
             <div className="auth-footer row">
                 <div className="col my-1">
-                    <p className="m-0">Telif Hakkı © <a href="/">Reqruit</a></p>
+                    <p className="m-0">Telif Hakkı © <a href="#">Reqruit</a></p>
                 </div>
                 <div className="col-auto my-1">
                     <ul className="list-inline footer-link mb-0">
-                        <li className="list-inline-item"><a href="/">Ana Sayfa</a></li>
+                        <li className="list-inline-item"><a href="#">Ana Sayfa</a></li>
                         <li className="list-inline-item"><a href="#">Gizlilik Politikası</a></li>
                         <li className="list-inline-item"><a href="#">Bize Ulaşın</a></li>
                     </ul>
                 </div>
             </div>
-        </>
+        </GuestLayout>
     );
 }
