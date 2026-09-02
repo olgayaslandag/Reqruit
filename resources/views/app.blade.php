@@ -14,7 +14,8 @@
 <link rel="shortcut icon" href="/assets/images/reqruit-icon.png" type="image/png">
 <title inertia>{{ config('app.name', 'Reqruit') }}</title>
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
 <link rel="stylesheet" href="/assets/css/plugins/bootstrap.min.css">
 @if (!$isLightPage)
 <link rel="stylesheet" href="/assets/fonts/tabler-icons.min.css">

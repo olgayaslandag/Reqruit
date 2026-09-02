@@ -585,6 +585,36 @@ html {
     to { opacity: 1; }
 }
 
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(60px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideRight {
+    from { opacity: 0; transform: translateX(-60px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideLeft {
+    from { opacity: 0; transform: translateX(60px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes zoomOut {
+    from { opacity: 1; transform: scale(1.1); }
+    to { opacity: 0; transform: scale(1); }
+}
+
 .fade-in-up {
     animation: fadeInUp 0.6s ease forwards;
 }
@@ -593,7 +623,7 @@ html {
     animation: fadeIn 0.6s ease forwards;
 }
 
-/* Sayaç animasyonu (opsiyonel JS tetiklemeli) */
+/* Sayaç animasyonu */
 @keyframes countUp {
     from { opacity: 0; transform: scale(0.5); }
     to { opacity: 1; transform: scale(1); }
@@ -601,6 +631,229 @@ html {
 
 .count-animate {
     animation: countUp 0.5s ease forwards;
+}
+
+/* ---- AOS Override & Custom Classes ---- */
+
+/* Dark section (AI) animasyonları için daha yavaş süre */
+[data-aos-duration="800"] {
+    transition-duration: 800ms;
+}
+
+/* AOS easing override */
+[data-aos-easing="ease-out"] {
+    transition-timing-function: ease-out;
+}
+
+/* Stagger child animations */
+.stagger-children > [data-aos] {
+    opacity: 0;
+}
+
+/* Hover lift effects */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Card hover animation for features */
+.features-card {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.features-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(32, 141, 241, 0.15);
+}
+
+/* Testimonial card hover */
+.testimonial-box {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.testimonial-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Button hover lift */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Navbar hover */
+.navbar-custom {
+    transition: all 0.3s ease;
+}
+
+/* Toast notification animation */
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.toast-animate-in {
+    animation: toastSlideIn 0.4s ease forwards;
+}
+
+.toast-animate-out {
+    animation: toastSlideOut 0.4s ease forwards;
+}
+
+/* Scroll indicator pulse */
+@keyframes scrollPulse {
+    0%, 100% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.5; transform: translateY(10px); }
+}
+
+.mouse-down {
+    animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* Counter card glow */
+@keyframes counterGlow {
+    0% { box-shadow: 0 0 0 0 rgba(32, 141, 241, 0.3); }
+    70% { box-shadow: 0 0 0 15px rgba(32, 141, 241, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(32, 141, 241, 0); }
+}
+
+.counter-glow {
+    animation: counterGlow 2s ease-out;
+}
+
+/* Heading underline animation */
+@keyframes underlineGrow {
+    from { width: 0; }
+    to { width: 72px; }
+}
+
+.heading::before {
+    animation: underlineGrow 0.8s ease-out;
+}
+
+/* Footer link hover slide */
+.footer-link a {
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-link a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    background-color: #fff;
+    transition: width 0.3s ease;
+}
+
+.footer-link a:hover::after {
+    width: 100%;
+}
+
+/* Social icon hover animation */
+.footer-social a {
+    transition: all 0.3s ease;
+}
+
+.footer-social a:hover {
+    transform: translateY(-3px) scale(1.1);
+}
+
+/* Input focus animation */
+.form-control {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #208df1;
+    box-shadow: 0 0 0 0.2rem rgba(32, 141, 241, 0.15);
+}
+
+/* Accordion header hover */
+.card-header button {
+    transition: color 0.3s ease;
+}
+
+.card-header button:hover {
+    color: #208df1 !important;
+}
+
+/* Carousel control button hover */
+.carousel-control-prev,
+.carousel-control-next {
+    transition: all 0.3s ease;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background-color: #1a3365;
+    transform: scale(1.1);
+}
+
+/* Back to top hover */
+#back-to-top {
+    transition: all 0.5s ease;
+}
+
+#back-to-top:hover {
+    background-color: #208df1;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(32, 141, 241, 0.4);
+}
+
+/* Navbar scroll indicator */
+.nav-sticky {
+    animation: fadeInDown 0.3s ease;
+}
+
+/* Custom easing for AOS */
+[data-aos-easing="ease-out-back"] {
+    transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* AI section stat counter animation */
+@keyframes countPulse {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 /* 14. Responsive Ayarlar */

@@ -31,13 +31,11 @@ export default function Index({ submissions, forms, departments, filters }) {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const startHandler = () => setIsLoading(true);
-        const finishHandler = () => setIsLoading(false);
-        router.on('start', startHandler);
-        router.on('finish', finishHandler);
+        const cleanupStart = router.on('start', () => { setIsLoading(true); });
+        const cleanupFinish = router.on('finish', () => { setIsLoading(false); });
         return () => {
-            router.off('start', startHandler);
-            router.off('finish', finishHandler);
+            cleanupStart();
+            cleanupFinish();
         };
     }, []);
 

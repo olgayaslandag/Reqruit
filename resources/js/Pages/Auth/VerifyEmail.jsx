@@ -33,14 +33,12 @@ export default function VerifyEmail({ status }) {
                         Doğrulama E-postasını Yeniden Gönder
                     </PrimaryButton>
 
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className="small text-muted-link"
-                    >
-                        Çıkış Yap
-                    </Link>
+                    <form method="post" action={route('logout')} data-inertia="false" style={{ display: 'inline' }}>
+                        <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
+                        <button type="submit" className="small text-muted-link" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'inherit', font: 'inherit' }}>
+                            Çıkış Yap
+                        </button>
+                    </form>
                 </div>
             </form>
         </GuestLayout>

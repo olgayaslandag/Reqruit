@@ -21,22 +21,52 @@ window.addEventListener('scroll', (ev) => {
   windowScroll();
 })
 
+// AOS Init
+AOS.init({
+    duration: 600,
+    once: true,
+    offset: 80,
+    easing: 'ease-out',
+    delay: 0,
+});
+
 // Swiper slider
 
 var swiper = new Swiper(".mySwiper", {
-  slidesPerView: 1,
-  spaceBetween: 30,
-  loop: true,
-  loopFillGroupWithBlank: true,
-  pagination: {
-    el: ".swiper-pagination",
-    clickable: true,
-  },
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev",
-  },
+    slidesPerView: 1,
+    spaceBetween: 30,
+    loop: true,
+    loopFillGroupWithBlank: true,
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+    },
+    pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+    },
+    navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+    },
+    on: {
+        slideChange: function () {
+            if (typeof AOS !== 'undefined') {
+                AOS.refresh();
+            }
+        },
+    },
 });
+
+// Bootstrap carousel AOS refresh
+var testimonialCarousel = document.getElementById('carouselTestimonials');
+if (testimonialCarousel) {
+    testimonialCarousel.addEventListener('slide.bs.carousel', function () {
+        if (typeof AOS !== 'undefined') {
+            setTimeout(function () { AOS.refresh(); }, 100);
+        }
+    });
+}
 
 
 

@@ -21,6 +21,9 @@
         <!-- CSS -->
         <link rel="stylesheet" href="{{ asset('assets/css/kasy/style.min.css') }}" type="text/css" />
 
+        <!-- AOS -->
+        <link rel="stylesheet" href="{{ asset('assets/css/kasy/aos.css') }}" type="text/css" />
+
     </head>
     <body data-bs-spy="scroll" data-bs-target="#navbar" data-bs-offset="71">
 
@@ -74,19 +77,19 @@
                 <div class="row">   
                     <div class="col-lg-12">
                         <div class="mt-5 pt-lg-5 text-center">
-                                <h3>İnsan Kaynakları Yönetiminde Tek Platform</h3>
-                            <p class="text-muted fs-18 mb-0">İşe alımdan bordroya, PDKS'den izin yönetimine kadar tüm İK süreçlerinizi
+                                <h3 data-aos="fade-up">İnsan Kaynakları Yönetiminde Tek Platform</h3>
+                            <p class="text-muted fs-18 mb-0" data-aos="fade-up" data-aos-delay="150">İşe alımdan bordroya, PDKS'den izin yönetimine kadar tüm İK süreçlerinizi
                                 tek çatı altında yönetin.</p>
-                        <div class="row justify-content-center mt-5">
+                        <div class="row justify-content-center mt-5" data-aos="fade-up" data-aos-delay="300">
                             <div class="col-lg-12 hstack gap-3 justify-content-center">
                                 <div class="d-grid d-sm-block gap-3">
-                                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demoModal">Ücretsiz Demo</a>
+                                    <a href="javascript:void(0);" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demoModal" data-aos="zoom-in" data-aos-delay="400">Ücretsiz Demo</a>
                                 </div>
                                 </div>
                                 <!-- END MODAL -->
                             </div><!-- END col -->
                         </div><!-- END row -->
-                        <img class="buy-about-img my-5 img-fluid" src="{{ asset('assets/images/reqruit-screen.jpg') }}" alt="Reqruit Dashboard">
+                        <img class="buy-about-img my-5 img-fluid" src="{{ asset('assets/images/reqruit-screen.jpg') }}" alt="Reqruit Dashboard" data-aos="zoom-in" data-aos-delay="500">
                         </div>
                     </div><!-- end col-->
                 </div><!-- end row-->
@@ -104,7 +107,7 @@
         <!-- Start features -->
         <section class="section features features-bg" id="features">
             <div class="container">
-                <div class="row justify-content-center">
+                <div class="row justify-content-center" data-aos="fade-up">
                     <div class="col-lg-7">
                         <div class="text-center mb-5">
                             <h3 class="heading">Modüller</h3>
@@ -113,7 +116,7 @@
                     </div><!-- end col-->
                 </div><!-- end row-->
                 <div class="row">
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-right" data-aos-delay="100">
                         <div class="card features-card border-primary">
                             <div class="card-body">
                                 <div class="avatar-md mb-4">
@@ -126,7 +129,7 @@
                             </div>
                         </div>
                     </div><!-- end col -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-right" data-aos-delay="200">
                         <div class="card features-card">
                             <div class="card-body">
                                 <div class="avatar-md mb-4">
@@ -139,7 +142,7 @@
                             </div>
                         </div>
                     </div><!-- end col -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-right" data-aos-delay="300">
                         <div class="card features-card">
                             <div class="card-body">
                                 <div class="avatar-md mb-4">
@@ -148,11 +151,11 @@
                                     </div>
                                 </div>
                                 <h5>İzin Yönetimi</h5>
-                                <p class="text-muted">Otomatik izin hesaplama, çoklu onay akışları ve takvim entegrasyonu ile izin süreçlerini kolayca yönetin.</p>
+                                <p class="text-muted">Otomatik izin hesaplama, çoklu onay akışları ve takvim entegrasyonu ile izin süreçlerinizi kolayca yönetin.</p>
                             </div>
                         </div>
                     </div><!-- end col -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-left" data-aos-delay="100">
                         <div class="card features-card">
                             <div class="card-body">
                                 <div class="avatar-md mb-4">
@@ -165,7 +168,7 @@
                             </div>
                         </div>
                     </div><!-- end col -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-left" data-aos-delay="200">
                         <div class="card features-card">
                             <div class="card-body">
                                 <div class="avatar-md mb-4">
@@ -178,7 +181,7 @@
                             </div>
                         </div>
                     </div><!-- end col -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-left" data-aos-delay="300">
                         <div class="card features-card">
                             <div class="card-body">
                                 <div class="avatar-md mb-4">
@@ -197,57 +200,57 @@
         <!-- end Features -->
 
         <!-- Start AI Feature Highlight -->
-        <section class="section" style="background: linear-gradient(135deg, #208df1 0%, #1a3365 100%);">
+        <section class="section" style="background: linear-gradient(135deg, #208df1 0%, #1a3365 100%);" data-aos="fade-up">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-6">
+                    <div class="col-lg-6" data-aos="fade-right" data-aos-duration="800">
                         <div class="text-white mb-4 mb-lg-0">
-                            <div class="mb-3">
+                            <div class="mb-3" data-aos="fade-down" data-aos-delay="100">
                                 <span class="badge bg-light text-primary px-3 py-2 fs-14">
                                     <i class="mdi mdi-robot me-1"></i> Yapay Zeka Entegrasyonu
                                 </span>
                             </div>
-                            <h2 class="fw-bold mb-3" style="font-size: 2rem;">AI Destekli İşe Alım</h2>
-                            <p class="mb-4" style="font-size: 1.1rem; opacity: 0.9;">
+                            <h2 class="fw-bold mb-3" style="font-size: 2rem;" data-aos="fade-right" data-aos-delay="200">AI Destekli İşe Alım</h2>
+                            <p class="mb-4" style="font-size: 1.1rem; opacity: 0.9;" data-aos="fade-right" data-aos-delay="300">
                                 Başvurularınızı yapay zeka ile değerlendirin. Her başvuru için otomatik <strong>AI yorumu</strong> ve 
                                 <strong>puanlama</strong> ile adaylarınızı hızla karşılaştırın, doğru kararları verin.
                             </p>
-                            <ul class="list-unstyled mb-4">
-                                <li class="mb-2">
+                            <ul class="list-unstyled mb-4" data-aos="fade-right" data-aos-delay="400">
+                                <li class="mb-2" data-aos="fade-right" data-aos-delay="450">
                                     <i class="mdi mdi-check-circle text-white me-2"></i>
                                     Otomatik CV analizi ve puanlama
                                 </li>
-                                <li class="mb-2">
+                                <li class="mb-2" data-aos="fade-right" data-aos-delay="500">
                                     <i class="mdi mdi-check-circle text-white me-2"></i>
                                     Adaylar için AI destekli yorumlar
                                 </li>
-                                <li class="mb-2">
+                                <li class="mb-2" data-aos="fade-right" data-aos-delay="550">
                                     <i class="mdi mdi-check-circle text-white me-2"></i>
                                     Pozisyon gereksinimlerine göre eşleştirme
                                 </li>
-                                <li class="mb-2">
+                                <li class="mb-2" data-aos="fade-right" data-aos-delay="600">
                                     <i class="mdi mdi-check-circle text-white me-2"></i>
                                     Hızlı ve tutarlı değerlendirme süreci
                                 </li>
                             </ul>
-                            <a href="javascript:void(0);" class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#demoModal">
+                            <a href="javascript:void(0);" class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#demoModal" data-aos="zoom-in" data-aos-delay="700">
                                 <i class="mdi mdi-rocket-launch me-2"></i>Hemen Başlayın
                             </a>
                         </div>
                     </div>
-                    <div class="col-lg-6 text-center">
+                    <div class="col-lg-6 text-center" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
                         <div class="p-4">
-                            <div class="bg-white rounded-4 p-5 shadow-lg">
+                            <div class="bg-white rounded-4 p-5 shadow-lg" data-aos="zoom-in" data-aos-delay="300">
                                 <div class="mb-4">
                                     <i class="mdi mdi-robot" style="font-size: 5rem; color: #208df1;"></i>
                                 </div>
                                 <h5 class="fw-bold text-dark mb-3">AI Değerlendirme Motoru</h5>
                                 <div class="d-flex justify-content-center gap-3 mb-3">
-                                    <div class="text-center">
+                                    <div class="text-center" data-aos="zoom-in" data-aos-delay="400">
                                         <div class="display-6 fw-bold text-primary">95%</div>
                                         <small class="text-muted">Doğruluk</small>
                                     </div>
-                                    <div class="text-center">
+                                    <div class="text-center" data-aos="zoom-in" data-aos-delay="500">
                                         <div class="display-6 fw-bold text-primary">10x</div>
                                         <small class="text-muted">Hız Artışı</small>
                                     </div>
@@ -262,23 +265,23 @@
         <!-- End AI Feature Highlight -->
 
         <!-- start about -->
-        <section class="section" id="about">
+        <section class="section" id="about" data-aos="fade-up">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-7">
-                        <div class="text-center mb-lg-5">
+                        <div class="text-center mb-lg-5" data-aos="fade-up">
                             <h3 class="heading">Neden Reqruit?</h3>
                         <p class="text-muted fs-17 mb-0">Teknoloji ve mevzuat bilgisini bir araya getirerek İK süreçlerinizi kolaylaştırıyoruz.</p>
                         </div>
                     </div><!--  end col  -->
                 </div><!--  end row  -->
-                <div class="row align-items-center justify-content-between">
-                    <div class="col-lg-6">
+                <div class="row align-items-center justify-content-between" data-aos="fade-right" data-aos-delay="100">
+                    <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="200">
                         <div class="card border-0">
                             <img src="{{ asset('assets/images/reqruit-mockup.png') }}" alt="Reqruit Hakkında">
                         </div>
                     </div><!--  end col  -->
-                    <div class="col-lg-5">
+                    <div class="col-lg-5" data-aos="fade-left" data-aos-delay="300">
                         <div class="card border-0">
                             <div class="card-body">
                                 <div class="about-title">
@@ -289,16 +292,16 @@
                                 <p class="text-muted lh-base">Bulut tabanlı altyapımız ile her yerden erişin. 7/24 kesintisiz hizmet,
                                     anlık veri senkronizasyonu ve üst düzey güvenlik standartları.</p>
                                 <ul class="list-unstyled mt-3">
-                                    <li class="mb-2"><i class="mdi mdi-check-circle text-primary me-2"></i>Bulut tabanlı - Her yerden erişim</li>
-                                    <li class="mb-2"><i class="mdi mdi-check-circle text-primary me-2"></i>%99.9 uptime garantisi</li>
-                                    <li class="mb-2"><i class="mdi mdi-check-circle text-primary me-2"></i>256-bit SSL şifreleme</li>
+                                    <li class="mb-2" data-aos="fade-up" data-aos-delay="400"><i class="mdi mdi-check-circle text-primary me-2"></i>Bulut tabanlı - Her yerden erişim</li>
+                                    <li class="mb-2" data-aos="fade-up" data-aos-delay="450"><i class="mdi mdi-check-circle text-primary me-2"></i>%99.9 uptime garantisi</li>
+                                    <li class="mb-2" data-aos="fade-up" data-aos-delay="500"><i class="mdi mdi-check-circle text-primary me-2"></i>256-bit SSL şifreleme</li>
                                 </ul>
                             </div>
                         </div>
                     </div><!--  end col  -->
                 </div><!--  end row  -->
-                <div class="row my-4 align-items-center justify-content-between">
-                    <div class="col-lg-5">
+                <div class="row my-4 align-items-center justify-content-between" data-aos="fade-left" data-aos-delay="100">
+                    <div class="col-lg-5" data-aos="fade-right" data-aos-delay="200">
                         <div class="card border-0">
                             <div class="card-body">
                                 <div class="me-lg-5">
@@ -316,17 +319,17 @@
                             </div><!-- End card-body -->
                         </div><!-- End card -->
                     </div><!--  end col  -->
-                    <div class="col-lg-6">
+                    <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="300">
                         <img src="{{ asset('assets/images/hr-team-about.jpg') }}" class="img-fluid rounded-4 shadow" alt="İK Yönetimi">
                     </div><!--  end col  -->
                 </div><!--  end row  -->
-                <div class="row align-items-center justify-content-between pt-lg-5">
-                    <div class="col-lg-6">
+                <div class="row align-items-center justify-content-between pt-lg-5" data-aos="fade-right" data-aos-delay="100">
+                    <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="200">
                         <div class="buy-about-img">
                             <img src="{{ asset('assets/images/hr-dashboard.jpg') }}" class="img-fluid rounded-4 shadow" alt="Çalışan Yönetimi">
                         </div>
                     </div><!-- End col -->
-                    <div class="col-lg-5">
+                    <div class="col-lg-5" data-aos="fade-left" data-aos-delay="300">
                         <div class="ms-lg-5">
                             <div class="about-title">
                                 <span></span>
@@ -351,7 +354,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
-                        <div class="text-center">
+                        <div class="text-center" data-aos="fade-up">
                             <h3 class="heading">Tüm İK süreçlerinizi tek platformda yönetin</h3>
                             <p class="text-muted">İş süreçlerinizi hızlandırın, verimliliğinizi artırın.</p>
                         </div>
@@ -361,7 +364,7 @@
                 <!--end row-->
                 <div class="row justify-content-lg-between justify-content-center">
                     <div class="col-lg-3 col-md-6">
-                        <div class="mt-5 text-center">
+                        <div class="mt-5 text-center" data-aos="zoom-in" data-aos-delay="100">
                             <h1 class="fw-semibold display-6 mb-3">
                                 <span class="counter_value" data-target="6">0</span>
                                 <span>+</span>
@@ -370,7 +373,7 @@
                         </div>
                     </div><!--end col-->
                     <div class="col-lg-3 col-md-6">
-                        <div class="mt-5 text-center">
+                        <div class="mt-5 text-center" data-aos="zoom-in" data-aos-delay="200">
                             <h1 class="fw-semibold display-6 mb-3">
                                 <span class="counter_value" data-target="500">0</span>
                                 <span>+</span>
@@ -379,7 +382,7 @@
                         </div>
                     </div><!--end col-->
                     <div class="col-lg-3 col-md-6">
-                        <div class="mt-5 text-center">
+                        <div class="mt-5 text-center" data-aos="zoom-in" data-aos-delay="300">
                             <h1 class="fw-semibold display-6 mb-3">
                                 <span class="counter_value" data-target="99">0</span>
                                 <span>%</span>
@@ -389,7 +392,7 @@
                     </div><!--end col-->
                     <div class="col-lg-12">
                         <div class="d-flex justify-content-center">
-                            <div class="mt-5">
+                            <div class="mt-5" data-aos="fade-up" data-aos-delay="400">
                                 <a class="btn btn-outline-dark" href="#features">Keşfet <i class="mdi mdi-arrow-right"></i></a>
                             </div>
                         </div>
@@ -400,11 +403,11 @@
         <!-- end counter -->
 
         <!-- START FAQ -->
-        <section class="section faq" id="faq">
+        <section class="section faq" id="faq" data-aos="fade-up">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
-                        <div class="text-center mb-5">
+                        <div class="text-center mb-5" data-aos="fade-up">
                             <h3 class="heading">Sıkça Sorulan Sorular</h3>
                             <p class="text-muted fs-17">Reqruit hakkında merak edilenlerin yanıtları.</p>
                         </div>
@@ -413,7 +416,7 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-9">
                         <div class="accordion" id="faqAccordion">
-                            <div class="card border-0 mb-3 shadow-sm">
+                            <div class="card border-0 mb-3 shadow-sm" data-aos="slide-down" data-aos-delay="100">
                                 <div class="card-header bg-white border-0 p-0" id="faqHeading1">
                                     <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="false" aria-controls="faqCollapse1">
                                         Reqruit nedir ve kimler için uygundur?
@@ -426,7 +429,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card border-0 mb-3 shadow-sm">
+                            <div class="card border-0 mb-3 shadow-sm" data-aos="slide-down" data-aos-delay="200">
                                 <div class="card-header bg-white border-0 p-0" id="faqHeading2">
                                     <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
                                         Kurulum ve geçiş süreci nasıl işliyor?
@@ -439,7 +442,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card border-0 mb-3 shadow-sm">
+                            <div class="card border-0 mb-3 shadow-sm" data-aos="slide-down" data-aos-delay="300">
                                 <div class="card-header bg-white border-0 p-0" id="faqHeading3">
                                     <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
                                         Verilerim güvende mi?
@@ -452,7 +455,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card border-0 mb-3 shadow-sm">
+                            <div class="card border-0 mb-3 shadow-sm" data-aos="slide-down" data-aos-delay="400">
                                 <div class="card-header bg-white border-0 p-0" id="faqHeading4">
                                     <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
                                         Mevcut sistemlerimle entegre olabilir mi?
@@ -465,7 +468,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card border-0 mb-3 shadow-sm">
+                            <div class="card border-0 mb-3 shadow-sm" data-aos="slide-down" data-aos-delay="500">
                                 <div class="card-header bg-white border-0 p-0" id="faqHeading5">
                                     <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
                                         Eğitim ve destek sağlıyor musunuz?
@@ -478,7 +481,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card border-0 mb-3 shadow-sm">
+                            <div class="card border-0 mb-3 shadow-sm" data-aos="slide-down" data-aos-delay="600">
                                 <div class="card-header bg-white border-0 p-0" id="faqHeading6">
                                     <button class="btn btn-link text-dark w-100 text-start p-4 fw-semibold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
                                         Özel ihtiyaçlarım için ne yapabilirim?
@@ -499,30 +502,30 @@
         <!-- END FAQ -->
 
         <!-- testimonial -->
-        <section class="section testimonial">
+        <section class="section testimonial" data-aos="fade-up">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-7">
-                        <div class="text-center mb-5">
+                        <div class="text-center mb-5" data-aos="fade-up">
                             <h3 class="heading">Müşterilerimiz Ne Diyor?</h3>
                         <p class="text-muted fs-17">Reqruit'i kullanan İK profesyonellerinin deneyimlerini keşfedin.</p>
                         </div>
                     </div><!-- End col -->
                 </div><!-- End row -->
-                <div class="row justify-content-between">
+                <div class="row justify-content-between" data-aos="fade-up" data-aos-delay="200">
                     <div class="col-lg-3">
-                        <h4>Onları Dinleyin</h4>
-                        <p class="fs-14 text-muted">Doğrudan kullanıcılarımızdan dinleyin, deneyimlerini öğrenin.</p>
-                        <button class="carousel-control-prev d-none d-lg-block" type="button" data-bs-target="#carouselTestimonials" data-bs-slide="prev">
+                        <h4 data-aos="fade-right">Onları Dinleyin</h4>
+                        <p class="fs-14 text-muted" data-aos="fade-right" data-aos-delay="100">Doğrudan kullanıcılarımızdan dinleyin, deneyimlerini öğrenin.</p>
+                        <button class="carousel-control-prev d-none d-lg-block" type="button" data-bs-target="#carouselTestimonials" data-bs-slide="prev" data-aos="fade-in" data-aos-delay="200">
                             <i class="mdi mdi-arrow-left"></i>
                         </button>
-                        <button class="carousel-control-next d-none d-lg-block" type="button" data-bs-target="#carouselTestimonials" data-bs-slide="next">
+                        <button class="carousel-control-next d-none d-lg-block" type="button" data-bs-target="#carouselTestimonials" data-bs-slide="next" data-aos="fade-in" data-aos-delay="300">
                             <i class="mdi mdi-arrow-right"></i>
                         </button>
                     </div>
                     <div class="col-lg-8">
-                        <div id="carouselTestimonials" class="carousel slide" data-bs-ride="carousel">
-                            <div class="carousel-indicators mb-0">
+                        <div id="carouselTestimonials" class="carousel slide" data-bs-ride="carousel" data-aos="fade-up" data-aos-delay="200">
+                            <div class="carousel-indicators mb-0" data-aos="fade-in">
                                 <button type="button" data-bs-target="#carouselTestimonials" data-bs-slide-to="0" class="" aria-label="Slide 1"></button>
                                 <button type="button" data-bs-target="#carouselTestimonials" data-bs-slide-to="1" class="active" aria-current="true" aria-label="Slide 2"></button>
                                 <button type="button" data-bs-target="#carouselTestimonials" data-bs-slide-to="2" class="" aria-label="Slide 3"></button>
@@ -546,7 +549,7 @@
                                         </div><!-- End card-body -->
                                     </div><!-- End card -->
                                 </div>
-    
+                                
                                 <div class="carousel-item active">
                                     <div class="card testimonial-box h-100">
                                         <div class="card-body">
@@ -564,7 +567,7 @@
                                         </div><!-- End card-body -->
                                     </div><!-- End card -->
                                 </div>
-    
+                                
                                 <div class="carousel-item">
                                     <div class="card testimonial-box h-100">
                                         <div class="card-body">
@@ -592,85 +595,81 @@
         <!-- testimonial -->
 
         <!-- Start contact -->
-        <section class="section" id="contact">
+        <section class="section" id="contact" data-aos="fade-up">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-6">
-                        <div class="text-center mb-5">
+                        <div class="text-center mb-5" data-aos="zoom-in">
                             <h3 class="heading">Bize Ulaşın</h3>
                             <p class="text-muted mt-2">Sorularınız veya demo talepleriniz için bizimle iletişime geçin.</p>
                         </div>
                     </div>
                 </div>
                 <div class="row justify-content-around">
-                    <div class="col-lg-6">
+                    <div class="col-lg-6" data-aos="slide-right" data-aos-delay="200">
                         <form method="post" action="{{ route('contact.submit') }}">
                             @csrf
                             <span id="error-msg"></span>
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <div class="position-relative mb-3">
+                                    <div class="position-relative mb-3" data-aos="slide-up" data-aos-delay="300">
                                         <span class="input-group-text"><i class="mdi mdi-account-outline"></i></span>
                                         <input name="name" id="name" type="text" class="form-control" placeholder="Ad Soyad*">
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="position-relative mb-3">
+                                    <div class="position-relative mb-3" data-aos="slide-up" data-aos-delay="350">
                                         <span class="input-group-text"><i class="mdi mdi-email-outline"></i></span>
                                         <input name="email" id="email" type="email" class="form-control" placeholder="E-posta*">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
-                                    <div class="position-relative mb-3">
+                                    <div class="position-relative mb-3" data-aos="slide-up" data-aos-delay="400">
                                         <span class="input-group-text"><i class="mdi mdi-file-document-outline"></i></span>
                                         <input name="subject" id="subject" type="text" class="form-control" placeholder="Konu">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
-                                    <div class="position-relative mb-3">
+                                    <div class="position-relative mb-3" data-aos="slide-up" data-aos-delay="450">
                                     <span class="input-group-text align-items-start"><i class="mdi mdi-comment-text-outline"></i></span>
                                         <textarea name="comments" id="comments" rows="4" class="form-control" placeholder="Mesajınız*"></textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-12" data-aos="zoom-in" data-aos-delay="500">
                                     <input type="submit" id="submit" name="send" class="btn btn-primary" value="Mesaj Gönder">
                                 </div>
                             </div>
                         </form>
                         <!--end form-->
                     </div>
-                    <!--end col-->
-                    <div class="col-lg-4">
+                    <div class="col-lg-4" data-aos="slide-left" data-aos-delay="300">
                         <div class="contact-details mb-4 mb-lg-0">
-                            <p class="mb-3"><i class="mdi mdi-email-outline align-middle text-muted fs-20 me-2"></i> <span class="fw-medium">info@reqruit.com</span></p>
-                            <p class="mb-3"><i class="mdi mdi-web align-middle text-muted fs-20 me-2"></i> <span class="fw-medium">www.reqruit.com</span></p>
-                            <p class="mb-3"><i class="mdi mdi-phone align-middle text-muted fs-20 me-2"></i> <span class="fw-medium">+90 (212) 555 0000</span></p>
-                            <p class="mb-3"><i class="mdi mdi-hospital-building text-muted fs-20 me-2"></i> <span class="fw-medium">09:00 - 18:00</span></p>
-                            <p class="mb-3"><i class="mdi mdi-map-marker-outline text-muted fs-20 me-2"></i> <span class="fw-medium">İstanbul, Türkiye</span></p>
+                            <p class="mb-3" data-aos="fade-up" data-aos-delay="350"><i class="mdi mdi-email-outline align-middle text-muted fs-20 me-2"></i> <span class="fw-medium">info@reqruit.com</span></p>
+                            <p class="mb-3" data-aos="fade-up" data-aos-delay="400"><i class="mdi mdi-web align-middle text-muted fs-20 me-2"></i> <span class="fw-medium">www.reqruit.com</span></p>
+                            <p class="mb-3" data-aos="fade-up" data-aos-delay="450"><i class="mdi mdi-phone align-middle text-muted fs-20 me-2"></i> <span class="fw-medium">+90 (212) 555 0000</span></p>
+                            <p class="mb-3" data-aos="fade-up" data-aos-delay="500"><i class="mdi mdi-hospital-building text-muted fs-20 me-2"></i> <span class="fw-medium">09:00 - 18:00</span></p>
+                            <p class="mb-3" data-aos="fade-up" data-aos-delay="550"><i class="mdi mdi-map-marker-outline text-muted fs-20 me-2"></i> <span class="fw-medium">İstanbul, Türkiye</span></p>
                         </div>
                         <!--end contact-details-->
                     </div>
-                    <!--end col-->
                 </div>
-                <!--end row-->
             </div>
-            <!--end container-->
         </section>
         <!-- End contact -->
 
         <!-- START FOOTER -->
-        <footer class="section bg-footer">
+        <footer class="section bg-footer" data-aos="fade-up">
             <div class="container">
                 <div class="row g-sm-4">
-                    <div class="col-lg-12">
+                    <div class="col-lg-12" data-aos="zoom-in">
                         <div class="mb-3 mb-sm-0">
                             <img src="{{ asset('assets/images/kasy/logo-dark.png') }}" class="logo-dark" alt="Reqruit" height="22">
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-4 col-6">
+                    <div class="col-lg-3 col-md-4 col-6" data-aos="fade-up" data-aos-delay="100">
                         <h6 class="text-uppercase fw-semibold">Hakkımızda</h6>
                         <ul class="list-unstyled footer-link mt-3 mb-0 fs-14">
                             <li><a href="#about">Hakkımızda</a></li>
@@ -680,7 +679,7 @@
                         </ul>
                     </div><!-- End col -->
 
-                    <div class="col-lg-3 col-md-4 col-6">
+                    <div class="col-lg-3 col-md-4 col-6" data-aos="fade-up" data-aos-delay="200">
                         <h6 class="text-uppercase fw-semibold">Modüller</h6>
                         <ul class="list-unstyled footer-link mt-3 mb-0 fs-14">
                             <li><a href="#features">İşe Alım</a></li>
@@ -692,7 +691,7 @@
                         </ul>
                     </div><!-- End col -->
 
-                    <div class="col-lg-3 col-md-4 col-6 d-none d-sm-block">
+                    <div class="col-lg-3 col-md-4 col-6 d-none d-sm-block" data-aos="fade-up" data-aos-delay="300">
                         <h6 class="text-uppercase fw-semibold">Destek</h6>
                         <ul class="list-unstyled footer-link mt-3 mb-0 fs-14">
                             <li><a href="#contact">Yardım Merkezi</a></li>
@@ -701,11 +700,11 @@
                             <li><a href="#contact">Sistem Durumu</a></li>
                         </ul>
                     </div><!-- End col -->
-                    <div class="col-lg-3 col-10">
+                    <div class="col-lg-3 col-10" data-aos="fade-up" data-aos-delay="400">
                         <h6 class="text-uppercase fw-semibold">Sosyal Medya
                             <span class="text-primary text-uppercase fs-18">Reqruit</span></h6>
                             <p class="mt-md-3 pt-3 pt-md-2 fs-14">Bizi takip edin, en güncel haberlerden haberdar olun.</p>
-                        <div class="footer-subcribe text-end shadow-sm d-inline-block">
+                        <div class="footer-subcribe text-end shadow-sm d-inline-block" data-aos="slide-up" data-aos-delay="450">
                             <form action="javascript:void(0)">
                                 <input placeholder="E-posta Adresiniz" type="email">
                                 <button type="submit" class="btn btn-primary"><i class="mdi mdi-bell-ring"></i></button>
@@ -713,25 +712,25 @@
                         </div>
                             <div class="mt-md-4 mt-3">
                                 <ul class="list-inline footer-social mb-0">
-                                    <li class="list-inline-item">
+                                    <li class="list-inline-item" data-aos="zoom-in" data-aos-delay="500">
                                         <a href="javascript:void(0)" class="rounded">
                                             <i class="mdi mdi-facebook text-dark"></i>
                                         </a>
                                     </li>
 
-                                    <li class="list-inline-item">
+                                    <li class="list-inline-item" data-aos="zoom-in" data-aos-delay="550">
                                         <a href="javascript:void(0)" class="rounded">
                                             <i class="mdi mdi-linkedin text-dark"></i>
                                         </a>
                                     </li>
 
-                                    <li class="list-inline-item">
+                                    <li class="list-inline-item" data-aos="zoom-in" data-aos-delay="600">
                                         <a href="javascript:void(0)" class="rounded">
                                             <i class="mdi mdi-pinterest text-dark"></i>
                                         </a>
                                     </li>
 
-                                    <li class="list-inline-item">
+                                    <li class="list-inline-item" data-aos="zoom-in" data-aos-delay="650">
                                         <a href="javascript:void(0)" class="rounded">
                                             <i class="mdi mdi-twitter text-dark"></i>
                                         </a>
@@ -745,7 +744,7 @@
         <!-- END FOOTER -->
 
         <!-- FOOTER-ALT -->
-        <div class="footer-alt pt-3 pb-3">
+        <div class="footer-alt pt-3 pb-3" data-aos="fade-up">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -821,6 +820,9 @@
         </div>
         <!-- End Demo Modal -->
 
+
+        <!-- AOS JS -->
+        <script src="{{ asset('assets/js/kasy/aos.js') }}"></script>
 
         <!--Custom js-->
         <script src="{{ asset('assets/js/kasy/counter.js') }}"></script>

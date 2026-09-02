@@ -101,7 +101,7 @@ class DashboardService
                 $month = now()->subMonths($i);
 
                 $monthlyHires[] = [
-                    'month' => $month->locale('tr')->format('M Y'),
+                    'month' => $month->locale('tr')->isoFormat('MMM Y'),
                     'count' => \DB::table('employees')
                         ->whereYear('hire_date', $month->year)
                         ->whereMonth('hire_date', $month->month)
@@ -155,7 +155,7 @@ class DashboardService
                 $date = now()->subDays($i)->toDateString();
 
                 $weeklyAttendance[] = [
-                    'day' => now()->subDays($i)->locale('tr')->dayName,
+                    'day' => now()->subDays($i)->locale('tr')->isoFormat('dddd'),
                     'date' => $date,
                     'present' => \DB::table('attendance_summaries')->where('date', $date)->where('status', 'present')->count(),
                     'absent' => \DB::table('attendance_summaries')->where('date', $date)->where('status', 'absent')->count(),
@@ -254,7 +254,7 @@ class DashboardService
                     : 0.0;
 
                 $monthlyPayrollTrend[] = [
-                    'month' => $month->locale('tr')->format('M Y'),
+                    'month' => $month->locale('tr')->isoFormat('MMM Y'),
                     'total' => $total,
                 ];
             }
@@ -327,8 +327,8 @@ class DashboardService
                 : 0;
 
             // Get Monday date of the week for label (Turkish locale)
-            $monday = $date->copy()->startOfWeek()->locale('tr')->format('d M');
-            $sunday = $date->copy()->endOfWeek()->locale('tr')->format('d M');
+            $monday = $date->copy()->startOfWeek()->locale('tr')->isoFormat('d MMM');
+            $sunday = $date->copy()->endOfWeek()->locale('tr')->isoFormat('d MMM');
             $label = "$monday - $sunday";
 
             $weeks[] = [

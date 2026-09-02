@@ -219,47 +219,50 @@ export default function AuthenticatedLayout({ header, children, pageHeader }) {
 
                             {/* Kullanıcı Profili */}
                             <li className="pc-h-item header-user-profile">
-                                <a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" aria-label="Kullanıcı profili">
-                                    <div className="user-avatar-sm" aria-hidden="true">
-                                        {user?.name?.charAt(0) || 'U'}
-                                    </div>
-                                    <span>{user?.name || 'User'}</span>
-                                </a>
-                                <div className="dropdown-menu dropdown-user-profile dropdown-menu-end">
-                                    <div className="dropdown-header">
-                                        <div className="d-flex">
-                                            <div className="flex-shrink-0">
-                                                <div className="user-avtar wid-35">
-                                                    {user?.name?.charAt(0) || 'U'}
+<a href='#!' className="pc-head-link dropdown-toggle arrow-none" data-bs-toggle="dropdown" aria-label="Kullanıcı profili">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-dark">
+                                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                            <circle cx="12" cy="7" r="4" />
+                                        </svg>
+                                        <span>{user?.name || 'User'}</span>
+                                    </a>
+                                    <div className="dropdown-menu dropdown-menu-end dropdown-user-profile">
+                                        <div className="dropdown-header">
+                                            <div className="d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted flex-shrink-0">
+                                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                                    <circle cx="12" cy="7" r="4" />
+                                                </svg>
+                                                <div className="flex-grow-1 ms-3">
+                                                    <h6 className="mb-1">{user?.name || 'User'}</h6>
+                                                    <span className="text-muted">Kullanıcı</span>
                                                 </div>
                                             </div>
-                                            <div className="flex-grow-1 ms-3">
-                                                <h6 className="mb-1">{user?.name || 'User'}</h6>
-                                                <span className="text-muted">Kullanıcı</span>
+                                        </div>
+                                        <ul className="nav drp-tabs nav-fill nav-tabs">
+                                            <li className="nav-item">
+                                                <button className="nav-link active" data-bs-toggle="tab" aria-label="Hesap sekmesi">
+                                                    <i className="ti ti-user" aria-hidden="true"></i> Hesap
+                                                </button>
+                                            </li>
+                                        </ul>
+                                        <div className="tab-content">
+                                            <div className="tab-pane fade show active">
+                                                <Link href={window.route('profile.edit')} className="dropdown-item" aria-label="Profili düzenle">
+                                                    <i className="ti ti-user" aria-hidden="true"></i>
+                                                    <span>Profil</span>
+                                                </Link>
+                                                <form method="post" action={window.route('logout')} data-inertia="false" style={{ display: 'inline' }}>
+                                                    <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''} />
+                                                    <button type="submit" className="dropdown-item" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} aria-label="Çıkış yap">
+                                                        <i className="ti ti-logout" aria-hidden="true"></i>
+                                                        <span>Çıkış Yap</span>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-                                    <ul className="nav drp-tabs nav-fill nav-tabs">
-                                        <li className="nav-item">
-                                            <button className="nav-link active" data-bs-toggle="tab" aria-label="Hesap sekmesi">
-                                                <i className="ti ti-user" aria-hidden="true"></i> Hesap
-                                            </button>
-                                        </li>
-                                    </ul>
-                                    <div className="tab-content">
-                                        <div className="tab-pane fade show active">
-                                                 <Link href={window.route('profile.edit')} className="dropdown-item" aria-label="Profili düzenle">
-                                                <i className="ti ti-user" aria-hidden="true"></i>
-                                                <span>Profil</span>
-                                            </Link>
-                                                 <Link href={window.route('logout')} method="post" className="dropdown-item" aria-label="Çıkış yap">
-                                                <i className="ti ti-logout" aria-hidden="true"></i>
-                                                <span>Çıkış Yap</span>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
+                                </li>
                         </ul>
                     </div>
                 </div>

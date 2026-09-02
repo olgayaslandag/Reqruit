@@ -36,8 +36,7 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
     const submissions = weeklySubmissions || [];
 
     const statusDistribution = recruitmentData.statusDistribution || [];
-    const byDepartment = employeesData.byDepartment || [];
-    const genderDistribution = employeesData.genderDistribution || [];
+    
     const monthlyHires = employeesData.monthlyHires || [];
     const weeklyAttendance = attendanceData.weeklyAttendance || [];
     const typeDistribution = leaveData.typeDistribution || [];
@@ -159,21 +158,6 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
         [submissions],
     );
 
-    const employeeDonutData = byDepartment.length > 0 ? byDepartment : genderDistribution;
-
-    const employeeDonutOptions = useMemo(() => ({
-        chart: { type: 'donut', toolbar: { show: false } },
-        labels: employeeDonutData.map((item) => item.department || item.gender),
-        colors: ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#059669', '#047857'],
-        legend: { position: 'bottom' },
-        dataLabels: { enabled: false },
-    }), [employeeDonutData]);
-
-    const employeeDonutSeries = useMemo(
-        () => employeeDonutData.map((item) => item.count ?? 0),
-        [employeeDonutData],
-    );
-
     const monthlyHiresOptions = useMemo(() => ({
         chart: { type: 'bar', height: 280, toolbar: { show: false } },
         plotOptions: {
@@ -277,21 +261,13 @@ export default function Dashboard({ recruitment, employees, attendance, leave, p
                         <p className="fs-6 text-muted">İK Yönetim Platformu</p>
                     </div>
 
-                    <DashboardSection title="Çalışanlar" subtitle="Çalışan istatistikleri ve dağılımlar" icon="👥">
+                    <DashboardSection title="Çalışanlar" subtitle="Çalışan istatistikleri ve dağılımlar" icon="👥" noCard>
                         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 mb-4">
                             {employeeCards.map((card) => (
                                 <div key={card.label} className="col">
                                     <StatCard {...card} />
                                 </div>
                             ))}
-                        </div>
-                        <div className="row row-cols-1 row-cols-lg-2 g-3">
-                            <div className="col">
-                                <LazyChart options={employeeDonutOptions} series={employeeDonutSeries} type="donut" height={280} eager />
-                            </div>
-                            <div className="col">
-                                <LazyChart options={monthlyHiresOptions} series={monthlyHiresSeries} type="bar" height={280} eager />
-                            </div>
                         </div>
                     </DashboardSection>
 

@@ -1,4 +1,4 @@
-export default function DashboardSection({ title, subtitle, icon = '', children }) {
+export default function DashboardSection({ title, subtitle, icon = '', children, noCard = false }) {
     return (
         <section className="mb-5">
             <div className="d-flex align-items-center gap-2 mb-3">
@@ -8,7 +8,7 @@ export default function DashboardSection({ title, subtitle, icon = '', children 
                     {subtitle && <p className="text-body-secondary mb-0 small">{subtitle}</p>}
                 </div>
             </div>
-            <div className="card border-0 shadow-sm p-4">{children}</div>
+            {noCard ? <>{children}</> : <div className="card border-0 shadow-sm p-4">{children}</div>}
         </section>
     );
 }
